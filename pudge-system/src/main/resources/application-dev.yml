@@ -1,0 +1,33 @@
+#spring
+spring:
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    url: jdbc:mysql://localhost:3306/dota2-pudge
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  #redis配置
+  redis:
+    host: localhost
+    password: 123456
+    port: 6379
+    jedis:
+      pool:
+        # 连接池最大连接数（使用负值表示没有限制）
+        max-active: 10
+        # 连接池中的最小空闲连接
+        min-idle: 0
+        # 连接池中的最大空闲连接
+        max-idle: 8
+    database: 13
+  #文件上传大小限制
+  servlet:
+    multipart:
+      max-file-size: 15MB
+      max-request-size: 15MB
+#日志
+log:
+  path: d:/logs/hfy-box/dev
+  level: INFO
+
+

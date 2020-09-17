@@ -15,65 +15,47 @@
  */
 package pers.yurwisher.dota2.pudge.utils;
 
+import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLEncoder;
-
 /**
- * @author Zheng Jie
+ * @author yq
+ * 2020年9月14日 17:16:56
  * 翻译工具类
  */
 public class TranslatorUtil {
 
     private static final String GOOGLE_TRANSLATE_API_URL = "https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=zh-CN&dt=t";
 
-    //public static String translate(String word){
-    //    try {
-    //        String url = "https://translate.googleapis.com/translate_a/single?" +
-    //                "client=gtx&" +
-    //                "sl=en" +
-    //                "&tl=zh-CN" +
-    //                "&dt=t&q=" + URLEncoder.encode(word, "UTF-8");
-    //
-    //        URL obj = new URL(url);
-    //        HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-    //        con.setRequestProperty("User-Agent", "Mozilla/5.0");
-    //
-    //        BufferedReader in = new BufferedReader(
-    //                new InputStreamReader(con.getInputStream()));
-    //        String inputLine;
-    //        StringBuilder response = new StringBuilder();
-    //
-    //        while ((inputLine = in.readLine()) != null) {
-    //            response.append(inputLine);
-    //        }
-    //        in.close();
-    //        return parseResult(response.toString());
-    //    }catch (Exception e){
-    //      return  word;
-    //    }
-    //}
-
-    //private static String parseResult(String inputJson){
-    //    JSONArray jsonArray2 = (JSONArray) new JSONArray(inputJson).get(0);
-    //    StringBuilder result = new StringBuilder();
-    //    for (Object o : jsonArray2) {
-    //        result.append(((JSONArray) o).get(0).toString());
-    //    }
-    //    return result.toString();
-    //}
-
-    public static String englishToChinese(String word){
-      return HttpUtil.get(GOOGLE_TRANSLATE_API_URL,new JSONObject().fluentPut("q",word));
+    /**默认超时时间*/
+    private static final int DEFAULT_TIME_OUT = 8 * 1000 ;
+    /**
+     * 英文转中文
+     * @param word 英文句子或单词
+     * @param timeout 超时时间 毫秒
+     * @return 首个匹配
+     */
+    public static String englishToChinese(String word,int timeout){
+        String result = HttpUtil.get(GOOGLE_TRANSLATE_API_URL,new JSONObject().fluentPut("q",word),timeout);
+        if(StrUtil.isNotEmpty(result)){
+            JSONArray array = JSON.parseArray(result);
+            array = CollectionUtil.isNotEmpty(array) ? array.getJSONArray(0) : null;
+            array = CollectionUtil.isNotEmpty(array) ? array.getJSONArray(0) : null;
+            return  CollectionUtil.isNotEmpty(array) ? array.getString(0) : null;
+        }
+        return null;
     }
-    public static void main(String[] args) {
-        System.out.println(englishToChinese("eat shit"));
+
+    /**
+     * 英文转中文
+     * @param word 英文句子或单词
+     * @return 首个匹配
+     */
+    public static String englishToChinese(String word){
+        return englishToChinese(word,DEFAULT_TIME_OUT);
     }
 }
