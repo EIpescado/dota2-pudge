@@ -1,7 +1,6 @@
 package pers.yurwisher.dota2.pudge.base;
 
 import com.alibaba.fastjson.annotation.JSONField;
-import com.alibaba.fastjson.serializer.ToStringSerializer;
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -9,6 +8,7 @@ import com.baomidou.mybatisplus.annotation.TableLogic;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
@@ -19,10 +19,10 @@ import java.time.LocalDateTime;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class BaseEntity {
+public class BaseEntity implements Serializable {
 
+    private static final long serialVersionUID = 6526236438185395534L;
     @TableId
-    @JSONField(serializeUsing = ToStringSerializer.class)
     private Long id;
 
     /**

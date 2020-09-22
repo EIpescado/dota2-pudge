@@ -33,5 +33,4 @@ public class CustomException extends RuntimeException {
     public CustomException(ICustomTipEnum customTipEnum, Object...args){
         this(customTipEnum.tip(),args);
     }
-
 }

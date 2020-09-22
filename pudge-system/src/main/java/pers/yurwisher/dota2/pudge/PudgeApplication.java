@@ -1,4 +1,4 @@
-package pers.yurwisher.pudge;
+package pers.yurwisher.dota2.pudge;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

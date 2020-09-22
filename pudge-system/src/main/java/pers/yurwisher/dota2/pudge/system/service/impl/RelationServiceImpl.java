@@ -1,0 +1,49 @@
+package pers.yurwisher.dota2.pudge.system.service.impl;
+
+import cn.hutool.core.collection.CollectionUtil;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import pers.yurwisher.dota2.pudge.system.mapper.RelationMapper;
+import pers.yurwisher.dota2.pudge.system.service.IRelationService;
+
+import java.util.List;
+
+/**
+ * @author yq
+ * @date 2020/09/22 10:03
+ * @description 关系service
+ * @since V1.0.0
+ */
+@Service
+@RequiredArgsConstructor
+public class RelationServiceImpl implements IRelationService {
+
+    private final RelationMapper relationMapper;
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void userBindRoles(Long userId, List<Long> roleIds) {
+        if (userId != null) {
+            //先删除所有已有角色
+            relationMapper.deleteUserRoleRelationByUserId(userId);
+            if (CollectionUtil.isNotEmpty(roleIds)) {
+                //绑定新角色
+                relationMapper.batchInsertUserRoleRelation(userId, roleIds);
+            }
+        }
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void roleBindMenus(Long roleId, List<Long> menuIds) {
+        if (roleId != null) {
+            //先删除所有已绑定菜单
+            relationMapper.deleteRoleMenuRelationByRoleId(roleId);
+            if (CollectionUtil.isNotEmpty(menuIds)) {
+                //绑定新菜单
+                relationMapper.batchInsertRoleMenuRelation(roleId, menuIds);
+            }
+        }
+    }
+}
