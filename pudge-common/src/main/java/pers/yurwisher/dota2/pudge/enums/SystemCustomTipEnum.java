@@ -13,6 +13,8 @@ public enum SystemCustomTipEnum implements ICustomTipEnum {
     USERNAME_NOT_ENABLED(10002,"账号未激活"),
     NOR_RIGHT(10003,"have no right to use"),
     LOGIN_EXPIRED(10004,"登录已过期"),
+    CODE_NOT_EXIST_OR_EXPIRED(10005,"验证码已过期"),
+    CODE_ERROR(10006,"验证码错误"),
     ;
 
     private CustomTip tip;

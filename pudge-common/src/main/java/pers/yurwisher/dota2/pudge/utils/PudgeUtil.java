@@ -1,7 +1,22 @@
 package pers.yurwisher.dota2.pudge.utils;
 
+import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.io.IoUtil;
+import cn.hutool.core.util.HexUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.crypto.SecureUtil;
+import cn.hutool.crypto.symmetric.DES;
+import cn.hutool.http.useragent.UserAgent;
+import cn.hutool.http.useragent.UserAgentUtil;
 import com.alibaba.fastjson.JSON;
+import lombok.Data;
+import org.lionsoul.ip2region.DataBlock;
+import org.lionsoul.ip2region.DbConfig;
+import org.lionsoul.ip2region.DbMakerConfigException;
+import org.lionsoul.ip2region.DbSearcher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpStatus;
 import pers.yurwisher.dota2.pudge.enums.ICustomTipEnum;
 import pers.yurwisher.dota2.pudge.wrapper.R;
@@ -9,6 +24,10 @@ import pers.yurwisher.dota2.pudge.wrapper.R;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 /**
  * @author yq
@@ -17,6 +36,8 @@ import java.io.IOException;
  * @since V1.0.0
  */
 public class PudgeUtil {
+
+    private static final Logger logger = LoggerFactory.getLogger(PudgeUtil.class);
 
     private static final String[] HEADERS_TO_TRY = {
             "X-Forwarded-For",
@@ -33,6 +54,7 @@ public class PudgeUtil {
             "X-Real-IP"
     };
     private static final String UN_KNOWN = "unknown";
+    private static final List<String> LOCALHOST_IP_LIST = CollectionUtil.newArrayList("127.0.0.1","0:0:0:0:0:0:0:1");
     private static final String APPLICATION_JSON_UTF_8 = "application/json;charset=UTF-8";
 
     public static void responseJSON(HttpServletResponse response, R r) throws IOException {
@@ -63,7 +85,113 @@ public class PudgeUtil {
                 break;
             }
         }
-        return StrUtil.isEmpty(ip) ? request.getRemoteAddr() : ip;
+        if(StrUtil.isBlank(ip)){
+            ip = request.getRemoteAddr();
+        }
+        //ip可能形如 117.1.1.1,192.168.0.01, 取第一个
+        if(ip.contains(StrUtil.COMMA)){
+            ip = ip.split(StrUtil.COMMA)[0];
+        }
+        //本机IP
+        if(LOCALHOST_IP_LIST.contains(ip)){
+            //获取真正的本机内网IP
+            try {
+                ip = InetAddress.getLocalHost().getHostAddress();
+            } catch (UnknownHostException e) {
+                logger.error(e.getMessage(), e);
+            }
+        }
+        return ip;
     }
 
+    private static DbSearcher ipSearcher;
+    static {
+        SpringContextHolder.addCallBacks(() -> {
+            String path = "ip2region/ip2region.db";
+            String name = "ip2region.db";
+            try {
+                //File file = IoUtil.copy (new ClassPathResource(path).getInputStream(), name);
+                //IoUtil.close();
+                ipSearcher = new DbSearcher(new DbConfig(), IoUtil.readBytes(new ClassPathResource(path).getInputStream()));
+            } catch (IOException | DbMakerConfigException e) {
+                logger.error("初始化ip2region DbSearcher 失败:[{}]",e.getLocalizedMessage());
+            }
+        });
+    }
+
+    /**
+     * 根据ID获取实际地址
+     * @param ip ip
+     * @return 地址
+     */
+    public static String getAddress(String ip) {
+        //先通过IP2region从本地获取
+        try {
+            DataBlock dataBlock = ipSearcher.memorySearch(ip);
+            String region = dataBlock.getRegion();
+            String address = region.replace("0|", "");
+            char symbol = '|';
+            if (address.charAt(address.length() - 1) == symbol) {
+                address = address.substring(0, address.length() - 1);
+            }
+            return address;
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+        }
+        return "";
+    }
+
+
+    /**
+     * 获取用户客户端信息
+     * @param request 请求
+     * @return  UserAgentInfo
+     */
+    public static UserClientInfo getUserClientInfo(HttpServletRequest request) {
+        UserClientInfo info = new UserClientInfo();
+        info.setIp(getIp(request));
+        info.setAddress(getAddress(info.getIp()));
+        UserAgent userAgent = UserAgentUtil.parse(request.getHeader("User-Agent"));
+        info.setBrowser(userAgent.getBrowser().getName());
+        info.setSystem(userAgent.getOs().getName());
+        return info;
+    }
+
+    private static final DES DES  = SecureUtil.des();
+
+    /**
+     * 解密 HEX + DES
+     * @param data 待解密数据
+     * @return 明文
+     */
+    public static String decrypt(String data){
+       return  DES.decryptStr(HexUtil.decodeHex(data));
+    }
+
+    /**
+     * 加密 DES + HEX
+     * @param data 待加密数据
+     * @return 密文
+     */
+    public static String encrypt(String data){
+        return HexUtil.encodeHexStr(DES.encrypt(data)).toUpperCase();
+    }
+
+    @Data
+    public static class UserClientInfo{
+        private String ip;
+        private String address;
+        private String browser;
+        private String system;
+    }
+
+    public static void main(String[] args) {
+        String data = "11213dssjk跨机房萨迪克";
+        String x = encrypt(data);
+        System.out.println(x);
+        String y = decrypt(x);
+        System.out.println(y);
+        System.out.println(data.equals(y));
+
+    }
 }

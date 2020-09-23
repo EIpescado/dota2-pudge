@@ -1,5 +1,6 @@
 package pers.yurwisher.dota2.pudge.system.controller;
 
+import com.alibaba.fastjson.JSONObject;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -8,6 +9,7 @@ import pers.yurwisher.dota2.pudge.annotation.rest.AnonymousPostMapping;
 import pers.yurwisher.dota2.pudge.base.BaseController;
 import pers.yurwisher.dota2.pudge.security.form.UserLoginForm;
 import pers.yurwisher.dota2.pudge.system.service.AuthorizationService;
+import pers.yurwisher.dota2.pudge.utils.PudgeUtil;
 import pers.yurwisher.dota2.pudge.wrapper.R;
 
 import javax.servlet.http.HttpServletRequest;
@@ -26,6 +28,11 @@ public class AuthorizationController extends BaseController {
 
     public AuthorizationController(AuthorizationService authorizationService) {
         this.authorizationService = authorizationService;
+    }
+
+    @AnonymousGetMapping
+    public R test(HttpServletRequest request){
+        return R.ok(PudgeUtil.getUserClientInfo(request));
     }
 
     @AnonymousPostMapping(value = "/login")

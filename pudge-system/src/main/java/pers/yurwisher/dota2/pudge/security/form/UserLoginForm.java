@@ -22,7 +22,4 @@ public class UserLoginForm {
     private String code;
 
     private String uuid;
-
-    /**登录用户客户端类型*/
-    private String type;
 }

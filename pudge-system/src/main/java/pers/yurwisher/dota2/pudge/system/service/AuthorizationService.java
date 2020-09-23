@@ -10,7 +10,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import pers.yurwisher.dota2.pudge.security.CurrentUser;
+import pers.yurwisher.dota2.pudge.enums.SystemCustomTipEnum;
 import pers.yurwisher.dota2.pudge.security.JwtUser;
 import pers.yurwisher.dota2.pudge.security.TokenProvider;
 import pers.yurwisher.dota2.pudge.security.bean.LoginCodeEnum;
@@ -18,6 +18,7 @@ import pers.yurwisher.dota2.pudge.security.bean.LoginProperties;
 import pers.yurwisher.dota2.pudge.security.bean.SecurityProperties;
 import pers.yurwisher.dota2.pudge.security.form.UserLoginForm;
 import pers.yurwisher.dota2.pudge.security.service.IOnlineUserService;
+import pers.yurwisher.dota2.pudge.system.exception.SystemCustomException;
 import pers.yurwisher.dota2.pudge.wrapper.R;
 
 import javax.servlet.http.HttpServletRequest;
@@ -44,9 +45,10 @@ public class AuthorizationService {
     private final RedisTemplate<String,Object> redisTemplate;
 
     public R login(UserLoginForm form, HttpServletRequest request) {
-        //todo 判断验证码
+        //校验验证码
+        //this.verifyCode(form.getUuid(),form.getCode());
+        //校验用户帐号密码 调用对应 UserDetailsService 获取用户信息 存入授权信息
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(form.getUsername(), form.getPassword());
-        //自动调用对应 UserDetailsService 获取用户信息 存入授权信息
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
         SecurityContextHolder.getContext().setAuthentication(authentication);
         final JwtUser jwtUser = (JwtUser) authentication.getPrincipal();
@@ -64,6 +66,26 @@ public class AuthorizationService {
             put("user", jwtUser.getUser());
         }};
         return R.ok(authInfo);
+    }
+
+    /**
+     * 校验验证码
+     * @param codeId 验证码ID
+     * @param codeVal 验证码
+     */
+    private void verifyCode(String codeId,String codeVal){
+        //从redis获取验证码
+        String code = (String) redisTemplate.opsForValue().get(codeId);
+        if(StrUtil.isBlank(code)){
+            //验证码过期
+            throw new SystemCustomException(SystemCustomTipEnum.CODE_NOT_EXIST_OR_EXPIRED);
+        }
+        if(StrUtil.isBlank(codeVal) || !codeVal.equalsIgnoreCase(code)){
+            //验证码错误
+            throw new SystemCustomException(SystemCustomTipEnum.CODE_ERROR);
+        }
+        //从redis移除验证码
+        redisTemplate.delete(codeId);
     }
 
     public R getCode() {

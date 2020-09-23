@@ -49,14 +49,14 @@ public class TokenFilter extends GenericFilterBean {
         String token = tokenProvider.getToken(httpServletRequest);
         if (StrUtil.isNotBlank(token)) {
             // 用户是否已登录
-            //OnlineUser onlineUser = onlineUserService.getOne(properties.getOnlineKey() + token);
-            //if (onlineUser != null) {
+            OnlineUser onlineUser = onlineUserService.getOne(properties.getOnlineKey() + token);
+            if (onlineUser != null) {
                 //存入用户信息
                 Authentication authentication = tokenProvider.getAuthentication(token);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
                 // 如有必要,Token 续期
                 tokenProvider.checkRenewal(token);
-            //}
+            }
         }
         filterChain.doFilter(servletRequest, servletResponse);
     }
