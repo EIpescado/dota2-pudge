@@ -11,6 +11,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import pers.yurwisher.dota2.pudge.enums.SystemCustomTipEnum;
+import pers.yurwisher.dota2.pudge.security.CurrentUser;
 import pers.yurwisher.dota2.pudge.security.JwtUser;
 import pers.yurwisher.dota2.pudge.security.TokenProvider;
 import pers.yurwisher.dota2.pudge.security.bean.LoginCodeEnum;
@@ -61,9 +62,8 @@ public class AuthorizationService {
             private static final long serialVersionUID = 568330464125730896L;
             {
             put("token", properties.getPrefix() + token);
-            //密码不返回给前端
-            jwtUser.getUser().setPassword(null);
-            put("user", jwtUser.getUser());
+            //去除掉一些敏感数据
+            put("user", back2Front(jwtUser.getUser()));
         }};
         return R.ok(authInfo);
     }
@@ -78,11 +78,11 @@ public class AuthorizationService {
         String code = (String) redisTemplate.opsForValue().get(codeId);
         if(StrUtil.isBlank(code)){
             //验证码过期
-            throw new SystemCustomException(SystemCustomTipEnum.CODE_NOT_EXIST_OR_EXPIRED);
+            throw new SystemCustomException(SystemCustomTipEnum.AUTH_CODE_NOT_EXIST_OR_EXPIRED);
         }
         if(StrUtil.isBlank(codeVal) || !codeVal.equalsIgnoreCase(code)){
             //验证码错误
-            throw new SystemCustomException(SystemCustomTipEnum.CODE_ERROR);
+            throw new SystemCustomException(SystemCustomTipEnum.AUTH_CODE_ERROR);
         }
         //从redis移除验证码
         redisTemplate.delete(codeId);
@@ -105,5 +105,25 @@ public class AuthorizationService {
             put("uuid", uuid);
         }};
         return R.ok(imgResult);
+    }
+
+    public R info() {
+        return R.ok(back2Front(JwtUser.current()));
+    }
+
+    private CurrentUser back2Front(CurrentUser currentUserWithPassword){
+        //密码不返回给前端
+        currentUserWithPassword.setPassword(null);
+        //权限不返回给前端
+        currentUserWithPassword.setPermissions(null);
+        return currentUserWithPassword;
+    }
+
+    public R logout(HttpServletRequest request) {
+        String token = tokenProvider.getToken(request);
+        if(StrUtil.isNotBlank(token)){
+            redisTemplate.delete(properties.getOnlineKey() + token);
+        }
+        return R.ok();
     }
 }

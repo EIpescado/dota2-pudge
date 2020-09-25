@@ -23,6 +23,6 @@ public class JwtAccessDeniedHandler implements AccessDeniedHandler {
    @Override
    public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException e) throws IOException {
       log.info("ip:{},request {} ,security error:{}", PudgeUtil.getIp(request), request.getRequestURI(),e.getMessage());
-      PudgeUtil.responseJSON(response, R.fail(SystemCustomTipEnum.NOR_RIGHT));
+      PudgeUtil.responseJSON(response, R.fail(SystemCustomTipEnum.AUTH_NOR_RIGHT));
    }
 }

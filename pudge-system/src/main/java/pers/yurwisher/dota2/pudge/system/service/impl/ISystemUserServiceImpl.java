@@ -36,11 +36,11 @@ public class ISystemUserServiceImpl extends BaseServiceImpl<SystemUserMapper, Sy
         SystemUser user = getUserByUsername(username);
         if (user == null){
             //账号或密码错误
-            throw new SystemCustomException(SystemCustomTipEnum.USERNAME_OR_PASSWORD_ERROR);
+            throw new SystemCustomException(SystemCustomTipEnum.AUTH_USERNAME_OR_PASSWORD_ERROR);
         }
         if(!user.getEnabled()){
             //账号未激活
-            throw new SystemCustomException(SystemCustomTipEnum.USERNAME_NOT_ENABLED);
+            throw new SystemCustomException(SystemCustomTipEnum.AUTH_USERNAME_NOT_ENABLED);
         }
         CurrentUser vo = new CurrentUser();
         BeanUtils.copyProperties(user,vo);

@@ -3,7 +3,6 @@ package pers.yurwisher.dota2.pudge.system.service;
 import pers.yurwisher.dota2.pudge.system.entity.Menu;
 import pers.yurwisher.dota2.pudge.base.BaseService;
 import pers.yurwisher.dota2.pudge.system.pojo.fo.MenuFo;
-import pers.yurwisher.dota2.pudge.system.pojo.vo.MenuVo;
 
 import java.util.List;
 
@@ -30,16 +29,23 @@ public interface IMenuService extends BaseService<Menu> {
     void update(Long id,MenuFo fo);
 
 
-     /**
-     * 删除
-     * @param id 主键
-     */
-    void delete(Long id);
-
     /**
      * 获取用户所有菜单
      * @param userId 用户ID
      * @return 菜单集合
      */
     List<Menu> findAllByUserId(Long userId);
+
+    /**
+     * 用户的菜单树
+     * @param userId 用户ID
+     * @return 菜单tree
+     */
+    Object tree(Long userId);
+
+    /**
+     * 完整菜单tree
+     * @return 完整菜单tree
+     */
+    Object wholeTree();
 }

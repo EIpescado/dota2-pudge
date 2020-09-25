@@ -37,7 +37,6 @@ public class TokenProvider implements InitializingBean {
 
     private final SecurityProperties properties;
     private final RedisTemplate<String,Object> redisTemplate;
-    public static final String USER_ID_KEY = "uid";
     private JwtParser jwtParser;
     private JwtBuilder jwtBuilder;
     private final ISystemUserService systemUserService;

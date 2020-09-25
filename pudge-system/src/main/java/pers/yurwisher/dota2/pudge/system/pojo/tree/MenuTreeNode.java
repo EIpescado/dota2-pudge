@@ -1,20 +1,27 @@
-package pers.yurwisher.dota2.pudge.system.entity;
+package pers.yurwisher.dota2.pudge.system.pojo.tree;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import pers.yurwisher.dota2.pudge.base.BaseEntity;
+import pers.yurwisher.dota2.pudge.wrapper.TreeNode;
+
+import java.util.List;
 
 /**
- * 菜单
- * @author yq 2020年9月21日 15:28:17
- */
+ * @author yq
+ * @date 2020/09/25 14:52
+ * @description 菜单树节点
+ * @sinceV1.0.0
+*/
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class Menu extends BaseEntity {
+public class MenuTreeNode extends TreeNode<Long,MenuTreeNode> {
+    private static final long serialVersionUID = 8337076770624687962L;
 
-    private static final long serialVersionUID = 5786814160655628952L;
+    private Long id;
 
     /**菜单标题*/
+    @JSONField(serialize = false)
     private String title;
 
     /**菜单组件名称*/
@@ -33,20 +40,15 @@ public class Menu extends BaseEntity {
      * 菜单类型: 0目录,1菜单.2按钮
      */
     private Integer type;
-
-    /**
-     * 权限标识
-     */
-    private String permission;
-
     /**
      * 菜单图标
      */
+    @JSONField(serialize = false)
     private String icon;
-
     /**
      * 是否缓存
      */
+    @JSONField(serialize = false)
     private Boolean cache;
 
     /**
@@ -63,10 +65,17 @@ public class Menu extends BaseEntity {
      * 是否外链菜单
      */
     private Boolean iFrame;
+    /**
+     * meta data
+     */
+    private MenuMeta meta;
 
     /**
-     * 按钮绑定事件
+     * 菜单下的按钮
      */
-    private String click;
+    private List<ButtonNode> buttons;
 
+    private Boolean alwaysShow;
+
+    private String redirect;
 }

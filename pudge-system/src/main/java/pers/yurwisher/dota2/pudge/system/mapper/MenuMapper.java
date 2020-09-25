@@ -2,6 +2,8 @@ package pers.yurwisher.dota2.pudge.system.mapper;
 
 import pers.yurwisher.dota2.pudge.system.entity.Menu;
 import pers.yurwisher.dota2.pudge.base.CommonMapper;
+import pers.yurwisher.dota2.pudge.system.pojo.tree.ButtonNode;
+import pers.yurwisher.dota2.pudge.system.pojo.tree.MenuTreeNode;
 import pers.yurwisher.dota2.pudge.system.pojo.vo.MenuVo;
 import org.apache.ibatis.annotations.Param;
 
@@ -24,9 +26,23 @@ public interface MenuMapper extends CommonMapper<Menu> {
     MenuVo get(@Param("id")Long id);
 
     /**
-     * 获取用户所有权限
+     * 获取用户所有菜单
      * @param userId 用户ID
      * @return 菜单权限
      */
     List<Menu> getUserMenus(@Param("userId")Long userId);
+
+    /**
+     * 获取用户所有菜单TreeNode
+     * @param userId 用户ID
+     * @return nodes
+     */
+    List<MenuTreeNode> getUserMenuTreeNodes(@Param("userId")Long userId);
+
+    /**
+     * 获取用户所有按钮node
+     * @param userId 用户ID
+     * @return buttons
+     */
+    List<ButtonNode> getUserButtonNodes(@Param("userId")Long userId);
 }

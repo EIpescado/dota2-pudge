@@ -84,15 +84,15 @@ public class JwtUser implements UserDetails {
     public static CurrentUser current(){
         final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if(authentication == null){
-            throw new SystemCustomException(SystemCustomTipEnum.LOGIN_EXPIRED);
+            throw new SystemCustomException(SystemCustomTipEnum.AUTH_LOGIN_EXPIRED);
         }
         Object principal = authentication.getPrincipal();
         if (principal == null) {
-            throw new SystemCustomException(SystemCustomTipEnum.LOGIN_EXPIRED);
+            throw new SystemCustomException(SystemCustomTipEnum.AUTH_LOGIN_EXPIRED);
         } else {
             //匿名用户
             if (principal instanceof String) {
-                throw new SystemCustomException(SystemCustomTipEnum.LOGIN_EXPIRED);
+                throw new SystemCustomException(SystemCustomTipEnum.AUTH_LOGIN_EXPIRED);
             }
             return ((JwtUser) principal).user;
         }

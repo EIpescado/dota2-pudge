@@ -29,6 +29,6 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint, Se
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException e) throws IOException, ServletException {
         log.info("ip:{},request {} ,security error:{}", PudgeUtil.getIp(request), request.getRequestURI(),e.getMessage());
-        PudgeUtil.responseJSON(response, R.fail(SystemCustomTipEnum.NOR_RIGHT));
+        PudgeUtil.responseJSON(response, R.fail(SystemCustomTipEnum.AUTH_NOR_RIGHT));
     }
 }
