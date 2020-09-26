@@ -18,7 +18,16 @@
             (#{roleId},#{menuId})
         </foreach>
     </insert>
+    <insert id="batchInsertRoleButtonRelation">
+        INSERT into role_button_relation(role_id,button_id) VALUES
+        <foreach collection="buttonIds" item="buttonId" separator=",">
+            (#{roleId},#{buttonId})
+        </foreach>
+    </insert>
     <delete id="deleteRoleMenuRelationByRoleId">
         delete from role_menu_relation where role_id = #{roleId}
+    </delete>
+    <delete id="deleteRoleButtonRelationByRoleId">
+           delete from role_button_relation where role_id = #{roleId}
     </delete>
 </mapper>

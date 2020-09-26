@@ -4,7 +4,6 @@ import java.io.Serializable;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
-import pers.yurwisher.dota2.pudge.validator.annotation.DataIn;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
@@ -18,24 +17,35 @@ import javax.validation.constraints.Positive;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-public class MenuFo implements Serializable {
+public class SystemMenuFo implements Serializable {
     private static final long serialVersionUID = -1918237882723347378L;
     @NotBlank(message = "菜单标题必填")
-    private String title;
-    private String name;
+    private String menuName;
     @Positive(message = "菜单排序号必须大于0")
-    private Integer menuSort;
+    private Integer sortNo;
     private String component;
-    private String path;
-    /**0 目录  1菜单  2按钮*/
-    @DataIn(message = "菜单类型无效",dataList = {"0","1","2"})
-    private Integer type;
-    private String permission;
+    /**
+     * 菜单图标
+     */
     private String icon;
-    private Boolean cache;
-    private Boolean hidden;
-    private Long pid;
-    private Integer subCount;
+    /**路由地址*/
+    private String path;
+    /**
+     * 是否外链菜单
+     */
     private Boolean iFrame;
-    private Long id;
+    /**
+     * 是否不缓存
+     */
+    private Boolean noCache;
+    /**
+     * 是否隐藏
+     */
+    private Boolean hidden;
+    /**
+     * 权限标识
+     */
+    private String permission;
+
+    private Long pid;
 }

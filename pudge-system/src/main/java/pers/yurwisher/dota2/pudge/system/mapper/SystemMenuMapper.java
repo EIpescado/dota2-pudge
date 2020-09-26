@@ -1,11 +1,10 @@
 package pers.yurwisher.dota2.pudge.system.mapper;
 
-import pers.yurwisher.dota2.pudge.system.entity.Menu;
+import org.apache.ibatis.annotations.Param;
 import pers.yurwisher.dota2.pudge.base.CommonMapper;
-import pers.yurwisher.dota2.pudge.system.pojo.tree.ButtonNode;
+import pers.yurwisher.dota2.pudge.system.entity.SystemMenu;
 import pers.yurwisher.dota2.pudge.system.pojo.tree.MenuTreeNode;
 import pers.yurwisher.dota2.pudge.system.pojo.vo.MenuVo;
-import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -15,7 +14,7 @@ import java.util.List;
  * @description 菜单 Mapper
  * @since V1.0.0
  */
-public interface MenuMapper extends CommonMapper<Menu> {
+public interface SystemMenuMapper extends CommonMapper<SystemMenu> {
 
 
     /**
@@ -30,7 +29,7 @@ public interface MenuMapper extends CommonMapper<Menu> {
      * @param userId 用户ID
      * @return 菜单权限
      */
-    List<Menu> getUserMenus(@Param("userId")Long userId);
+    List<SystemMenu> getUserMenus(@Param("userId")Long userId);
 
     /**
      * 获取用户所有菜单TreeNode
@@ -40,9 +39,9 @@ public interface MenuMapper extends CommonMapper<Menu> {
     List<MenuTreeNode> getUserMenuTreeNodes(@Param("userId")Long userId);
 
     /**
-     * 获取用户所有按钮node
-     * @param userId 用户ID
-     * @return buttons
+     * 所有菜单
+     * @return 菜单集合
      */
-    List<ButtonNode> getUserButtonNodes(@Param("userId")Long userId);
+    List<MenuTreeNode> getAllMenuTreeNodes();
+
 }

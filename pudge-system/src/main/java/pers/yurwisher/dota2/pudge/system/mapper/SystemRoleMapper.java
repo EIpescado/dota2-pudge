@@ -1,6 +1,5 @@
 package pers.yurwisher.dota2.pudge.system.mapper;
 
-import pers.yurwisher.dota2.pudge.system.entity.Menu;
 import pers.yurwisher.dota2.pudge.system.entity.SystemRole;
 import pers.yurwisher.dota2.pudge.base.CommonMapper;
 import pers.yurwisher.dota2.pudge.system.pojo.qo.SystemRoleQo;
@@ -9,8 +8,6 @@ import pers.yurwisher.dota2.pudge.system.pojo.vo.SystemRoleVo;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.annotations.Param;
-
-import java.util.List;
 
 
 /**

@@ -5,24 +5,27 @@ import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpUtil;
-import org.apache.poi.ss.formula.functions.T;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pers.yurwisher.dota2.pudge.base.impl.BaseServiceImpl;
 import pers.yurwisher.dota2.pudge.enums.SystemCustomTipEnum;
-import pers.yurwisher.dota2.pudge.system.entity.Menu;
+import pers.yurwisher.dota2.pudge.system.entity.SystemMenu;
 import pers.yurwisher.dota2.pudge.system.exception.SystemCustomException;
-import pers.yurwisher.dota2.pudge.system.mapper.MenuMapper;
-import pers.yurwisher.dota2.pudge.system.pojo.fo.MenuFo;
+import pers.yurwisher.dota2.pudge.system.mapper.SystemMenuMapper;
+import pers.yurwisher.dota2.pudge.system.pojo.fo.SystemMenuFo;
 import pers.yurwisher.dota2.pudge.system.pojo.tree.ButtonNode;
 import pers.yurwisher.dota2.pudge.system.pojo.tree.MenuMeta;
 import pers.yurwisher.dota2.pudge.system.pojo.tree.MenuTreeNode;
-import pers.yurwisher.dota2.pudge.system.service.IMenuService;
+import pers.yurwisher.dota2.pudge.system.service.ISystemButtonService;
+import pers.yurwisher.dota2.pudge.system.service.ISystemMenuService;
 import pers.yurwisher.dota2.pudge.wrapper.Tree;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -32,7 +35,10 @@ import java.util.stream.Collectors;
  * @since V1.0.0
  */
 @Service
-public class MenuServiceImpl extends BaseServiceImpl<MenuMapper, Menu> implements IMenuService {
+@RequiredArgsConstructor
+public class SystemMenuServiceImpl extends BaseServiceImpl<SystemMenuMapper, SystemMenu> implements ISystemMenuService {
+
+    private final ISystemButtonService systemButtonService;
 
     /**
      * 新增
@@ -41,14 +47,10 @@ public class MenuServiceImpl extends BaseServiceImpl<MenuMapper, Menu> implement
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void create(MenuFo fo) {
-        //title名称不可重复
-        if (super.haveFieldValueEq(Menu::getTitle, fo.getTitle())) {
-            throw new SystemCustomException(SystemCustomTipEnum.MENU_TITLE_REPEAT);
-        }
-        //component name 不可重复
-        if (super.haveFieldValueEq(Menu::getName, fo.getName())) {
-            throw new SystemCustomException(SystemCustomTipEnum.MENU_COMPONENT_NAME_REPEAT);
+    public void create(SystemMenuFo fo) {
+        //名称不可重复
+        if (super.haveFieldValueEq(SystemMenu::getMenuName, fo.getMenuName())) {
+            throw new SystemCustomException(SystemCustomTipEnum.MENU_NAME_REPEAT);
         }
         //菜单若为iFrame  path必须以http/https开头
         if (fo.getIFrame()) {
@@ -56,12 +58,9 @@ public class MenuServiceImpl extends BaseServiceImpl<MenuMapper, Menu> implement
                 throw new SystemCustomException(SystemCustomTipEnum.MENU_I_FRAME_PATH_PREFIX_ERROR);
             }
         }
-        if (fo.getPid().equals(0L)) {
-            fo.setPid(null);
-        }
-        Menu menu = new Menu();
-        BeanUtils.copyProperties(fo, menu);
-        baseMapper.insert(menu);
+        SystemMenu systemMenu = new SystemMenu();
+        BeanUtils.copyProperties(fo, systemMenu);
+        baseMapper.insert(systemMenu);
     }
 
     /**
@@ -72,7 +71,7 @@ public class MenuServiceImpl extends BaseServiceImpl<MenuMapper, Menu> implement
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void update(Long id, MenuFo fo) {
+    public void update(Long id, SystemMenuFo fo) {
         if(id.equals(fo.getPid())){
             throw new SystemCustomException(SystemCustomTipEnum.MENU_PID_NOT_ID);
         }
@@ -82,29 +81,21 @@ public class MenuServiceImpl extends BaseServiceImpl<MenuMapper, Menu> implement
                 throw new SystemCustomException(SystemCustomTipEnum.MENU_I_FRAME_PATH_PREFIX_ERROR);
             }
         }
-        //title不可重复
-        Menu x = super.getOneByFieldValueEq(Menu::getTitle,fo.getTitle());
+        //名称不可重复
+        SystemMenu x = super.getOneByFieldValueEq(SystemMenu::getMenuName,fo.getMenuName());
         if(x != null && !x.getId().equals(id)){
-            throw new SystemCustomException(SystemCustomTipEnum.MENU_TITLE_REPEAT);
+            throw new SystemCustomException(SystemCustomTipEnum.MENU_NAME_REPEAT);
         }
-        //name 不可重复
-        x = super.getOneByFieldValueEq(Menu::getName,fo.getName());
-        if(x != null && !x.getId().equals(id)){
-            throw new SystemCustomException(SystemCustomTipEnum.MENU_COMPONENT_NAME_REPEAT);
-        }
-        if (fo.getPid().equals(0L)) {
-            fo.setPid(null);
-        }
-        Menu menu = baseMapper.selectById(id);
-        Assert.notNull(menu);
-        BeanUtils.copyProperties(fo, menu);
-        baseMapper.updateById(menu);
+        SystemMenu systemMenu = baseMapper.selectById(id);
+        Assert.notNull(systemMenu);
+        BeanUtils.copyProperties(fo, systemMenu);
+        baseMapper.updateById(systemMenu);
         //todo 清除缓存
     }
 
 
     @Override
-    public List<Menu> findAllByUserId(Long userId) {
+    public List<SystemMenu> findAllByUserId(Long userId) {
         return baseMapper.getUserMenus(userId);
     }
 
@@ -113,33 +104,35 @@ public class MenuServiceImpl extends BaseServiceImpl<MenuMapper, Menu> implement
         //菜单
         List<MenuTreeNode> menuTreeNodeList = baseMapper.getUserMenuTreeNodes(userId);
         //按钮
-        List<ButtonNode> buttonNodeList = baseMapper.getUserButtonNodes(userId);
+        List<ButtonNode> buttonNodeList = systemButtonService.getUserButtonNodes(userId);
         return this.buildTree(menuTreeNodeList,buttonNodeList);
     }
 
     private List<MenuTreeNode> buildTree(List<MenuTreeNode> menuTreeNodeList,List<ButtonNode> buttonNodeList){
+        Map<Long,List<ButtonNode>> buttonMap = null;
         if (CollectionUtil.isNotEmpty(buttonNodeList)) {
-            Map<Long,List<ButtonNode>> buttonMap = buttonNodeList.stream()
-                    .peek(bn->bn.setPid(bn.getPid() == null ? 0L : bn.getPid()))
-                    .collect(Collectors.groupingBy(ButtonNode::getPid));
-            if(CollectionUtil.isNotEmpty(menuTreeNodeList)){
+            buttonMap = buttonNodeList.stream().collect(Collectors.groupingBy(ButtonNode::getPid));
+        }
+        Set<Long> hasChildMenu = new HashSet<>();
+        if(CollectionUtil.isNotEmpty(menuTreeNodeList)){
+            for(MenuTreeNode mn: menuTreeNodeList){
                 //将按钮挂载到菜单下
-                menuTreeNodeList.forEach(mn -> mn.setButtons(buttonMap.get(mn.getId())));
+                mn.setButtons(CollectionUtil.isNotEmpty(buttonMap) ? buttonMap.get(mn.getId()): ListUtil.empty());
+                if(mn.getPid() != null){
+                    hasChildMenu.add(mn.getPid());
+                }
             }
         }
-        List<MenuTreeNode> menuTreeNodes =  new Tree<Long,MenuTreeNode>(0L).build(menuTreeNodeList,node ->{
+        //构建树
+        List<MenuTreeNode> treeNodes = new Tree<Long,MenuTreeNode>(-1L).build(menuTreeNodeList,node ->{
             //元数据
             MenuMeta menuMeta = new MenuMeta();
-            menuMeta.setNoCache(!node.getCache());
+            menuMeta.setNoCache(node.getNoCache());
             menuMeta.setIcon(node.getIcon());
-            menuMeta.setTitle(node.getTitle());
+            menuMeta.setTitle(node.getMenuName());
             node.setMeta(menuMeta);
             //是否一级目录
             boolean pidIsNull = node.getPid() == null;
-            //componentName 为空则赋值为title. 按钮需要
-            if(StrUtil.isBlank(node.getName())){
-                node.setName(node.getTitle());
-            }
             // 一级目录需要加斜杠，不然会报警告
             if(pidIsNull){
                 node.setPath(StrUtil.SLASH + node.getPath());
@@ -152,7 +145,7 @@ public class MenuServiceImpl extends BaseServiceImpl<MenuMapper, Menu> implement
                 }
             }
             //存在子节点
-            if(CollectionUtil.isNotEmpty(node.getChildren())){
+            if(hasChildMenu.contains(node.getId())){
                 node.setAlwaysShow(true);
                 node.setRedirect("noredirect");
             }else if(pidIsNull){
@@ -162,22 +155,26 @@ public class MenuServiceImpl extends BaseServiceImpl<MenuMapper, Menu> implement
                 // 非外链
                 if(!node.getIFrame()){
                     newNode.setPath("index");
-                    newNode.setName(node.getName());
+                    newNode.setMenuName(node.getMenuName());
                     newNode.setComponent(node.getComponent());
                 } else {
                     newNode.setPath(node.getPath());
                 }
                 node.setMeta(null);
-                node.setName(null);
+                node.setMenuName(null);
                 node.setComponent("Layout");
                 node.setChildren(ListUtil.toList(newNode));
             }
         });
-        return menuTreeNodes;
+        return treeNodes;
     }
 
     @Override
     public Object wholeTree() {
-        return null;
+        //所有菜单
+        List<MenuTreeNode> menuTreeNodeList = baseMapper.getAllMenuTreeNodes();
+        //所有按钮
+        List<ButtonNode> buttonNodeList = systemButtonService.getAllButtonNodes();
+        return this.buildTree(menuTreeNodeList,buttonNodeList);
     }
 }

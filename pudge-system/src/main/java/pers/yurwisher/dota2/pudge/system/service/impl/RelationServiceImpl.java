@@ -46,4 +46,17 @@ public class RelationServiceImpl implements IRelationService {
             }
         }
     }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void roleBindButtons(Long roleId, List<Long> buttonIds) {
+        if (roleId != null) {
+            //先删除所有已绑定按钮
+            relationMapper.deleteRoleButtonRelationByRoleId(roleId);
+            if (CollectionUtil.isNotEmpty(buttonIds)) {
+                //绑定新按钮
+                relationMapper.batchInsertRoleButtonRelation(roleId, buttonIds);
+            }
+        }
+    }
 }

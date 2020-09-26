@@ -1,8 +1,8 @@
 package pers.yurwisher.dota2.pudge.system.service;
 
-import pers.yurwisher.dota2.pudge.system.entity.Menu;
+import pers.yurwisher.dota2.pudge.system.entity.SystemMenu;
 import pers.yurwisher.dota2.pudge.base.BaseService;
-import pers.yurwisher.dota2.pudge.system.pojo.fo.MenuFo;
+import pers.yurwisher.dota2.pudge.system.pojo.fo.SystemMenuFo;
 
 import java.util.List;
 
@@ -13,28 +13,27 @@ import java.util.List;
  * @description 菜单
  * @since V1.0.0
  */
-public interface IMenuService extends BaseService<Menu> {
+public interface ISystemMenuService extends BaseService<SystemMenu> {
 
     /**
      * 新增
      * @param fo 参数
      */
-    void create(MenuFo fo);
+    void create(SystemMenuFo fo);
 
     /**
      * 更新
      * @param id 主键
      * @param fo 参数
      */
-    void update(Long id,MenuFo fo);
-
+    void update(Long id, SystemMenuFo fo);
 
     /**
      * 获取用户所有菜单
      * @param userId 用户ID
      * @return 菜单集合
      */
-    List<Menu> findAllByUserId(Long userId);
+    List<SystemMenu> findAllByUserId(Long userId);
 
     /**
      * 用户的菜单树

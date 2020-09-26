@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pers.yurwisher.dota2.pudge.base.BaseController;
 import pers.yurwisher.dota2.pudge.security.JwtUser;
-import pers.yurwisher.dota2.pudge.system.pojo.fo.MenuFo;
-import pers.yurwisher.dota2.pudge.system.service.IMenuService;
+import pers.yurwisher.dota2.pudge.system.pojo.fo.SystemMenuFo;
+import pers.yurwisher.dota2.pudge.system.service.ISystemMenuService;
 import pers.yurwisher.dota2.pudge.wrapper.R;
 
 /**
@@ -22,23 +22,23 @@ import pers.yurwisher.dota2.pudge.wrapper.R;
  */
 @RestController
 @RequestMapping("/menu")
-public class MenuController extends BaseController{
-    private IMenuService menuService;
+public class SystemMenuController extends BaseController{
+    private ISystemMenuService menuService;
 
-    public MenuController(IMenuService menuService) {
+    public SystemMenuController(ISystemMenuService menuService) {
         this.menuService = menuService;
     }
 
     @PostMapping
     @PreAuthorize("@el.check('menu:add')")
-    public R create(@RequestBody @Validated MenuFo fo){
+    public R create(@RequestBody @Validated SystemMenuFo fo){
         menuService.create(fo);
         return R.ok();
     }
 
     @PostMapping("{id}")
     @PreAuthorize("@el.check('menu:edit')")
-    public R update(@PathVariable(name = "id")Long id, @RequestBody MenuFo fo){
+    public R update(@PathVariable(name = "id")Long id, @RequestBody @Validated SystemMenuFo fo){
         menuService.update(id,fo);
         return R.ok();
     }

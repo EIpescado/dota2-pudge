@@ -10,14 +10,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pers.yurwisher.dota2.pudge.base.impl.BaseServiceImpl;
 import pers.yurwisher.dota2.pudge.constants.CacheNameConstant;
-import pers.yurwisher.dota2.pudge.system.entity.Menu;
+import pers.yurwisher.dota2.pudge.system.entity.SystemMenu;
 import pers.yurwisher.dota2.pudge.system.entity.SystemRole;
 import pers.yurwisher.dota2.pudge.system.mapper.SystemRoleMapper;
 import pers.yurwisher.dota2.pudge.system.pojo.fo.SystemRoleFo;
 import pers.yurwisher.dota2.pudge.system.pojo.qo.SystemRoleQo;
 import pers.yurwisher.dota2.pudge.system.pojo.to.SystemRoleTo;
 import pers.yurwisher.dota2.pudge.system.pojo.vo.SystemRoleVo;
-import pers.yurwisher.dota2.pudge.system.service.IMenuService;
+import pers.yurwisher.dota2.pudge.system.service.ISystemMenuService;
 import pers.yurwisher.dota2.pudge.system.service.ISystemRoleService;
 import pers.yurwisher.dota2.pudge.wrapper.PageR;
 
@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
 @CacheConfig(cacheNames = CacheNameConstant.SYSTEM_ROLE)
 public class SystemRoleServiceImpl extends BaseServiceImpl<SystemRoleMapper,SystemRole> implements ISystemRoleService{
 
-    private final IMenuService menuService;
+    private final ISystemMenuService menuService;
 
     /**
      * 新增
@@ -98,10 +98,10 @@ public class SystemRoleServiceImpl extends BaseServiceImpl<SystemRoleMapper,Syst
     @Override
     public List<String> getUserPermission(Long userId) {
         //获取用户所有菜单
-        List<Menu> list = menuService.findAllByUserId(userId);
+        List<SystemMenu> list = menuService.findAllByUserId(userId);
         if(CollectionUtil.isNotEmpty(list)){
             return  list.stream().filter(m -> StrUtil.isNotBlank(m.getPermission()))
-                    .map(Menu::getPermission).collect(Collectors.toList());
+                    .map(SystemMenu::getPermission).collect(Collectors.toList());
         }
         return null;
     }

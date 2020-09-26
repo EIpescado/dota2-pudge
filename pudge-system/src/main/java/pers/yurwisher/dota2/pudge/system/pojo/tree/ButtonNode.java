@@ -13,15 +13,15 @@ public class ButtonNode {
 
     private Long id;
 
-    private String title;
+    private String buttonName;
 
-    private Integer menuSort ;
-
-    private Integer type;
+    private Integer sortNo ;
 
     private String icon;
 
     private String click;
 
     private Long pid;
+
+    private String position;
 }

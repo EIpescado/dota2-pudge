@@ -41,4 +41,19 @@ public interface RelationMapper {
      * @return 影响行数
      */
     Integer batchInsertRoleMenuRelation(@Param("roleId")Long roleId, @Param("menuIds")List<Long> menuIds);
+
+    /**
+     * 删除角色已绑定的按钮
+     * @param roleId 角色ID
+     * @return 影响行数
+     */
+    Integer deleteRoleButtonRelationByRoleId(@Param("roleId")Long roleId);
+
+    /**
+     * 批量插入角色按钮关系
+     * @param roleId 角色ID
+     * @param buttonIds 按钮ID集合
+     * @return 影响行数
+     */
+    Integer batchInsertRoleButtonRelation(@Param("roleId")Long roleId,@Param("buttonIds") List<Long> buttonIds);
 }
