@@ -1,6 +1,9 @@
 package pers.yurwisher.dota2.pudge.system.pojo.fo;
 
 import java.io.Serializable;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
@@ -48,4 +51,10 @@ public class SystemMenuFo implements Serializable {
     private String permission;
 
     private Long pid;
+
+    public static void main(String[] args) {
+        SystemMenuFo f = new SystemMenuFo();
+        f.setMenuName("");
+        System.out.println(JSON.toJSONString(f, SerializerFeature.WriteMapNullValue)); ;
+    }
 }

@@ -14,6 +14,11 @@ public class LoginProperties {
      */
     private boolean single = false;
 
+    /**
+     *密码前端会通过公钥加密, 解密私钥
+     */
+    private String passwordPrivateKey;
+
     private LoginCode codeConfig;
 
 }

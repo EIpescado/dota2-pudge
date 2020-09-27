@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pers.yurwisher.dota2.pudge.base.BaseController;
 import pers.yurwisher.dota2.pudge.security.JwtUser;
+import pers.yurwisher.dota2.pudge.system.entity.SystemMenu;
 import pers.yurwisher.dota2.pudge.system.pojo.fo.SystemMenuFo;
 import pers.yurwisher.dota2.pudge.system.service.ISystemMenuService;
 import pers.yurwisher.dota2.pudge.wrapper.R;
@@ -23,28 +24,27 @@ import pers.yurwisher.dota2.pudge.wrapper.R;
 @RestController
 @RequestMapping("/menu")
 public class SystemMenuController extends BaseController{
-    private ISystemMenuService menuService;
+    private final ISystemMenuService menuService;
 
     public SystemMenuController(ISystemMenuService menuService) {
         this.menuService = menuService;
     }
 
     @PostMapping
-    @PreAuthorize("@el.check('menu:add')")
-    public R create(@RequestBody @Validated SystemMenuFo fo){
+    public R<String> create(@RequestBody @Validated SystemMenuFo fo){
         menuService.create(fo);
         return R.ok();
     }
 
     @PostMapping("{id}")
     @PreAuthorize("@el.check('menu:edit')")
-    public R update(@PathVariable(name = "id")Long id, @RequestBody @Validated SystemMenuFo fo){
+    public R<String> update(@PathVariable(name = "id")Long id, @RequestBody @Validated SystemMenuFo fo){
         menuService.update(id,fo);
         return R.ok();
     }
 
     @GetMapping("{id}")
-    public R get(@PathVariable(name = "id")Long id){
+    public R<SystemMenu> get(@PathVariable(name = "id")Long id){
         return R.ok(menuService.getById(id));
     }
 
@@ -52,7 +52,7 @@ public class SystemMenuController extends BaseController{
      * 用户的菜单树
      */
     @GetMapping("tree")
-    public R tree(){
+    public R<Object> tree(){
         return R.ok(menuService.tree(JwtUser.currentUserId()));
     }
 
@@ -60,7 +60,7 @@ public class SystemMenuController extends BaseController{
      * 完整菜单树,用于分配菜单及按钮
      */
     @GetMapping("wholeTree")
-    public R wholeTree(){
+    public R<Object> wholeTree(){
         return R.ok(menuService.wholeTree());
     }
 

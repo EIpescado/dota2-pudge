@@ -2,6 +2,9 @@ package pers.yurwisher.dota2.pudge.system.service;
 
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.crypto.SecureUtil;
+import cn.hutool.crypto.asymmetric.KeyType;
+import cn.hutool.crypto.asymmetric.RSA;
 import com.wf.captcha.base.Captcha;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -22,6 +25,7 @@ import pers.yurwisher.dota2.pudge.security.service.IOnlineUserService;
 import pers.yurwisher.dota2.pudge.system.exception.SystemCustomException;
 import pers.yurwisher.dota2.pudge.wrapper.R;
 
+import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
@@ -44,12 +48,21 @@ public class AuthorizationService {
     private final LoginProperties loginProperties;
     private final Captcha captcha;
     private final RedisTemplate<String,Object> redisTemplate;
+    private RSA loginRsa;
+
+    @PostConstruct
+    public void init(){
+        //只传入私钥解密
+        loginRsa = SecureUtil.rsa(loginProperties.getPasswordPrivateKey(),null);
+    }
 
     public R login(UserLoginForm form, HttpServletRequest request) {
+        // 密码解密
+        String password = loginRsa.decryptStr(form.getPassword(), KeyType.PrivateKey);
         //校验验证码
-        //this.verifyCode(form.getUuid(),form.getCode());
+        this.verifyCode(form.getUuid(),form.getCode());
         //校验用户帐号密码 调用对应 UserDetailsService 获取用户信息 存入授权信息
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(form.getUsername(), form.getPassword());
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(form.getUsername(), password);
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
         SecurityContextHolder.getContext().setAuthentication(authentication);
         final JwtUser jwtUser = (JwtUser) authentication.getPrincipal();

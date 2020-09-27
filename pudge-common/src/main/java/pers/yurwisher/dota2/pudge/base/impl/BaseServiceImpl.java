@@ -60,7 +60,7 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceImpl<M, 
     @Override
     public boolean haveFieldValueEq(SFunction<T, ?> function, Object value) {
        Integer count = baseMapper.selectCount(Wrappers.<T>lambdaQuery().eq(function,value));
-       return count == null || count == 0;
+       return count != null && count > 0;
     }
 
     @Override

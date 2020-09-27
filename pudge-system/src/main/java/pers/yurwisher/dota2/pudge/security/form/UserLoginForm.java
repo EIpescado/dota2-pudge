@@ -13,10 +13,10 @@ import javax.validation.constraints.NotBlank;
 @Data
 public class UserLoginForm {
 
-    @NotBlank
+    @NotBlank(message = "帐号不可为空")
     private String username;
 
-    @NotBlank
+    @NotBlank(message = "密码不可为空")
     private String password;
 
     private String code;

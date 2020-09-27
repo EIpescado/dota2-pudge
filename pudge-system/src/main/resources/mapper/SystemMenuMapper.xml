@@ -10,10 +10,10 @@
         SELECT m.* from user_role_relation r
         INNER JOIN system_role sr ON sr.id = r.role_id
         INNER JOIN role_menu_relation mr on mr.role_id = sr.id
-        INNER JOIN systemMenu m ON m.id = mr.menu_id
+        INNER JOIN system_menu m ON m.id = mr.menu_id
         where r.user_id = #{userId} AND sr.enabled = 1 AND m.enabled = 1
         GROUP BY m.id
-        ORDER BY m.menu_sort
+        ORDER BY m.sort_no
     </select>
 
     <select id="getUserMenuTreeNodes" resultType="pers.yurwisher.dota2.pudge.system.pojo.tree.MenuTreeNode">
