@@ -23,7 +23,7 @@ import javax.validation.constraints.Positive;
 public class SystemMenuFo implements Serializable {
     private static final long serialVersionUID = -1918237882723347378L;
     @NotBlank(message = "菜单标题必填")
-    private String menuName;
+    private String title;
     @Positive(message = "菜单排序号必须大于0")
     private Integer sortNo;
     private String component;
@@ -54,7 +54,7 @@ public class SystemMenuFo implements Serializable {
 
     public static void main(String[] args) {
         SystemMenuFo f = new SystemMenuFo();
-        f.setMenuName("");
-        System.out.println(JSON.toJSONString(f, SerializerFeature.WriteMapNullValue)); ;
+        f.setTitle("");
+        System.out.println(JSON.toJSONString(f, SerializerFeature.WriteMapNullValue));
     }
 }

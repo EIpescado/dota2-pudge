@@ -49,7 +49,7 @@ public class SystemMenuServiceImpl extends BaseServiceImpl<SystemMenuMapper, Sys
     @Transactional(rollbackFor = Exception.class)
     public void create(SystemMenuFo fo) {
         //名称不可重复
-        if (super.haveFieldValueEq(SystemMenu::getMenuName, fo.getMenuName())) {
+        if (super.haveFieldValueEq(SystemMenu::getTitle, fo.getTitle())) {
             throw new SystemCustomException(SystemCustomTipEnum.MENU_NAME_REPEAT);
         }
         //菜单若为iFrame  path必须以http/https开头
@@ -82,7 +82,7 @@ public class SystemMenuServiceImpl extends BaseServiceImpl<SystemMenuMapper, Sys
             }
         }
         //名称不可重复
-        SystemMenu x = super.getOneByFieldValueEq(SystemMenu::getMenuName,fo.getMenuName());
+        SystemMenu x = super.getOneByFieldValueEq(SystemMenu::getTitle,fo.getTitle());
         if(x != null && !x.getId().equals(id)){
             throw new SystemCustomException(SystemCustomTipEnum.MENU_NAME_REPEAT);
         }
@@ -101,11 +101,12 @@ public class SystemMenuServiceImpl extends BaseServiceImpl<SystemMenuMapper, Sys
 
     @Override
     public Object tree(Long userId) {
-        //菜单
-        List<MenuTreeNode> menuTreeNodeList = baseMapper.getUserMenuTreeNodes(userId);
-        //按钮
-        List<ButtonNode> buttonNodeList = systemButtonService.getUserButtonNodes(userId);
-        return this.buildTree(menuTreeNodeList,buttonNodeList);
+        ////菜单
+        //List<MenuTreeNode> menuTreeNodeList = baseMapper.getUserMenuTreeNodes(userId);
+        ////按钮
+        //List<ButtonNode> buttonNodeList = systemButtonService.getUserButtonNodes(userId);
+        //return this.buildTree(menuTreeNodeList,buttonNodeList);
+        return this.wholeTree();
     }
 
     private List<MenuTreeNode> buildTree(List<MenuTreeNode> menuTreeNodeList,List<ButtonNode> buttonNodeList){
@@ -126,17 +127,10 @@ public class SystemMenuServiceImpl extends BaseServiceImpl<SystemMenuMapper, Sys
         //构建树
         List<MenuTreeNode> treeNodes = new Tree<Long,MenuTreeNode>(-1L).build(menuTreeNodeList,node ->{
             //元数据
-            MenuMeta menuMeta = new MenuMeta();
-            menuMeta.setNoCache(node.getNoCache());
-            menuMeta.setIcon(node.getIcon());
-            menuMeta.setTitle(node.getMenuName());
+            MenuMeta menuMeta = this.createMeta(node);
             node.setMeta(menuMeta);
             //是否一级目录
             boolean pidIsNull = node.getPid() == null;
-            // 一级目录需要加斜杠，不然会报警告
-            if(pidIsNull){
-                node.setPath(StrUtil.SLASH + node.getPath());
-            }
             //非外链
             if(!node.getIFrame()){
                 //一级目录 且无 component,默认为Layout
@@ -148,25 +142,20 @@ public class SystemMenuServiceImpl extends BaseServiceImpl<SystemMenuMapper, Sys
             if(hasChildMenu.contains(node.getId())){
                 node.setAlwaysShow(true);
                 node.setRedirect("noredirect");
-            }else if(pidIsNull){
-                //一级目录无子菜单
-                MenuTreeNode newNode = new MenuTreeNode();
-                newNode.setMeta(menuMeta);
-                // 非外链
-                if(!node.getIFrame()){
-                    newNode.setPath("index");
-                    newNode.setMenuName(node.getMenuName());
-                    newNode.setComponent(node.getComponent());
-                } else {
-                    newNode.setPath(node.getPath());
-                }
-                node.setMeta(null);
-                node.setMenuName(null);
-                node.setComponent("Layout");
-                node.setChildren(ListUtil.toList(newNode));
             }
         });
         return treeNodes;
+    }
+
+    private MenuMeta createMeta(MenuTreeNode node){
+        MenuMeta menuMeta = new MenuMeta();
+        menuMeta.setNoCache(node.getNoCache());
+        menuMeta.setIcon(node.getIcon());
+        menuMeta.setTitle(node.getTitle());
+        menuMeta.setActiveMenu(node.getActiveMenu());
+        menuMeta.setAffix(node.getAffix());
+        menuMeta.setBreadCrumb(node.getBreadCrumb());
+        return menuMeta;
     }
 
     @Override

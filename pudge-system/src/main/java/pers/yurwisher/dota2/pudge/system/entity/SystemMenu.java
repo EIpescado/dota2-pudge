@@ -18,34 +18,65 @@ public class SystemMenu extends BaseEntity {
      */
     private Long pid;
     /**
+     * 路由名称 设定路由的名字，一定要填写不然使用<keep-alive>时会出现各种问题
+     */
+    private String routerName;
+    /**
      * 菜单名称
      */
-    private String menuName;
+    private String title;
     /**组件*/
     private String component;
-    /**排序*/
-    private Integer sortNo ;
+    /**路由地址*/
+    private String path;
     /**
      * 菜单图标
      */
     private String icon;
-    /**路由地址*/
-    private String path;
     /**
-     * 是否外链菜单
+     * 点击目录默认跳转的path
+     */
+    private String redirect;
+
+    /**
+     * 是否外链菜单 若为外链,则path必须为 http://或 https:// 开头
      */
     private Boolean iFrame;
+
     /**
-     * 是否不缓存
+     * 是否不被 <keep-alive> 缓存
      */
     private Boolean noCache;
+
     /**
-     * 是否隐藏
+     * 是否固定在 tag-view中
+     */
+    private Boolean affix;
+
+    /**
+     * 是否隐藏 即不会在侧边栏出现
      */
     private Boolean hidden;
+
     /**
      * 权限标识
      */
     private String permission;
+
+    /**排序*/
+    private Integer sortNo ;
+
+    /**
+     * 是否在面包屑中显示
+     */
+    private Boolean breadCrumb;
+
+    /**
+     * 当路由设置了该属性，则会高亮相对应的侧边栏
+     * 这在某些场景非常有用，比如：一个文章的列表页路由为：/article/list
+     * 点击文章进入文章详情页，这时候路由为/article/1，但你想在侧边栏高亮文章列表的路由，就可以进行如下设置
+     */
+    private String activeMenu;
+
 
 }

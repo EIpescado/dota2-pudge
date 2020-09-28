@@ -2,6 +2,7 @@ package pers.yurwisher.dota2.pudge.system.pojo.tree;
 
 import lombok.Data;
 
+
 /**
  * @author yq
  * @date 2020/09/25 16:02
@@ -16,4 +17,11 @@ public class MenuMeta {
     private String icon;
 
     private Boolean noCache;
+
+    private Boolean affix;
+
+    private Boolean breadCrumb;
+
+    private String activeMenu;
+
 }
