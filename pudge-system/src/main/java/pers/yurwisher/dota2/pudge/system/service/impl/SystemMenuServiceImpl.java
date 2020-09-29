@@ -114,48 +114,26 @@ public class SystemMenuServiceImpl extends BaseServiceImpl<SystemMenuMapper, Sys
         if (CollectionUtil.isNotEmpty(buttonNodeList)) {
             buttonMap = buttonNodeList.stream().collect(Collectors.groupingBy(ButtonNode::getPid));
         }
-        Set<Long> hasChildMenu = new HashSet<>();
-        if(CollectionUtil.isNotEmpty(menuTreeNodeList)){
-            for(MenuTreeNode mn: menuTreeNodeList){
-                //将按钮挂载到菜单下
-                mn.setButtons(CollectionUtil.isNotEmpty(buttonMap) ? buttonMap.get(mn.getId()): ListUtil.empty());
-                if(mn.getPid() != null){
-                    hasChildMenu.add(mn.getPid());
-                }
-            }
-        }
         //构建树
-        List<MenuTreeNode> treeNodes = new Tree<Long,MenuTreeNode>(-1L).build(menuTreeNodeList,node ->{
-            //元数据
-            MenuMeta menuMeta = this.createMeta(node);
-            node.setMeta(menuMeta);
-            //是否一级目录
-            boolean pidIsNull = node.getPid() == null;
-            //非外链
-            if(!node.getIFrame()){
-                //一级目录 且无 component,默认为Layout
-                if(pidIsNull && StrUtil.isBlank(node.getComponent())){
-                    node.setComponent("Layout");
-                }
-            }
-            //存在子节点
-            if(hasChildMenu.contains(node.getId())){
-                node.setAlwaysShow(true);
-                node.setRedirect("noredirect");
+        Map<Long, List<ButtonNode>> finalButtonMap = buttonMap;
+        List<MenuTreeNode> treeNodes = new Tree<Long,MenuTreeNode>(-1L).build(menuTreeNodeList, node ->{
+            //将按钮挂载到菜单下
+            hangButtonToMenu(node, finalButtonMap);
+            if(StrUtil.isNotBlank(node.getComponent()) && "Layout".equalsIgnoreCase(node.getComponent())){
+                node.setRedirect("noRedirect");
             }
         });
         return treeNodes;
     }
 
-    private MenuMeta createMeta(MenuTreeNode node){
-        MenuMeta menuMeta = new MenuMeta();
-        menuMeta.setNoCache(node.getNoCache());
-        menuMeta.setIcon(node.getIcon());
-        menuMeta.setTitle(node.getTitle());
-        menuMeta.setActiveMenu(node.getActiveMenu());
-        menuMeta.setAffix(node.getAffix());
-        menuMeta.setBreadCrumb(node.getBreadCrumb());
-        return menuMeta;
+    private void hangButtonToMenu(MenuTreeNode node,Map<Long,List<ButtonNode>> buttonMap){
+        MenuMeta menuMeta = node.getMeta();
+        if(menuMeta != null){
+            List<ButtonNode> buttons = CollectionUtil.isNotEmpty(buttonMap) ? buttonMap.get(node.getId()): ListUtil.empty();
+            if(CollectionUtil.isNotEmpty(buttons)){
+                menuMeta.setButtons(buttons.stream().collect(Collectors.groupingBy(ButtonNode::getPosition)));
+            }
+        }
     }
 
     @Override

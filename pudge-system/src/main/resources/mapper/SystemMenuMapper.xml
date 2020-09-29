@@ -18,7 +18,9 @@
 
     <select id="getUserMenuTreeNodes" resultType="pers.yurwisher.dota2.pudge.system.pojo.tree.MenuTreeNode">
         SELECT
-          m.*, m.router_name as name
+          m.router_name as name, m.component,m.path, m.hidden,m.i_frame,m.sort_no, m.pid, m.id,
+          m.title as "meta.title", m.icon as "meta.icon",m.no_cache as "meta.noCache",
+          m.affix as "meta.affix",m.bread_crumb as "meta.breadCrumb",m.active_menu as "meta.activeMenu"
         FROM
             user_role_relation r
         INNER JOIN system_role sr ON sr.id = r.role_id
@@ -35,8 +37,10 @@
     </select>
 
     <select id="getAllMenuTreeNodes" resultType="pers.yurwisher.dota2.pudge.system.pojo.tree.MenuTreeNode">
-        SELECT *,router_name as name
-        from system_menu where enabled = 1 ORDER BY sort_no
+        SELECT m.router_name as name, m.component,m.path, m.hidden,m.i_frame,m.sort_no,m.pid, m.id,
+          m.title as "meta.title", m.icon as "meta.icon",m.no_cache as "meta.noCache",
+          m.affix as "meta.affix",m.bread_crumb as "meta.breadCrumb",m.active_menu as "meta.activeMenu"
+        from system_menu m where m.enabled = 1 ORDER BY m.sort_no
     </select>
 
 

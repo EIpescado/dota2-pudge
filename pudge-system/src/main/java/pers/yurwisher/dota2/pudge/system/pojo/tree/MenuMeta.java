@@ -2,6 +2,9 @@ package pers.yurwisher.dota2.pudge.system.pojo.tree;
 
 import lombok.Data;
 
+import java.util.List;
+import java.util.Map;
+
 
 /**
  * @author yq
@@ -24,4 +27,8 @@ public class MenuMeta {
 
     private String activeMenu;
 
+    /**
+     * 菜单下的按钮
+     */
+    private Map<String,List<ButtonNode>> buttons;
 }

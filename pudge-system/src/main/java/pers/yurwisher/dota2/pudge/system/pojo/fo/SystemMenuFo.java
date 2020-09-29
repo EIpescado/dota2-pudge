@@ -1,15 +1,12 @@
 package pers.yurwisher.dota2.pudge.system.pojo.fo;
 
-import java.io.Serializable;
-
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.serializer.SerializerFeature;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
+import java.io.Serializable;
 
 /**
  * @author yq
@@ -22,17 +19,32 @@ import javax.validation.constraints.Positive;
 @Accessors(chain = true)
 public class SystemMenuFo implements Serializable {
     private static final long serialVersionUID = -1918237882723347378L;
+
+    private Long pid;
+
+    /**
+     * 路由名称 一定要填写不然使用<keep-alive>时会出现各种问题
+     */
+    private String routerName;
+
     @NotBlank(message = "菜单标题必填")
     private String title;
-    @Positive(message = "菜单排序号必须大于0")
-    private Integer sortNo;
+
     private String component;
+
+    /**路由地址*/
+    private String path;
+
     /**
      * 菜单图标
      */
     private String icon;
-    /**路由地址*/
-    private String path;
+
+    /**
+     * 点击目录默认跳转的path
+     */
+    private String redirect;
+
     /**
      * 是否外链菜单
      */
@@ -42,6 +54,10 @@ public class SystemMenuFo implements Serializable {
      */
     private Boolean noCache;
     /**
+     * 是否固定在 tag-view中
+     */
+    private Boolean affix;
+    /**
      * 是否隐藏
      */
     private Boolean hidden;
@@ -50,11 +66,19 @@ public class SystemMenuFo implements Serializable {
      */
     private String permission;
 
-    private Long pid;
+    @Positive(message = "菜单排序号必须大于0")
+    private Integer sortNo;
 
-    public static void main(String[] args) {
-        SystemMenuFo f = new SystemMenuFo();
-        f.setTitle("");
-        System.out.println(JSON.toJSONString(f, SerializerFeature.WriteMapNullValue));
-    }
+    /**
+     * 是否在面包屑中显示
+     */
+    private Boolean breadCrumb;
+
+    /**
+     * 当路由设置了该属性，则会高亮相对应的侧边栏
+     * 这在某些场景非常有用，比如：一个文章的列表页路由为：/article/list
+     * 点击文章进入文章详情页，这时候路由为/article/1，但你想在侧边栏高亮文章列表的路由，就可以进行如下设置
+     */
+    private String activeMenu;
+
 }
