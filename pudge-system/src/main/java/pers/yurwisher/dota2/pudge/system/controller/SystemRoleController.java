@@ -23,7 +23,7 @@ import pers.yurwisher.dota2.pudge.wrapper.R;
  * @since V1.0.0
  */
 @RestController
-@RequestMapping("/systemRole")
+@RequestMapping("/role")
 public class SystemRoleController extends BaseController{
     private ISystemRoleService systemRoleService;
 
