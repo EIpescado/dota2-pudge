@@ -2,10 +2,6 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="pers.yurwisher.dota2.pudge.system.mapper.SystemMenuMapper">
 
-    <select id="get" resultType="pers.yurwisher.dota2.pudge.system.pojo.vo.MenuVo">
-      select * from system_menu where id = #{id}
-    </select>
-
     <select id="getUserMenus" resultType="pers.yurwisher.dota2.pudge.system.entity.SystemMenu">
         SELECT m.* from user_role_relation r
         INNER JOIN system_role sr ON sr.id = r.role_id
@@ -41,6 +37,12 @@
           m.title as "meta.title", m.icon as "meta.icon",m.no_cache as "meta.noCache",
           m.affix as "meta.affix",m.bread_crumb as "meta.breadCrumb",m.active_menu as "meta.activeMenu"
         from system_menu m where m.enabled = 1 ORDER BY m.sort_no
+    </select>
+    <select id="getAllNodes" resultType="pers.yurwisher.dota2.pudge.system.pojo.tree.MenuAndButtonTreeNode">
+        (SELECT id,pid,icon,sort_no,title as name, 0 as whetherButton from system_menu where enabled = 1)
+        UNION ALL
+        (SELECT id,menu_id as pid,icon,sort_no,button_name as name, 1 as whetherButton from system_button where enabled = 1)
+        ORDER BY sort_no
     </select>
 
 

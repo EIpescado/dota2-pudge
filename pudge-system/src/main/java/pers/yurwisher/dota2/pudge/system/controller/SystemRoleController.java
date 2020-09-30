@@ -1,17 +1,17 @@
 package pers.yurwisher.dota2.pudge.system.controller;
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import pers.yurwisher.dota2.pudge.base.BaseController;
+import pers.yurwisher.dota2.pudge.system.entity.SystemRole;
 import pers.yurwisher.dota2.pudge.system.pojo.fo.SystemRoleFo;
 import pers.yurwisher.dota2.pudge.system.pojo.qo.SystemRoleQo;
-import pers.yurwisher.dota2.pudge.base.BaseController;
 import pers.yurwisher.dota2.pudge.system.pojo.to.SystemRoleTo;
-import pers.yurwisher.dota2.pudge.system.pojo.vo.SystemRoleVo;
 import pers.yurwisher.dota2.pudge.system.service.ISystemRoleService;
 import pers.yurwisher.dota2.pudge.wrapper.PageR;
 import pers.yurwisher.dota2.pudge.wrapper.R;
@@ -44,8 +44,8 @@ public class SystemRoleController extends BaseController{
     }
 
     @GetMapping("{id}")
-    public R<SystemRoleVo> get(@PathVariable(name = "id")Long id){
-        return R.ok(systemRoleService.get(id));
+    public R<SystemRole> get(@PathVariable(name = "id")Long id){
+        return R.ok(systemRoleService.getById(id));
     }
 
     @PostMapping("/delete/{id}")

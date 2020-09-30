@@ -4,10 +4,11 @@ import pers.yurwisher.dota2.pudge.system.entity.SystemRole;
 import pers.yurwisher.dota2.pudge.base.CommonMapper;
 import pers.yurwisher.dota2.pudge.system.pojo.qo.SystemRoleQo;
 import pers.yurwisher.dota2.pudge.system.pojo.to.SystemRoleTo;
-import pers.yurwisher.dota2.pudge.system.pojo.vo.SystemRoleVo;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 
 /**
@@ -27,11 +28,9 @@ public interface SystemRoleMapper extends CommonMapper<SystemRole> {
     IPage<SystemRoleTo> list(Page page, @Param("qo") SystemRoleQo qo);
 
     /**
-    * 详情
-    * @param id ID
-    * @return 详情
-    */
-    SystemRoleVo get(@Param("id")Long id);
-
-
+     * 获取指定用户角色
+     * @param userId 用户ID
+     * @return 角色集合
+     */
+    List<String> getUserRole(@Param("userId")Long userId);
 }

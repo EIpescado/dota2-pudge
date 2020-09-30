@@ -44,6 +44,9 @@ public class ISystemUserServiceImpl extends BaseServiceImpl<SystemUserMapper, Sy
         }
         CurrentUser vo = new CurrentUser();
         BeanUtils.copyProperties(user,vo);
+        //获取用户角色
+        List<String> roles = systemRoleService.getUserRole(user.getId());
+        vo.setRoles(roles);
         //获取用户权限
         List<String> permissions = systemRoleService.getUserPermission(user.getId());
         vo.setPermissions(permissions);

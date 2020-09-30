@@ -5,7 +5,6 @@ import pers.yurwisher.dota2.pudge.system.entity.SystemRole;
 import pers.yurwisher.dota2.pudge.system.pojo.fo.SystemRoleFo;
 import pers.yurwisher.dota2.pudge.system.pojo.qo.SystemRoleQo;
 import pers.yurwisher.dota2.pudge.system.pojo.to.SystemRoleTo;
-import pers.yurwisher.dota2.pudge.system.pojo.vo.SystemRoleVo;
 import pers.yurwisher.dota2.pudge.wrapper.PageR;
 
 import java.util.List;
@@ -39,14 +38,6 @@ public interface ISystemRoleService extends BaseService<SystemRole> {
      */
     PageR<SystemRoleTo> list(SystemRoleQo qo);
 
-
-    /**
-    * 详情
-    * @param id 主键
-    * @return SystemRoleVo
-    */
-    SystemRoleVo get(Long id);
-
      /**
      * 删除
      * @param id 主键
@@ -59,4 +50,11 @@ public interface ISystemRoleService extends BaseService<SystemRole> {
      * @return 权限
      */
     List<String> getUserPermission(Long userId);
+
+    /**
+     * 获取用户角色
+     * @param userId 用户ID
+     * @return 角色代码集合
+     */
+    List<String> getUserRole(Long userId);
 }

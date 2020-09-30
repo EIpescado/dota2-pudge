@@ -3,8 +3,8 @@ package pers.yurwisher.dota2.pudge.system.mapper;
 import org.apache.ibatis.annotations.Param;
 import pers.yurwisher.dota2.pudge.base.CommonMapper;
 import pers.yurwisher.dota2.pudge.system.entity.SystemMenu;
+import pers.yurwisher.dota2.pudge.system.pojo.tree.MenuAndButtonTreeNode;
 import pers.yurwisher.dota2.pudge.system.pojo.tree.MenuTreeNode;
-import pers.yurwisher.dota2.pudge.system.pojo.vo.MenuVo;
 
 import java.util.List;
 
@@ -15,14 +15,6 @@ import java.util.List;
  * @since V1.0.0
  */
 public interface SystemMenuMapper extends CommonMapper<SystemMenu> {
-
-
-    /**
-    * 详情
-    * @param id ID
-    * @return 详情
-    */
-    MenuVo get(@Param("id")Long id);
 
     /**
      * 获取用户所有菜单
@@ -44,4 +36,9 @@ public interface SystemMenuMapper extends CommonMapper<SystemMenu> {
      */
     List<MenuTreeNode> getAllMenuTreeNodes();
 
+    /**
+     * 获取所有菜单和按钮
+     * @return 菜单和按钮集合
+     */
+    List<MenuAndButtonTreeNode> getAllNodes();
 }

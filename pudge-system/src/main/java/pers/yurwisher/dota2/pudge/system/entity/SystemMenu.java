@@ -34,11 +34,6 @@ public class SystemMenu extends BaseEntity {
      */
     private String icon;
     /**
-     * 点击目录默认跳转的path
-     */
-    private String redirect;
-
-    /**
      * 是否外链菜单 若为外链,则path必须为 http://或 https:// 开头
      */
     private Boolean iFrame;

@@ -4,9 +4,10 @@
     <select id="list" resultType="pers.yurwisher.dota2.pudge.system.pojo.to.SystemRoleTo">
 
     </select>
-
-    <select id="get" resultType="pers.yurwisher.dota2.pudge.system.pojo.vo.SystemRoleVo">
-
+    <select id="getUserRole" resultType="java.lang.String">
+        SELECT DISTINCT sr.name from user_role_relation r
+        LEFT JOIN system_role sr on sr.id = r.role_id
+        where r.user_id = #{userId} and sr.enabled = 1
     </select>
 
 </mapper>

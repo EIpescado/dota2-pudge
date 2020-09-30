@@ -1,10 +1,9 @@
 package pers.yurwisher.dota2.pudge.system.mapper;
 
-import pers.yurwisher.dota2.pudge.system.entity.SystemButton;
-import pers.yurwisher.dota2.pudge.base.CommonMapper;
-import pers.yurwisher.dota2.pudge.system.pojo.tree.ButtonNode;
-import pers.yurwisher.dota2.pudge.system.pojo.vo.SystemButtonVo;
 import org.apache.ibatis.annotations.Param;
+import pers.yurwisher.dota2.pudge.base.CommonMapper;
+import pers.yurwisher.dota2.pudge.system.entity.SystemButton;
+import pers.yurwisher.dota2.pudge.system.pojo.tree.ButtonNode;
 
 import java.util.List;
 
@@ -15,13 +14,6 @@ import java.util.List;
  * @since V1.0.0
  */
 public interface SystemButtonMapper extends CommonMapper<SystemButton> {
-
-    /**
-    * 详情
-    * @param id ID
-    * @return 详情
-    */
-    SystemButtonVo get(@Param("id")Long id);
 
 
     /**

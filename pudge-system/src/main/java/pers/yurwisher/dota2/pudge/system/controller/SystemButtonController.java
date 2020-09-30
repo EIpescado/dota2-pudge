@@ -1,5 +1,6 @@
 package pers.yurwisher.dota2.pudge.system.controller;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,12 +29,14 @@ public class SystemButtonController extends BaseController{
     }
 
     @PostMapping
+    @PreAuthorize("@el.check('menu:create')")
     public R create(@RequestBody @Validated SystemButtonFo fo){
         systemButtonService.create(fo);
         return R.ok();
     }
 
     @PostMapping("{id}")
+    @PreAuthorize("@el.check('menu:update')")
     public R update(@PathVariable(name = "id")Long id, @RequestBody @Validated SystemButtonFo fo){
         systemButtonService.update(id,fo);
         return R.ok();
@@ -41,7 +44,7 @@ public class SystemButtonController extends BaseController{
 
     @GetMapping("{id}")
     public R get(@PathVariable(name = "id")Long id){
-        return R.ok(systemButtonService.get(id));
+        return R.ok(systemButtonService.getById(id));
     }
 
 

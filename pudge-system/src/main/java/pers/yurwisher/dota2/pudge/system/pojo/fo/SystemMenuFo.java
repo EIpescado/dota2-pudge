@@ -23,8 +23,9 @@ public class SystemMenuFo implements Serializable {
     private Long pid;
 
     /**
-     * 路由名称 一定要填写不然使用<keep-alive>时会出现各种问题
+     * 路由名称 一定要填写不然使用<keep-alive>时会出现各种问题 组件内Name
      */
+    @NotBlank(message = "菜单路由必填")
     private String routerName;
 
     @NotBlank(message = "菜单标题必填")
@@ -39,11 +40,6 @@ public class SystemMenuFo implements Serializable {
      * 菜单图标
      */
     private String icon;
-
-    /**
-     * 点击目录默认跳转的path
-     */
-    private String redirect;
 
     /**
      * 是否外链菜单

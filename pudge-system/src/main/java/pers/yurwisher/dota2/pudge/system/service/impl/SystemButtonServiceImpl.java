@@ -7,10 +7,9 @@ import org.springframework.transaction.annotation.Transactional;
 import pers.yurwisher.dota2.pudge.base.impl.BaseServiceImpl;
 import pers.yurwisher.dota2.pudge.system.entity.SystemButton;
 import pers.yurwisher.dota2.pudge.system.mapper.SystemButtonMapper;
+import pers.yurwisher.dota2.pudge.system.pojo.fo.SystemButtonFo;
 import pers.yurwisher.dota2.pudge.system.pojo.tree.ButtonNode;
 import pers.yurwisher.dota2.pudge.system.service.ISystemButtonService;
-import pers.yurwisher.dota2.pudge.system.pojo.fo.SystemButtonFo;
-import pers.yurwisher.dota2.pudge.system.pojo.vo.SystemButtonVo;
 
 import java.util.List;
 
@@ -47,17 +46,6 @@ public class SystemButtonServiceImpl extends BaseServiceImpl<SystemButtonMapper,
         Assert.notNull(systemButton);
         BeanUtils.copyProperties(fo,systemButton);
         baseMapper.updateById(systemButton);
-    }
-
-
-    /**
-    * 详情
-    * @param id 主键
-    * @return SystemButtonVo
-    */
-    @Override
-    public SystemButtonVo get(Long id){
-        return baseMapper.get(id);
     }
 
     @Override

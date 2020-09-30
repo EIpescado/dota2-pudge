@@ -11,21 +11,22 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pers.yurwisher.dota2.pudge.base.impl.BaseServiceImpl;
 import pers.yurwisher.dota2.pudge.enums.SystemCustomTipEnum;
+import pers.yurwisher.dota2.pudge.security.CurrentUser;
+import pers.yurwisher.dota2.pudge.security.JwtUser;
 import pers.yurwisher.dota2.pudge.system.entity.SystemMenu;
 import pers.yurwisher.dota2.pudge.system.exception.SystemCustomException;
 import pers.yurwisher.dota2.pudge.system.mapper.SystemMenuMapper;
 import pers.yurwisher.dota2.pudge.system.pojo.fo.SystemMenuFo;
 import pers.yurwisher.dota2.pudge.system.pojo.tree.ButtonNode;
+import pers.yurwisher.dota2.pudge.system.pojo.tree.MenuAndButtonTreeNode;
 import pers.yurwisher.dota2.pudge.system.pojo.tree.MenuMeta;
 import pers.yurwisher.dota2.pudge.system.pojo.tree.MenuTreeNode;
 import pers.yurwisher.dota2.pudge.system.service.ISystemButtonService;
 import pers.yurwisher.dota2.pudge.system.service.ISystemMenuService;
 import pers.yurwisher.dota2.pudge.wrapper.Tree;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -48,15 +49,15 @@ public class SystemMenuServiceImpl extends BaseServiceImpl<SystemMenuMapper, Sys
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void create(SystemMenuFo fo) {
-        //名称不可重复
-        if (super.haveFieldValueEq(SystemMenu::getTitle, fo.getTitle())) {
-            throw new SystemCustomException(SystemCustomTipEnum.MENU_NAME_REPEAT);
-        }
         //菜单若为iFrame  path必须以http/https开头
         if (fo.getIFrame()) {
             if (!HttpUtil.isHttp(fo.getPath()) && HttpUtil.isHttps(fo.getPath())) {
                 throw new SystemCustomException(SystemCustomTipEnum.MENU_I_FRAME_PATH_PREFIX_ERROR);
             }
+        }
+        //非根节点 component 不可为空
+        if(fo.getPid() != null && StrUtil.isEmpty(fo.getComponent())){
+            throw new SystemCustomException(SystemCustomTipEnum.MENU_COMPONENT_NOT_BE_NULL);
         }
         SystemMenu systemMenu = new SystemMenu();
         BeanUtils.copyProperties(fo, systemMenu);
@@ -81,10 +82,9 @@ public class SystemMenuServiceImpl extends BaseServiceImpl<SystemMenuMapper, Sys
                 throw new SystemCustomException(SystemCustomTipEnum.MENU_I_FRAME_PATH_PREFIX_ERROR);
             }
         }
-        //名称不可重复
-        SystemMenu x = super.getOneByFieldValueEq(SystemMenu::getTitle,fo.getTitle());
-        if(x != null && !x.getId().equals(id)){
-            throw new SystemCustomException(SystemCustomTipEnum.MENU_NAME_REPEAT);
+        //非根节点 component 不可为空
+        if(fo.getPid() != null && StrUtil.isEmpty(fo.getComponent())){
+            throw new SystemCustomException(SystemCustomTipEnum.MENU_COMPONENT_NOT_BE_NULL);
         }
         SystemMenu systemMenu = baseMapper.selectById(id);
         Assert.notNull(systemMenu);
@@ -100,13 +100,20 @@ public class SystemMenuServiceImpl extends BaseServiceImpl<SystemMenuMapper, Sys
     }
 
     @Override
-    public Object tree(Long userId) {
-        ////菜单
-        //List<MenuTreeNode> menuTreeNodeList = baseMapper.getUserMenuTreeNodes(userId);
-        ////按钮
-        //List<ButtonNode> buttonNodeList = systemButtonService.getUserButtonNodes(userId);
-        //return this.buildTree(menuTreeNodeList,buttonNodeList);
-        return this.wholeTree();
+    public List<MenuTreeNode> tree() {
+        CurrentUser currentUser = JwtUser.current();
+        //菜单
+        List<MenuTreeNode> menuTreeNodeList;
+        //按钮
+        List<ButtonNode> buttonNodeList;
+        if(currentUser.isAdmin()){
+            menuTreeNodeList = baseMapper.getAllMenuTreeNodes();
+            buttonNodeList = systemButtonService.getAllButtonNodes();
+        }else{
+            menuTreeNodeList = baseMapper.getUserMenuTreeNodes(currentUser.getId());
+            buttonNodeList = systemButtonService.getUserButtonNodes(currentUser.getId());
+        }
+        return this.buildTree(menuTreeNodeList,buttonNodeList);
     }
 
     private List<MenuTreeNode> buildTree(List<MenuTreeNode> menuTreeNodeList,List<ButtonNode> buttonNodeList){
@@ -116,14 +123,13 @@ public class SystemMenuServiceImpl extends BaseServiceImpl<SystemMenuMapper, Sys
         }
         //构建树
         Map<Long, List<ButtonNode>> finalButtonMap = buttonMap;
-        List<MenuTreeNode> treeNodes = new Tree<Long,MenuTreeNode>(-1L).build(menuTreeNodeList, node ->{
+        return new Tree<Long,MenuTreeNode>(-1L).build(menuTreeNodeList, node ->{
             //将按钮挂载到菜单下
             hangButtonToMenu(node, finalButtonMap);
             if(StrUtil.isNotBlank(node.getComponent()) && "Layout".equalsIgnoreCase(node.getComponent())){
                 node.setRedirect("noRedirect");
             }
         });
-        return treeNodes;
     }
 
     private void hangButtonToMenu(MenuTreeNode node,Map<Long,List<ButtonNode>> buttonMap){
@@ -137,11 +143,26 @@ public class SystemMenuServiceImpl extends BaseServiceImpl<SystemMenuMapper, Sys
     }
 
     @Override
-    public Object wholeTree() {
-        //所有菜单
-        List<MenuTreeNode> menuTreeNodeList = baseMapper.getAllMenuTreeNodes();
-        //所有按钮
-        List<ButtonNode> buttonNodeList = systemButtonService.getAllButtonNodes();
-        return this.buildTree(menuTreeNodeList,buttonNodeList);
+    public List<MenuAndButtonTreeNode> wholeTree() {
+        List<MenuAndButtonTreeNode> nodes = baseMapper.getAllNodes();
+        return new Tree<Long,MenuAndButtonTreeNode>(-1L).build(nodes);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void delete(List<MenuAndButtonTreeNode> nodes) {
+        if(CollectionUtil.isNotEmpty(nodes)){
+           Map<Boolean,List<MenuAndButtonTreeNode>> map = nodes.stream().collect(Collectors.groupingBy(MenuAndButtonTreeNode::getWhetherButton));
+           //菜单
+            List<MenuAndButtonTreeNode> menus = map.get(false);
+            if(CollectionUtil.isNotEmpty(menus)){
+                baseMapper.deleteBatchIds(menus.stream().map(MenuAndButtonTreeNode::getId).collect(Collectors.toList()));
+            }
+            //按钮
+            List<MenuAndButtonTreeNode> buttons = map.get(true);
+            if(CollectionUtil.isNotEmpty(buttons)){
+                systemButtonService.removeByIds(buttons.stream().map(MenuAndButtonTreeNode::getId).collect(Collectors.toList()));
+            }
+        }
     }
 }

@@ -16,10 +16,9 @@ public enum SystemCustomTipEnum implements ICustomTipEnum {
     AUTH_CODE_NOT_EXIST_OR_EXPIRED(10005,"验证码已过期"),
     AUTH_CODE_ERROR(10006,"验证码错误"),
 
-    MENU_NAME_REPEAT(10007,"菜单名称重复"),
-    BUTTON_NAME_REPEAT(10008,"按钮名称重复"),
     MENU_I_FRAME_PATH_PREFIX_ERROR(10009,"iFrame菜单路由地址必须以http/https开头"),
     MENU_PID_NOT_ID(10010,"上级不能为自己"),
+    MENU_COMPONENT_NOT_BE_NULL(10011,"菜单component不可为空"),
     ;
 
     private CustomTip tip;

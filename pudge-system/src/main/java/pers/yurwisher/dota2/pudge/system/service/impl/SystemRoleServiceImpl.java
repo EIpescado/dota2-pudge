@@ -16,7 +16,6 @@ import pers.yurwisher.dota2.pudge.system.mapper.SystemRoleMapper;
 import pers.yurwisher.dota2.pudge.system.pojo.fo.SystemRoleFo;
 import pers.yurwisher.dota2.pudge.system.pojo.qo.SystemRoleQo;
 import pers.yurwisher.dota2.pudge.system.pojo.to.SystemRoleTo;
-import pers.yurwisher.dota2.pudge.system.pojo.vo.SystemRoleVo;
 import pers.yurwisher.dota2.pudge.system.service.ISystemMenuService;
 import pers.yurwisher.dota2.pudge.system.service.ISystemRoleService;
 import pers.yurwisher.dota2.pudge.wrapper.PageR;
@@ -74,17 +73,6 @@ public class SystemRoleServiceImpl extends BaseServiceImpl<SystemRoleMapper,Syst
         return super.toPageR(baseMapper.list(super.toPage(qo),qo));
     }
 
-
-    /**
-    * 详情
-    * @param id 主键
-    * @return SystemRoleVo
-    */
-    @Override
-    public SystemRoleVo get(Long id){
-        return baseMapper.get(id);
-    }
-
      /**
      * 删除
      * @param id 主键
@@ -104,5 +92,10 @@ public class SystemRoleServiceImpl extends BaseServiceImpl<SystemRoleMapper,Syst
                     .map(SystemMenu::getPermission).collect(Collectors.toList());
         }
         return null;
+    }
+
+    @Override
+    public List<String> getUserRole(Long userId) {
+        return baseMapper.getUserRole(userId);
     }
 }

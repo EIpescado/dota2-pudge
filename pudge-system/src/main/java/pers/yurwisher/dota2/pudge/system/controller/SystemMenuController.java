@@ -9,11 +9,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pers.yurwisher.dota2.pudge.base.BaseController;
-import pers.yurwisher.dota2.pudge.security.JwtUser;
 import pers.yurwisher.dota2.pudge.system.entity.SystemMenu;
 import pers.yurwisher.dota2.pudge.system.pojo.fo.SystemMenuFo;
+import pers.yurwisher.dota2.pudge.system.pojo.tree.MenuAndButtonTreeNode;
+import pers.yurwisher.dota2.pudge.system.pojo.tree.MenuTreeNode;
 import pers.yurwisher.dota2.pudge.system.service.ISystemMenuService;
 import pers.yurwisher.dota2.pudge.wrapper.R;
+
+import java.util.List;
 
 /**
  * @author yq
@@ -31,13 +34,14 @@ public class SystemMenuController extends BaseController{
     }
 
     @PostMapping
+    @PreAuthorize("@el.check('menu:create')")
     public R<String> create(@RequestBody @Validated SystemMenuFo fo){
         menuService.create(fo);
         return R.ok();
     }
 
     @PostMapping("{id}")
-    @PreAuthorize("@el.check('menu:edit')")
+    @PreAuthorize("@el.check('menu:update')")
     public R<String> update(@PathVariable(name = "id")Long id, @RequestBody @Validated SystemMenuFo fo){
         menuService.update(id,fo);
         return R.ok();
@@ -48,19 +52,27 @@ public class SystemMenuController extends BaseController{
         return R.ok(menuService.getById(id));
     }
 
+    @PostMapping("delete")
+    @PreAuthorize("@el.check('node:delete')")
+    public R<String> delete(@RequestBody List<MenuAndButtonTreeNode> nodes){
+        menuService.delete(nodes);
+        return R.ok();
+    }
+
     /**
      * 用户的菜单树
      */
     @GetMapping("tree")
-    public R<Object> tree(){
-        return R.ok(menuService.tree(JwtUser.currentUserId()));
+    public R<List<MenuTreeNode>> tree(){
+        return R.ok(menuService.tree());
     }
 
     /**
      * 完整菜单树,用于分配菜单及按钮
      */
     @GetMapping("wholeTree")
-    public R<Object> wholeTree(){
+    @PreAuthorize("@el.check('menu:wholeTree')")
+    public R<List<MenuAndButtonTreeNode>> wholeTree(){
         return R.ok(menuService.wholeTree());
     }
 
