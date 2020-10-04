@@ -25,6 +25,9 @@ spring:
     multipart:
       max-file-size: 15MB
       max-request-size: 15MB
+  #404直接抛出异常 方便统一处理
+  mvc:
+    throw-exception-if-no-handler-found: true
 #日志
 log:
   path: d:/logs/hfy-box/dev

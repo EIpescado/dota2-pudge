@@ -11,6 +11,14 @@
     <delete id="deleteUserRoleRelationByUserId">
         delete from user_role_relation where user_id = #{userId}
     </delete>
+    <select id="singleRoleMenu" resultType="java.lang.Long">
+        SELECT DISTINCT menu_id from role_menu_relation
+        where role_id = #{roleId}
+    </select>
+    <select id="singleRoleButton" resultType="java.lang.Long">
+        SELECT DISTINCT button_id from role_button_relation
+        where role_id = #{roleId}
+    </select>
 
     <insert id="batchInsertRoleMenuRelation">
         INSERT into role_menu_relation(role_id,menu_id) VALUES

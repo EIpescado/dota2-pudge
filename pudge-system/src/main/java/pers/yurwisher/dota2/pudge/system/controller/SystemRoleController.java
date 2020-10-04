@@ -12,9 +12,12 @@ import pers.yurwisher.dota2.pudge.system.entity.SystemRole;
 import pers.yurwisher.dota2.pudge.system.pojo.fo.SystemRoleFo;
 import pers.yurwisher.dota2.pudge.system.pojo.qo.SystemRoleQo;
 import pers.yurwisher.dota2.pudge.system.pojo.to.SystemRoleTo;
+import pers.yurwisher.dota2.pudge.system.pojo.tree.MenuAndButtonTreeNode;
 import pers.yurwisher.dota2.pudge.system.service.ISystemRoleService;
 import pers.yurwisher.dota2.pudge.wrapper.PageR;
 import pers.yurwisher.dota2.pudge.wrapper.R;
+
+import java.util.List;
 
 /**
  * @author yq
@@ -25,20 +28,20 @@ import pers.yurwisher.dota2.pudge.wrapper.R;
 @RestController
 @RequestMapping("/role")
 public class SystemRoleController extends BaseController{
-    private ISystemRoleService systemRoleService;
+    private final ISystemRoleService systemRoleService;
 
     public SystemRoleController(ISystemRoleService systemRoleService) {
         this.systemRoleService = systemRoleService;
     }
 
     @PostMapping
-    public R create(@RequestBody SystemRoleFo fo){
+    public R<String> create(@RequestBody SystemRoleFo fo){
         systemRoleService.create(fo);
         return R.ok();
     }
 
     @PostMapping("{id}")
-    public R update(@PathVariable(name = "id")Long id, @RequestBody SystemRoleFo fo){
+    public R<String> update(@PathVariable(name = "id")Long id, @RequestBody SystemRoleFo fo){
         systemRoleService.update(id,fo);
         return R.ok();
     }
@@ -59,5 +62,15 @@ public class SystemRoleController extends BaseController{
         return R.ok(systemRoleService.list(qo));
     }
 
+    @PostMapping("/{roleId}/bindMenuAndButton")
+    public R<String> bindMenuAndButton(@RequestBody List<MenuAndButtonTreeNode> nodes, @PathVariable Long roleId){
+        systemRoleService.bindMenuAndButton(roleId,nodes);
+        return R.ok();
+    }
+
+    @GetMapping("/{roleId}/singleRoleMenuAndButton")
+    public R<List<String>> singleRoleMenuAndButton(@PathVariable Long roleId){
+        return R.ok(systemRoleService.singleRoleMenuAndButton(roleId));
+    }
 
 }

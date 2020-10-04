@@ -59,4 +59,14 @@ public class RelationServiceImpl implements IRelationService {
             }
         }
     }
+
+    @Override
+    public List<Long> singleRoleMenu(Long roleId) {
+        return relationMapper.singleRoleMenu(roleId);
+    }
+
+    @Override
+    public List<Long> singleRoleButton(Long roleId) {
+        return relationMapper.singleRoleButton(roleId);
+    }
 }

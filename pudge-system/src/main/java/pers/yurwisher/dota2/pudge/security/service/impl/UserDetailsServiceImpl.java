@@ -20,7 +20,7 @@ import pers.yurwisher.dota2.pudge.system.service.ISystemUserService;
 public class UserDetailsServiceImpl implements UserDetailsService {
     private static final Logger logger = LoggerFactory.getLogger(UserDetailsServiceImpl.class);
 
-    private ISystemUserService systemUserService;
+    private final ISystemUserService systemUserService;
 
     public UserDetailsServiceImpl(ISystemUserService systemUserService) {
         this.systemUserService = systemUserService;

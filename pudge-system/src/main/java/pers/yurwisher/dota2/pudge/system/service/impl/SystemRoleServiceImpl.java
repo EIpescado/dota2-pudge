@@ -16,11 +16,14 @@ import pers.yurwisher.dota2.pudge.system.mapper.SystemRoleMapper;
 import pers.yurwisher.dota2.pudge.system.pojo.fo.SystemRoleFo;
 import pers.yurwisher.dota2.pudge.system.pojo.qo.SystemRoleQo;
 import pers.yurwisher.dota2.pudge.system.pojo.to.SystemRoleTo;
+import pers.yurwisher.dota2.pudge.system.pojo.tree.MenuAndButtonTreeNode;
+import pers.yurwisher.dota2.pudge.system.service.IRelationService;
 import pers.yurwisher.dota2.pudge.system.service.ISystemMenuService;
 import pers.yurwisher.dota2.pudge.system.service.ISystemRoleService;
 import pers.yurwisher.dota2.pudge.wrapper.PageR;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -35,6 +38,7 @@ import java.util.stream.Collectors;
 public class SystemRoleServiceImpl extends BaseServiceImpl<SystemRoleMapper,SystemRole> implements ISystemRoleService{
 
     private final ISystemMenuService menuService;
+    private final IRelationService relationService;
 
     /**
      * 新增
@@ -97,5 +101,38 @@ public class SystemRoleServiceImpl extends BaseServiceImpl<SystemRoleMapper,Syst
     @Override
     public List<String> getUserRole(Long userId) {
         return baseMapper.getUserRole(userId);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void bindMenuAndButton(Long roleId,List<MenuAndButtonTreeNode> nodes) {
+        //删除角色所有已绑定节点
+        if(CollectionUtil.isNotEmpty(nodes)){
+            Map<Boolean,List<MenuAndButtonTreeNode>> map = nodes.stream().collect(Collectors.groupingBy(MenuAndButtonTreeNode::getWhetherButton));
+            //绑定菜单
+            List<MenuAndButtonTreeNode> menus = map.get(Boolean.FALSE);
+            if(CollectionUtil.isNotEmpty(menus)){
+                relationService.roleBindMenus(roleId,menus.stream().map(MenuAndButtonTreeNode::getId).collect(Collectors.toList()));
+            }
+            //绑定按钮
+            List<MenuAndButtonTreeNode> buttons = map.get(Boolean.TRUE);
+            if(CollectionUtil.isNotEmpty(buttons)){
+                relationService.roleBindButtons(roleId,buttons.stream().map(MenuAndButtonTreeNode::getId).collect(Collectors.toList()));
+            }
+        }
+    }
+
+    @Override
+    public List<String> singleRoleMenuAndButton(Long roleId) {
+        List<Long> menuIds =  relationService.singleRoleMenu(roleId);
+        List<Long> buttonIds = relationService.singleRoleButton(roleId);
+        if(CollectionUtil.isNotEmpty(menuIds)){
+            if(CollectionUtil.isNotEmpty(buttonIds)){
+                menuIds.addAll(buttonIds);
+            }
+            //fastjson 即使配置全局对Long的序列化 ToStringSerializer , 序列化 List<Long> 使用的 ListSerializer 未对Long做处理 依旧返回Long
+            return menuIds.stream().map(Object::toString).collect(Collectors.toList());
+        }
+        return null;
     }
 }

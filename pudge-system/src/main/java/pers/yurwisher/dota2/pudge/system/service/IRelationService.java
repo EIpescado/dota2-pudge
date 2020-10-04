@@ -31,4 +31,18 @@ public interface IRelationService {
      * @param buttonIds 按钮ID集合
      */
     void roleBindButtons(Long roleId, List<Long> buttonIds);
+
+    /**
+     * 单个角色所有菜单
+     * @param roleId 角色ID
+     * @return 所有菜单
+     */
+    List<Long> singleRoleMenu(Long roleId);
+
+    /**
+     * 单个角色所有按钮
+     * @param roleId 角色ID
+     * @return 所有按钮
+     */
+    List<Long> singleRoleButton(Long roleId);
 }

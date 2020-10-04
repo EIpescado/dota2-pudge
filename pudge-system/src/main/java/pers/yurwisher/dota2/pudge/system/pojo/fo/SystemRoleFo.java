@@ -1,7 +1,6 @@
 package pers.yurwisher.dota2.pudge.system.pojo.fo;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
@@ -15,12 +14,7 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 public class SystemRoleFo implements Serializable {
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = -2787152552603004097L;
     private String name;
     private String description;
-    private Integer level;
-    private Long id;
-    private Boolean enabled;
-    private LocalDateTime dateCreated;
-    private LocalDateTime lastUpdated;
 }

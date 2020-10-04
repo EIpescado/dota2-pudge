@@ -56,4 +56,18 @@ public interface RelationMapper {
      * @return 影响行数
      */
     Integer batchInsertRoleButtonRelation(@Param("roleId")Long roleId,@Param("buttonIds") List<Long> buttonIds);
+
+    /**
+     * 单个角色菜单
+     * @param roleId 角色ID
+     * @return 菜单ID集合
+     */
+    List<Long> singleRoleMenu(@Param("roleId")Long roleId);
+
+    /**
+     * 单个角色按钮
+     * @param roleId 角色ID
+     * @return 按钮集合
+     */
+    List<Long> singleRoleButton(@Param("roleId")Long roleId);
 }
