@@ -3,6 +3,11 @@ package pers.yurwisher.dota2.pudge.system.service;
 import pers.yurwisher.dota2.pudge.base.BaseService;
 import pers.yurwisher.dota2.pudge.security.CurrentUser;
 import pers.yurwisher.dota2.pudge.system.entity.SystemUser;
+import pers.yurwisher.dota2.pudge.system.pojo.qo.SystemUserQo;
+import pers.yurwisher.dota2.pudge.system.pojo.to.SystemUserTo;
+import pers.yurwisher.dota2.pudge.wrapper.PageR;
+
+import java.util.List;
 
 /**
  * @author yq
@@ -26,4 +31,11 @@ public interface ISystemUserService extends BaseService<SystemUser> {
      * @return 用户
      */
     SystemUser getUserByUsername(String username);
+
+    /**
+     * 用户列表
+     * @param qo 查询对象
+     * @return 分页结果
+     */
+    PageR<SystemUserTo> list(SystemUserQo qo);
 }

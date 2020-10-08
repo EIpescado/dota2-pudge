@@ -12,8 +12,11 @@ import pers.yurwisher.dota2.pudge.security.CurrentUser;
 import pers.yurwisher.dota2.pudge.system.entity.SystemUser;
 import pers.yurwisher.dota2.pudge.system.exception.SystemCustomException;
 import pers.yurwisher.dota2.pudge.system.mapper.SystemUserMapper;
+import pers.yurwisher.dota2.pudge.system.pojo.qo.SystemUserQo;
+import pers.yurwisher.dota2.pudge.system.pojo.to.SystemUserTo;
 import pers.yurwisher.dota2.pudge.system.service.ISystemRoleService;
 import pers.yurwisher.dota2.pudge.system.service.ISystemUserService;
+import pers.yurwisher.dota2.pudge.wrapper.PageR;
 
 import java.util.List;
 
@@ -57,5 +60,11 @@ public class ISystemUserServiceImpl extends BaseServiceImpl<SystemUserMapper, Sy
     @Override
     public SystemUser getUserByUsername(String username) {
         return baseMapper.selectOne(super.buildLambdaQueryWrapper().eq(SystemUser::getUsername, username));
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public PageR<SystemUserTo> list(SystemUserQo qo) {
+        return super.toPageR(baseMapper.list(super.toPage(qo), qo));
     }
 }

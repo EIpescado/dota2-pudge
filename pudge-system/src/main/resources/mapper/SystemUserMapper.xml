@@ -3,4 +3,12 @@
 <mapper namespace="pers.yurwisher.dota2.pudge.system.mapper.SystemUserMapper">
 
 
+    <select id="list" resultType="pers.yurwisher.dota2.pudge.system.pojo.to.SystemUserTo">
+        select  * from system_user
+        <where>
+            <if test="qo.username != null and qo.username != ''">
+                username = #{qo.username}
+            </if>
+        </where>
+    </select>
 </mapper>
