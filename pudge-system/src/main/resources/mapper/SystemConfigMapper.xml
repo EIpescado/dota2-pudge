@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="pers.yurwisher.dota2.pudge.system.mapper.SystemConfigMapper">
+    <select id="list" resultType="pers.yurwisher.dota2.pudge.system.pojo.to.SystemConfigTo">
+     SELECT * from system_config
+     <where>
+         <if test="qo.code != null and qo.code != ''">
+             code like concat('%',#{qo.code},'%')
+         </if>
+         <if test="qo.description != null and qo.description != ''">
+             description like concat('%',#{qo.description},'%')
+         </if>
+     </where>
+     ORDER BY last_updated desc
+    </select>
+
+
+</mapper>
