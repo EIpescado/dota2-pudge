@@ -63,7 +63,6 @@ public class AuthorizationService {
         this.verifyCode(form.getUuid(),form.getCode());
         //校验用户帐号密码 调用对应 UserDetailsService 获取用户信息 存入授权信息
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(form.getUsername(), password);
-        //UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(form.getUsername(), form.getPassword());
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
         SecurityContextHolder.getContext().setAuthentication(authentication);
         final JwtUser jwtUser = (JwtUser) authentication.getPrincipal();

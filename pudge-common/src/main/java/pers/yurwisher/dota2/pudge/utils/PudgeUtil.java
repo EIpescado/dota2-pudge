@@ -28,7 +28,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 /**
@@ -201,13 +200,4 @@ public class PudgeUtil {
         private String system;
     }
 
-    public static void main(String[] args) {
-        String data = "11213dssjk跨机房萨迪克";
-        String x = encrypt(data);
-        System.out.println(x);
-        String y = decrypt(x);
-        System.out.println(y);
-        System.out.println(data.equals(y));
-
-    }
 }

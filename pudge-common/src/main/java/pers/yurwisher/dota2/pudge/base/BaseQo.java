@@ -23,4 +23,9 @@ public class BaseQo implements Serializable {
      * 用户ID
      */
     private Long userId;
+
+    /**
+     * 关键字搜索,用于全局搜索
+     */
+    private String keyWord;
 }
