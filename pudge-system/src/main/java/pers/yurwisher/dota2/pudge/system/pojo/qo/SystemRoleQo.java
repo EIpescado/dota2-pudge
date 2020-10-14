@@ -1,7 +1,6 @@
 package pers.yurwisher.dota2.pudge.system.pojo.qo;
 
 import pers.yurwisher.dota2.pudge.base.BasePageQo;
-import java.time.LocalDateTime;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
@@ -17,10 +16,4 @@ import lombok.experimental.Accessors;
 public class SystemRoleQo extends BasePageQo {
     private static final long serialVersionUID = -3915449507367561347L;
     private String name;
-    private String description;
-    private Integer level;
-    private Long id;
-    private Boolean enabled;
-    private LocalDateTime dateCreated;
-    private LocalDateTime lastUpdated;
 }

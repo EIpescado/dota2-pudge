@@ -11,4 +11,7 @@
             </if>
         </where>
     </select>
+    <select id="get" resultType="pers.yurwisher.dota2.pudge.system.pojo.vo.SystemUserVo">
+        select  * from system_user where id = #{id}
+    </select>
 </mapper>

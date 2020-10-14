@@ -16,7 +16,7 @@ public class OnlineUser {
     /**用户名*/
     private String username;
     /**名称*/
-    private String nickName;
+    private String nickname;
     /**IP*/
     private String ip;
     /**ip对应地址*/

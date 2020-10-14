@@ -39,7 +39,7 @@ public class OnlineUserServiceImpl implements IOnlineUserService {
         OnlineUser onlineUser = new OnlineUser();
         CurrentUser currentUser = user.getUser();
         onlineUser.setUsername(currentUser.getUsername());
-        onlineUser.setNickName(currentUser.getNickName());
+        onlineUser.setNickname(currentUser.getNickname());
         //加密token
         onlineUser.setToken(PudgeUtil.encrypt(token));
         onlineUser.setLoginDate(LocalDateTime.now());

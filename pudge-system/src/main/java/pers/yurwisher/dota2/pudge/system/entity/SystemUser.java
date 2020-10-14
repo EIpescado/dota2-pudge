@@ -26,7 +26,7 @@ public class SystemUser extends BaseEntity {
     /**
      * 昵称
      */
-    private String nickName;
+    private String nickname;
 
     /**
      * 密码

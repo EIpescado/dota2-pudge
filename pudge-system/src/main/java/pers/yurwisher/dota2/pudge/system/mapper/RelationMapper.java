@@ -70,4 +70,11 @@ public interface RelationMapper {
      * @return 按钮集合
      */
     List<Long> singleRoleButton(@Param("roleId")Long roleId);
+
+    /**
+     * 获取用户已经绑定的所有角色ID
+     * @param userId 用户ID
+     * @return 角色ID集合
+     */
+    List<Long> getUserAlreadyBindRoleIds(@Param("userId")Long userId);
 }

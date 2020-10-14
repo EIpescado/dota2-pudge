@@ -26,7 +26,7 @@ public class DataInValidator implements ConstraintValidator<DataIn, Object> {
 
     @Override
     public boolean isValid(Object value, ConstraintValidatorContext context) {
-        if(value == null || StrUtil.isEmpty(value.toString())){
+        if(StrUtil.isEmpty(value.toString())){
             return nullable;
         }else{
             for (int i = 0; i < dataList.length; i++) {

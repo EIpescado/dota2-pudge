@@ -19,6 +19,9 @@
         SELECT DISTINCT button_id from role_button_relation
         where role_id = #{roleId}
     </select>
+    <select id="getUserAlreadyBindRoleIds" resultType="java.lang.Long">
+        SELECT DISTINCT role_id from user_role_relation where user_id = #{userId}
+    </select>
 
     <insert id="batchInsertRoleMenuRelation">
         INSERT into role_menu_relation(role_id,menu_id) VALUES

@@ -21,6 +21,7 @@ import pers.yurwisher.dota2.pudge.system.service.IRelationService;
 import pers.yurwisher.dota2.pudge.system.service.ISystemMenuService;
 import pers.yurwisher.dota2.pudge.system.service.ISystemRoleService;
 import pers.yurwisher.dota2.pudge.wrapper.PageR;
+import pers.yurwisher.dota2.pudge.wrapper.Selector;
 
 import java.util.List;
 import java.util.Map;
@@ -134,5 +135,10 @@ public class SystemRoleServiceImpl extends BaseServiceImpl<SystemRoleMapper,Syst
             return menuIds.stream().map(Object::toString).collect(Collectors.toList());
         }
         return null;
+    }
+
+    @Override
+    public List<Selector<Long>> select() {
+        return baseMapper.select();
     }
 }

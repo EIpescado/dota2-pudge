@@ -3,11 +3,19 @@
 <mapper namespace="pers.yurwisher.dota2.pudge.system.mapper.SystemRoleMapper">
     <select id="list" resultType="pers.yurwisher.dota2.pudge.system.pojo.to.SystemRoleTo">
       select * from system_role
+      <where>
+          <if test="qo.name != null and qo.name != ''">
+              name like concat('%',#{qo.name},'%')
+          </if>
+      </where>
     </select>
     <select id="getUserRole" resultType="java.lang.String">
         SELECT DISTINCT sr.name from user_role_relation r
         LEFT JOIN system_role sr on sr.id = r.role_id
         where r.user_id = #{userId} and sr.enabled = 1
+    </select>
+    <select id="select" resultType="pers.yurwisher.dota2.pudge.wrapper.Selector">
+        SELECT id as 'value',description as label from system_role where enabled  = 1
     </select>
 
 </mapper>

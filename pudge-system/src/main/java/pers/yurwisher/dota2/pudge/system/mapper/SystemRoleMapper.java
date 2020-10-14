@@ -7,6 +7,7 @@ import pers.yurwisher.dota2.pudge.system.pojo.to.SystemRoleTo;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.annotations.Param;
+import pers.yurwisher.dota2.pudge.wrapper.Selector;
 
 import java.util.List;
 
@@ -33,4 +34,10 @@ public interface SystemRoleMapper extends CommonMapper<SystemRole> {
      * @return 角色集合
      */
     List<String> getUserRole(@Param("userId")Long userId);
+
+    /**
+     * 角色集合
+     * @return 角色集合
+     */
+    List<Selector<Long>> select();
 }

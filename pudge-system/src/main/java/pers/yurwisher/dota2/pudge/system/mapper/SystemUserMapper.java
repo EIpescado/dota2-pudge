@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Param;
 import pers.yurwisher.dota2.pudge.system.entity.SystemUser;
 import pers.yurwisher.dota2.pudge.system.pojo.qo.SystemUserQo;
 import pers.yurwisher.dota2.pudge.system.pojo.to.SystemUserTo;
+import pers.yurwisher.dota2.pudge.system.pojo.vo.SystemUserVo;
 
 /**
  * @author yq
@@ -24,4 +25,11 @@ public interface SystemUserMapper extends BaseMapper<SystemUser> {
      * @return 分页结果
      */
     IPage<SystemUserTo> list(Page<SystemUserTo> page,@Param("qo") SystemUserQo qo);
+
+    /**
+     * 用户详情
+     * @param id 用户ID
+     * @return 详情
+     */
+    SystemUserVo get(@Param("id") Long id);
 }

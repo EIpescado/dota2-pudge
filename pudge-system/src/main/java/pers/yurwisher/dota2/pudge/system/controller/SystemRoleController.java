@@ -16,6 +16,7 @@ import pers.yurwisher.dota2.pudge.system.pojo.tree.MenuAndButtonTreeNode;
 import pers.yurwisher.dota2.pudge.system.service.ISystemRoleService;
 import pers.yurwisher.dota2.pudge.wrapper.PageR;
 import pers.yurwisher.dota2.pudge.wrapper.R;
+import pers.yurwisher.dota2.pudge.wrapper.Selector;
 
 import java.util.List;
 
@@ -52,7 +53,7 @@ public class SystemRoleController extends BaseController{
     }
 
     @PostMapping("/delete/{id}")
-    public R delete(@PathVariable(name = "id")Long id){
+    public R<String> delete(@PathVariable(name = "id")Long id){
         systemRoleService.delete(id);
         return R.ok();
     }
@@ -60,6 +61,11 @@ public class SystemRoleController extends BaseController{
     @GetMapping
     public R<PageR<SystemRoleTo>> list(@ModelAttribute SystemRoleQo qo){
         return R.ok(systemRoleService.list(qo));
+    }
+
+    @GetMapping("select")
+    public R<List<Selector<Long>>> select(){
+        return R.ok(systemRoleService.select());
     }
 
     @PostMapping("/{roleId}/bindMenuAndButton")

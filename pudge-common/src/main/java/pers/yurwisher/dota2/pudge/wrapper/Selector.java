@@ -1,5 +1,7 @@
 package pers.yurwisher.dota2.pudge.wrapper;
 
+import com.alibaba.fastjson.annotation.JSONField;
+import com.alibaba.fastjson.serializer.ToStringSerializer;
 import lombok.Data;
 
 /**
@@ -12,5 +14,6 @@ import lombok.Data;
 public class Selector<T> {
 
     private String label;
+    @JSONField(serializeUsing = ToStringSerializer.class)
     private T value;
 }

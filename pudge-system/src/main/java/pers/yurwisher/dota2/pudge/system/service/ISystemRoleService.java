@@ -7,6 +7,7 @@ import pers.yurwisher.dota2.pudge.system.pojo.qo.SystemRoleQo;
 import pers.yurwisher.dota2.pudge.system.pojo.to.SystemRoleTo;
 import pers.yurwisher.dota2.pudge.system.pojo.tree.MenuAndButtonTreeNode;
 import pers.yurwisher.dota2.pudge.wrapper.PageR;
+import pers.yurwisher.dota2.pudge.wrapper.Selector;
 
 import java.util.List;
 
@@ -72,4 +73,10 @@ public interface ISystemRoleService extends BaseService<SystemRole> {
      * @return 菜单和按钮ID集合
      */
     List<String> singleRoleMenuAndButton(Long roleId);
+
+    /**
+     * 角色下拉框
+     * @return 角色集合
+     */
+    List<Selector<Long>> select();
 }

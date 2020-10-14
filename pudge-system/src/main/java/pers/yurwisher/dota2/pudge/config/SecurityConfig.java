@@ -1,6 +1,7 @@
 package pers.yurwisher.dota2.pudge.config;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.crypto.SecureUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -27,6 +28,7 @@ import pers.yurwisher.dota2.pudge.security.TokenConfigurer;
 import pers.yurwisher.dota2.pudge.security.TokenProvider;
 import pers.yurwisher.dota2.pudge.security.bean.SecurityProperties;
 import pers.yurwisher.dota2.pudge.security.service.IOnlineUserService;
+import pers.yurwisher.dota2.pudge.utils.PudgeUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -62,7 +64,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public PasswordEncoder passwordEncoder() {
         // 密码加密方式
-        return new BCryptPasswordEncoder();
+        return new PasswordEncoder() {
+            @Override
+            public String encode(CharSequence charSequence) {
+                return PudgeUtil.encodePwd(charSequence.toString());
+            }
+
+            @Override
+            public boolean matches(CharSequence charSequence, String encodedPassword) {
+                return encodedPassword.equals(PudgeUtil.encodePwd(charSequence.toString()));
+            }
+        };
     }
 
     @Override

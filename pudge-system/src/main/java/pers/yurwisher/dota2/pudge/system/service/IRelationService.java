@@ -45,4 +45,11 @@ public interface IRelationService {
      * @return 所有按钮
      */
     List<Long> singleRoleButton(Long roleId);
+
+    /**
+     * 获取用户已经绑定的角色
+     * @param userId 用户ID
+     * @return 角色ID集合
+     */
+    List<Long> getUserAlreadyBindRoleIds(Long userId);
 }

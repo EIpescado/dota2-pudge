@@ -69,4 +69,9 @@ public class RelationServiceImpl implements IRelationService {
     public List<Long> singleRoleButton(Long roleId) {
         return relationMapper.singleRoleButton(roleId);
     }
+
+    @Override
+    public List<Long> getUserAlreadyBindRoleIds(Long userId) {
+        return relationMapper.getUserAlreadyBindRoleIds(userId);
+    }
 }

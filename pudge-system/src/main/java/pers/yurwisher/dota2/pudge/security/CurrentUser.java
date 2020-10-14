@@ -18,7 +18,7 @@ public class CurrentUser {
     private Long id;
     private String username;
     private String password;
-    private String nickName;
+    private String nickname;
     private String avatar;
     private String phone;
     private Boolean enabled;
