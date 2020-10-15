@@ -51,7 +51,6 @@ public class SystemUserController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("@el.check('user:get')")
     public R<SystemUserVo> get(@PathVariable Long id){
         return R.ok(systemUserService.get(id));
     }

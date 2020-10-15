@@ -1,5 +1,6 @@
 package pers.yurwisher.dota2.pudge.system.controller;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -36,12 +37,14 @@ public class SystemRoleController extends BaseController{
     }
 
     @PostMapping
+    @PreAuthorize("@el.check('role:create')")
     public R<String> create(@RequestBody SystemRoleFo fo){
         systemRoleService.create(fo);
         return R.ok();
     }
 
     @PostMapping("{id}")
+    @PreAuthorize("@el.check('role:update')")
     public R<String> update(@PathVariable(name = "id")Long id, @RequestBody SystemRoleFo fo){
         systemRoleService.update(id,fo);
         return R.ok();
@@ -59,6 +62,7 @@ public class SystemRoleController extends BaseController{
     }
 
     @GetMapping
+    @PreAuthorize("@el.check('role:list')")
     public R<PageR<SystemRoleTo>> list(@ModelAttribute SystemRoleQo qo){
         return R.ok(systemRoleService.list(qo));
     }
@@ -68,6 +72,7 @@ public class SystemRoleController extends BaseController{
         return R.ok(systemRoleService.select());
     }
 
+    @PreAuthorize("@el.check('menu:bind')")
     @PostMapping("/{roleId}/bindMenuAndButton")
     public R<String> bindMenuAndButton(@RequestBody List<MenuAndButtonTreeNode> nodes, @PathVariable Long roleId){
         systemRoleService.bindMenuAndButton(roleId,nodes);

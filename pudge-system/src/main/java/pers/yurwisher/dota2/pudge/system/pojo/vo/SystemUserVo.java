@@ -35,6 +35,4 @@ public class SystemUserVo implements Serializable {
      * 角色ID集合
      */
     List<Long> roleIds;
-
-    private LocalDateTime lastUpdated;
 }

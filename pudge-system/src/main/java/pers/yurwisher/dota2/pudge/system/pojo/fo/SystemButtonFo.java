@@ -28,7 +28,7 @@ public class SystemButtonFo implements Serializable {
     @Positive(message = "按钮排序号必须大于0")
     private Integer sortNo;
     private String icon;
-    @DataIn(message = "无效按钮位置",dataList = {"TOP","RIGHT","OTHER"})
+    @DataIn(message = "无效按钮位置",dataList = {"TOP","ROW","OTHER"})
     private String position;
     @NotBlank(message = "按钮绑定函数必填")
     private String click;
