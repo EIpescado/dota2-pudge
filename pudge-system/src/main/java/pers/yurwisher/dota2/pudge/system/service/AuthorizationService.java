@@ -137,7 +137,7 @@ public class AuthorizationService {
         if(StrUtil.isNotBlank(token)){
             String username = tokenProvider.getUsernameFromToken(token);
             if(StrUtil.isNotBlank(username)){
-                redisTemplate.delete(CacheConstant.MaName.PC_ONLINE_USER + username);
+                customRedisCacheService.deleteCachePlus(CacheConstant.MaName.PC_ONLINE_USER,username);
             }
         }
         return R.ok();

@@ -66,7 +66,7 @@ public class SystemRoleServiceImpl extends BaseServiceImpl<SystemRoleMapper, Sys
     public void update(Long id, SystemRoleFo fo) {
         SystemRole systemRole = baseMapper.selectById(id);
         Assert.notNull(systemRole);
-        BeanUtils.copyProperties(fo, systemRole);
+        BeanUtils.copyProperties(fo, systemRole,"name");
         baseMapper.updateById(systemRole);
         this.deleteCache();
     }
@@ -93,6 +93,10 @@ public class SystemRoleServiceImpl extends BaseServiceImpl<SystemRoleMapper, Sys
     public void delete(Long id) {
         baseMapper.deleteById(id);
         this.deleteCache();
+        //删除所有含有此角色的用户缓存信息 与 菜单缓存
+        List<String> usernameList = relationService.getAllHaveThisRoleIdUsername(id);
+        customRedisCacheService.batchDelete(CacheConstant.AnName.SYSTEM_USER_INFO,usernameList);
+        customRedisCacheService.batchDelete(CacheConstant.MaName.SYSTEM_USER_TREE,usernameList);
     }
 
     @Override

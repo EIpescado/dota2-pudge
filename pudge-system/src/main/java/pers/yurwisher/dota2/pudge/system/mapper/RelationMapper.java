@@ -77,4 +77,11 @@ public interface RelationMapper {
      * @return 角色ID集合
      */
     List<Long> getUserAlreadyBindRoleIds(@Param("userId")Long userId);
+
+    /**
+     * 获取已绑定指定角色的所有username
+     * @param roleId 角色ID
+     * @return username集合
+     */
+    List<String> getAllHaveThisRoleIdUsername(Long roleId);
 }

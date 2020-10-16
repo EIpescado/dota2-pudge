@@ -200,7 +200,7 @@ public class PudgeUtil {
      * @return redis key
      */
     public static String generateKeyWithDoubleColon(String prefix,String key){
-        return prefix + DOUBLE_COLON + key;
+        return  StrUtil.builder(prefix,DOUBLE_COLON,key).toString();
     }
 
 }

@@ -109,7 +109,7 @@ public class SystemMenuServiceImpl extends BaseServiceImpl<SystemMenuMapper, Sys
     @SuppressWarnings("unchecked")
     public List<MenuTreeNode> tree() {
         CurrentUser currentUser = JwtUser.current();
-        return customRedisCacheService.cacheRoundPlus(CacheConstant.MaName.SYSTEM_USER_TREE, currentUser.getId().toString(), () -> {
+        return customRedisCacheService.cacheRoundPlus(CacheConstant.MaName.SYSTEM_USER_TREE, currentUser.getUsername(), () -> {
             //菜单
             List<MenuTreeNode> menuTreeNodeList;
             //按钮

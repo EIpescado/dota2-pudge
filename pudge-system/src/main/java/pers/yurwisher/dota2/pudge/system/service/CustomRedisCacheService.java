@@ -8,10 +8,12 @@ import pers.yurwisher.dota2.pudge.constants.CacheConstant;
 import pers.yurwisher.dota2.pudge.utils.PudgeUtil;
 
 import java.time.Duration;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * @author yq
@@ -224,6 +226,13 @@ public class CustomRedisCacheService {
         Set<String> keys = redisTemplate.keys(keyPattern);
         if (CollectionUtil.isNotEmpty(keys)) {
             redisTemplate.delete(keys);
+        }
+    }
+
+    public void batchDelete(String name, List<String> keys) {
+        if(CollectionUtil.isNotEmpty(keys)){
+            Set<String> redisKeys = keys.stream().map(s -> PudgeUtil.generateKeyWithDoubleColon(name,s)).collect(Collectors.toSet());
+            redisTemplate.delete(redisKeys);
         }
     }
 

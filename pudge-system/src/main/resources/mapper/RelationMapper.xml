@@ -22,6 +22,12 @@
     <select id="getUserAlreadyBindRoleIds" resultType="java.lang.Long">
         SELECT DISTINCT role_id from user_role_relation where user_id = #{userId}
     </select>
+    <select id="getAllHaveThisRoleIdUsername" resultType="java.lang.String">
+        SELECT su.username from system_user su
+        INNER JOIN (
+         SELECT DISTINCT user_id from user_role_relation where role_id = #{roleId}
+        ) t on t.user_id = su.id
+    </select>
 
     <insert id="batchInsertRoleMenuRelation">
         INSERT into role_menu_relation(role_id,menu_id) VALUES

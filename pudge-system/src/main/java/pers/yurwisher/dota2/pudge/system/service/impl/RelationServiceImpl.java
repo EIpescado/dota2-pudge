@@ -74,4 +74,9 @@ public class RelationServiceImpl implements IRelationService {
     public List<Long> getUserAlreadyBindRoleIds(Long userId) {
         return relationMapper.getUserAlreadyBindRoleIds(userId);
     }
+
+    @Override
+    public List<String> getAllHaveThisRoleIdUsername(Long roleId) {
+        return relationMapper.getAllHaveThisRoleIdUsername(roleId);
+    }
 }

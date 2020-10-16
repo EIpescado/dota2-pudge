@@ -52,4 +52,11 @@ public interface IRelationService {
      * @return 角色ID集合
      */
     List<Long> getUserAlreadyBindRoleIds(Long userId);
+
+    /**
+     * 获取所有拥有指定角色ID的用户名称
+     * @param roleId  角色ID
+     * @return username 集合
+     */
+    List<String> getAllHaveThisRoleIdUsername(Long roleId);
 }
