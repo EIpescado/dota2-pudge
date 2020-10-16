@@ -40,10 +40,6 @@ jwt:
     secret: YWhycHQ3aXAyb3psdndwNnE0bXp6NDZvcnZ2bGRxZG40M3g1NGVlZHFkM2oxdzV2MGZlejM5aDg5aGYxM29iZ20zNTFjMzRiY3V0MTVmNXVkcXYyMzMyOWZsMm04bmN1Nmh2OGlsdmtodTdjb3VrdmpiM2M0dXB5M3Y1a3dwc3k=
     #令牌过期时间 4小时
     expire-time: 14400000
-    # 在线用户缓存 key
-    online-key: online-token-
-    #验证码缓存key
-    code-key: code-key-
     #续期检查时间 30分钟
     detect-time: 1800000
     #续期时间 1小时

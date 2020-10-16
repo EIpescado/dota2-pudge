@@ -20,7 +20,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpStatus;
-import pers.yurwisher.dota2.pudge.enums.ICustomTipEnum;
 import pers.yurwisher.dota2.pudge.wrapper.R;
 
 import javax.servlet.http.HttpServletRequest;
@@ -59,6 +58,7 @@ public class PudgeUtil {
     private static final String APPLICATION_JSON_UTF_8 = "application/json;charset=UTF-8";
     private static final Digester SHA256_DIGESTER = new Digester(DigestAlgorithm.SHA256);
     private static final DES DES = SecureUtil.des();
+    private static final String DOUBLE_COLON = "::";
 
     public static void responseJSON(HttpServletResponse response, R r) throws IOException {
         response.setStatus(HttpStatus.OK.value());
@@ -67,13 +67,6 @@ public class PudgeUtil {
         response.getWriter().flush();
         response.getWriter().close();
     }
-
-    public static void responseJSON(HttpServletResponse response, ICustomTipEnum customTipEnum) throws IOException {
-        response.setStatus(HttpStatus.OK.value());
-        response.setContentType(APPLICATION_JSON_UTF_8);
-        response.getWriter().append(JSON.toJSONString(R.fail(customTipEnum)));
-    }
-
 
     /**
      * 根据请求获取用户ip 取第一个非unknown的ip,穿透代理
@@ -198,6 +191,16 @@ public class PudgeUtil {
         private String address;
         private String browser;
         private String system;
+    }
+
+    /**
+     * 生成redisKey
+     * @param prefix 前缀
+     * @param key key
+     * @return redis key
+     */
+    public static String generateKeyWithDoubleColon(String prefix,String key){
+        return prefix + DOUBLE_COLON + key;
     }
 
 }

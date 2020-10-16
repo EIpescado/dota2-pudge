@@ -1,8 +1,8 @@
 package pers.yurwisher.dota2.pudge.config;
 
 import cn.hutool.core.collection.CollectionUtil;
-import cn.hutool.crypto.SecureUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,7 +13,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.core.GrantedAuthorityDefaults;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -26,7 +25,7 @@ import pers.yurwisher.dota2.pudge.security.JwtAccessDeniedHandler;
 import pers.yurwisher.dota2.pudge.security.JwtAuthenticationEntryPoint;
 import pers.yurwisher.dota2.pudge.security.TokenConfigurer;
 import pers.yurwisher.dota2.pudge.security.TokenProvider;
-import pers.yurwisher.dota2.pudge.security.bean.SecurityProperties;
+import pers.yurwisher.dota2.pudge.security.bean.LoginProperties;
 import pers.yurwisher.dota2.pudge.security.service.IOnlineUserService;
 import pers.yurwisher.dota2.pudge.utils.PudgeUtil;
 
@@ -51,9 +50,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final JwtAuthenticationEntryPoint authenticationErrorHandler;
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
     private final ApplicationContext applicationContext;
-    private final SecurityProperties properties;
     private final IOnlineUserService onlineUserService;
     private final String ALL = "ALL";
+
+    @Bean
+    @ConfigurationProperties(prefix = "login")
+    public LoginProperties loginProperties(){
+        return new LoginProperties();
+    }
 
     @Bean
     GrantedAuthorityDefaults grantedAuthorityDefaults() {
@@ -166,7 +170,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     private TokenConfigurer securityConfigurerAdapter() {
-        return new TokenConfigurer(tokenProvider, properties, onlineUserService);
+        return new TokenConfigurer(tokenProvider, onlineUserService);
     }
 
 }

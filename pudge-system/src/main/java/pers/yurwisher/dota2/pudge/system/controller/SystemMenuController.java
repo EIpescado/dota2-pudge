@@ -41,7 +41,7 @@ public class SystemMenuController extends BaseController{
     }
 
     @PostMapping("{id}")
-    @PreAuthorize("@el.check('menu:update')")
+    @PreAuthorize("@el.check('node:update')")
     public R<String> update(@PathVariable(name = "id")Long id, @RequestBody @Validated SystemMenuFo fo){
         menuService.update(id,fo);
         return R.ok();

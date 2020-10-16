@@ -29,14 +29,14 @@ public class SystemButtonController extends BaseController{
     }
 
     @PostMapping
-    @PreAuthorize("@el.check('menu:create')")
+    @PreAuthorize("@el.check('button:create')")
     public R create(@RequestBody @Validated SystemButtonFo fo){
         systemButtonService.create(fo);
         return R.ok();
     }
 
     @PostMapping("{id}")
-    @PreAuthorize("@el.check('menu:update')")
+    @PreAuthorize("@el.check('node:update')")
     public R update(@PathVariable(name = "id")Long id, @RequestBody @Validated SystemButtonFo fo){
         systemButtonService.update(id,fo);
         return R.ok();

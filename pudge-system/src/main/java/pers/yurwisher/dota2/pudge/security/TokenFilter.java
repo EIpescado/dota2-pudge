@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.GenericFilterBean;
-import pers.yurwisher.dota2.pudge.security.bean.SecurityProperties;
 import pers.yurwisher.dota2.pudge.security.cache.OnlineUser;
 import pers.yurwisher.dota2.pudge.security.service.IOnlineUserService;
 
@@ -20,24 +19,17 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
 /**
- * @author /
+ * 请求凭证过滤器
+ * @author yq 2020年10月16日 14:19:25
  */
 public class TokenFilter extends GenericFilterBean {
     private static final Logger log = LoggerFactory.getLogger(TokenFilter.class);
 
 
     private final TokenProvider tokenProvider;
-    private final SecurityProperties properties;
     private final IOnlineUserService onlineUserService;
 
-    /**
-     * @param tokenProvider Token
-     * @param properties    JWT
-     *                      //* @param onlineUserService 用户在线
-     *                      //* @param userCacheClean    用户缓存清理工具
-     */
-    public TokenFilter(TokenProvider tokenProvider, SecurityProperties properties, IOnlineUserService onlineUserService) {
-        this.properties = properties;
+    public TokenFilter(TokenProvider tokenProvider, IOnlineUserService onlineUserService) {
         this.onlineUserService = onlineUserService;
         this.tokenProvider = tokenProvider;
     }
@@ -48,14 +40,17 @@ public class TokenFilter extends GenericFilterBean {
         HttpServletRequest httpServletRequest = (HttpServletRequest) servletRequest;
         String token = tokenProvider.getToken(httpServletRequest);
         if (StrUtil.isNotBlank(token)) {
-            // 用户是否已登录
-            OnlineUser onlineUser = onlineUserService.getOne(properties.getOnlineKey() + token);
-            if (onlineUser != null) {
-                //存入用户信息
-                Authentication authentication = tokenProvider.getAuthentication(token);
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-                // 如有必要,Token 续期
-                tokenProvider.checkRenewal(token);
+            String username = tokenProvider.getUsernameFromToken(token);
+            if(StrUtil.isNotBlank(username))        {
+                // 用户是否已登录
+                OnlineUser onlineUser = onlineUserService.getOne(username);
+                if (onlineUser != null) {
+                    //存入用户信息
+                    Authentication authentication = tokenProvider.getAuthentication(username,token);
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                    // 如有必要,Token 续期
+                    tokenProvider.checkRenewal(username);
+                }
             }
         }
         filterChain.doFilter(servletRequest, servletResponse);

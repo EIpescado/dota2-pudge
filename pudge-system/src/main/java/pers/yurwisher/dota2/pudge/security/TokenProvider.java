@@ -18,8 +18,10 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
+import pers.yurwisher.dota2.pudge.constants.CacheConstant;
 import pers.yurwisher.dota2.pudge.security.bean.SecurityProperties;
 import pers.yurwisher.dota2.pudge.system.service.ISystemUserService;
+import pers.yurwisher.dota2.pudge.utils.PudgeUtil;
 
 import javax.servlet.http.HttpServletRequest;
 import java.security.Key;
@@ -67,15 +69,13 @@ public class TokenProvider implements InitializingBean {
                 .compact();
     }
 
-
     /**
      * 依据Token 获取鉴权信息
-     * @param token token字符串
+     * @param username 用户名
+     * @param token 请求凭证
      * @return 鉴权信息
      */
-    Authentication getAuthentication(String token) {
-        Claims claims = getClaims(token);
-        String username = claims.getSubject();
+    Authentication getAuthentication(String username,String token) {
         CurrentUser currentUser = systemUserService.findUserByUsername(username);
         JwtUser principal = new JwtUser(currentUser);
         return new UsernamePasswordAuthenticationToken(principal, token, principal.getAuthorities());
@@ -93,10 +93,10 @@ public class TokenProvider implements InitializingBean {
     }
 
     /**
-     * @param token 需要检查的token
+     * @param username 需要检查的用户
      */
-    public void checkRenewal(String token) {
-        String onlineKey = properties.getOnlineKey() + token;
+    public void checkRenewal(String username) {
+        String onlineKey = PudgeUtil.generateKeyWithDoubleColon(CacheConstant.MaName.PC_ONLINE_USER,username);
         // 判断是否续期token,计算token的过期时间
         Long time = redisTemplate.getExpire(onlineKey);
         int timeInt = time != null ? time.intValue() : 0;
@@ -123,6 +123,22 @@ public class TokenProvider implements InitializingBean {
             return requestHeader.replace(properties.getPrefix(), "");
         } else {
             log.debug("非法Token：{}", requestHeader);
+        }
+        return null;
+    }
+
+    /**
+     * 从请求中获取token -> 从token中获取用户名
+     * @param token 请求凭证
+     * @return username
+     */
+    public String getUsernameFromToken(String token) {
+        if(StrUtil.isNotBlank(token)){
+            Claims claims = getClaims(token);
+            String username = claims.getSubject();
+            if(StrUtil.isNotBlank(username)){
+                return username;
+            }
         }
         return null;
     }

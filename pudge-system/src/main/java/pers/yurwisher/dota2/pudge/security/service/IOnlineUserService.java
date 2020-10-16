@@ -14,10 +14,18 @@ import javax.servlet.http.HttpServletRequest;
 public interface IOnlineUserService {
     /**
      * 根据key获取当前在线用户
-     * @param key 存储在redis中的用户key
+     * @param username 用户名
      * @return 在线用户信息
      */
-    OnlineUser getOne(String key);
+    OnlineUser getOne(String username);
+
+    /**
+     * 根据key获取当前在线用户
+     * @param username 用户名
+     * @param type 客户端类型
+     * @return 在线用户信息
+     */
+    OnlineUser getOneByType(String username,String type);
 
     /**
      * 保存在线信息到redis

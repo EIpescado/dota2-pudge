@@ -12,7 +12,7 @@ public class LoginCode {
     /**
      * 验证码配置
      */
-    private LoginCodeEnum type;
+    private LoginCodeEnum type = LoginCodeEnum.arithmetic;
     /**
      * 验证码有效期 分钟
      */

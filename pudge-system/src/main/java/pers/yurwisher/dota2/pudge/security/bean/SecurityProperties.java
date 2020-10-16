@@ -34,16 +34,6 @@ public class SecurityProperties {
     private Long expireTime;
 
     /**
-     * 在线用户 key，根据 key 查询 redis 中在线用户的数据
-     */
-    private String onlineKey;
-
-    /**
-     * 验证码 缓存 key
-     */
-    private String codeKey;
-
-    /**
      * token 续期检查时间
      */
     private Long detectTime;

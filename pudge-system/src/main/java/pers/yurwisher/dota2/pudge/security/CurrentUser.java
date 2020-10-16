@@ -32,7 +32,6 @@ public class CurrentUser {
     /**用户权限*/
     private List<String> permissions;
 
-
     public boolean isAdmin(){
         return CollectionUtil.isNotEmpty(roles) && roles.contains("admin");
     }

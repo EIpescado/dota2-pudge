@@ -13,6 +13,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import pers.yurwisher.dota2.pudge.constants.CacheConstant;
 import pers.yurwisher.dota2.pudge.enums.SystemCustomTipEnum;
 import pers.yurwisher.dota2.pudge.security.CurrentUser;
 import pers.yurwisher.dota2.pudge.security.JwtUser;
@@ -29,7 +30,6 @@ import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author yq
@@ -46,8 +46,8 @@ public class AuthorizationService {
     private final IOnlineUserService onlineUserService;
     private final SecurityProperties properties;
     private final LoginProperties loginProperties;
-    private final Captcha captcha;
     private final RedisTemplate<String,Object> redisTemplate;
+    private final CustomRedisCacheService customRedisCacheService;
     private RSA loginRsa;
 
     @PostConstruct
@@ -87,29 +87,29 @@ public class AuthorizationService {
      * @param codeVal 验证码
      */
     private void verifyCode(String codeId,String codeVal){
-        //从redis获取验证码
-        String code = (String) redisTemplate.opsForValue().get(codeId);
-        if(StrUtil.isBlank(code)){
-            //验证码过期
-            throw new SystemCustomException(SystemCustomTipEnum.AUTH_CODE_NOT_EXIST_OR_EXPIRED);
-        }
-        if(StrUtil.isBlank(codeVal) || !codeVal.equalsIgnoreCase(code)){
-            //验证码错误
-            throw new SystemCustomException(SystemCustomTipEnum.AUTH_CODE_ERROR);
-        }
-        //从redis移除验证码
-        redisTemplate.delete(codeId);
+        customRedisCacheService.getCacheAndDeletePlus(CacheConstant.MaName.LOGIN_CODE,codeId,(String code) -> {
+            if(StrUtil.isBlank(code)){
+                //验证码过期
+                throw new SystemCustomException(SystemCustomTipEnum.AUTH_CODE_NOT_EXIST_OR_EXPIRED);
+            }
+            if(StrUtil.isBlank(codeVal) || !codeVal.equalsIgnoreCase(code)){
+                //验证码错误
+                throw new SystemCustomException(SystemCustomTipEnum.AUTH_CODE_ERROR);
+            }
+        });
     }
 
     public R getCode() {
-        String uuid = properties.getCodeKey() + IdUtil.simpleUUID();
-        //当验证码类型为 arithmetic时且长度 >= 2 时，captcha.text()的结果有几率为浮点型
-        String captchaValue = captcha.text();
-        if (captcha.getCharType() - 1 == LoginCodeEnum.arithmetic.ordinal() && captchaValue.contains(StrUtil.DOT)) {
-            captchaValue = captchaValue.split("\\.")[0];
-        }
-        // 保存
-        redisTemplate.opsForValue().set(uuid, captchaValue, loginProperties.getCodeConfig().getExpiration(), TimeUnit.MINUTES);
+        String uuid = IdUtil.simpleUUID();
+        Captcha captcha = loginProperties.switchCaptcha();
+        customRedisCacheService.setCachePlus(CacheConstant.MaName.LOGIN_CODE,uuid,() ->{
+            //当验证码类型为 arithmetic时且长度 >= 2 时，captcha.text()的结果有几率为浮点型
+            String captchaValue = captcha.text();
+            if (captcha.getCharType() - 1 == LoginCodeEnum.arithmetic.ordinal() && captchaValue.contains(StrUtil.DOT)) {
+                captchaValue = captchaValue.split("\\.")[0];
+            }
+            return captchaValue;
+        });
         // 验证码信息
         Map<String, Object> imgResult = new HashMap<String, Object>(2) {
             private static final long serialVersionUID = 9009002806086752036L;
@@ -135,7 +135,10 @@ public class AuthorizationService {
     public R logout(HttpServletRequest request) {
         String token = tokenProvider.getToken(request);
         if(StrUtil.isNotBlank(token)){
-            redisTemplate.delete(properties.getOnlineKey() + token);
+            String username = tokenProvider.getUsernameFromToken(token);
+            if(StrUtil.isNotBlank(username)){
+                redisTemplate.delete(CacheConstant.MaName.PC_ONLINE_USER + username);
+            }
         }
         return R.ok();
     }

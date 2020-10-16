@@ -1,6 +1,5 @@
 package pers.yurwisher.dota2.pudge.config;
 
-import com.alibaba.fastjson.parser.ParserConfig;
 import com.alibaba.fastjson.support.spring.GenericFastJsonRedisSerializer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -19,6 +18,7 @@ import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+import pers.yurwisher.dota2.pudge.system.service.CustomRedisCacheService;
 
 import java.time.Duration;
 import java.util.HashMap;
@@ -39,40 +39,45 @@ public class RedisConfig extends CachingConfigurerSupport {
 
     /**
      * 自定义redis 缓存管理
-     * @param redisConnectionFactory 工厂
+     *
+     * @param redisConnectionFactory     工厂
      * @param redisCacheConfigurationMap 自定义key策略
      */
     @Bean
-    public CacheManager cacheManager(RedisConnectionFactory redisConnectionFactory, Map<String,RedisCacheConfiguration> redisCacheConfigurationMap) {
+    public CacheManager cacheManager(RedisConnectionFactory redisConnectionFactory, Map<String, RedisCacheConfiguration> redisCacheConfigurationMap) {
         return new RedisCacheManager(
                 RedisCacheWriter.nonLockingRedisCacheWriter(redisConnectionFactory),
                 // 默认策略，未配置的 key 会使用这个, 默认过期时间 8 小时
-                this.createRedisCacheConfigurationWithTtl(Duration.ofHours(8)),
+                this.createRedisCacheConfigurationWithTtl(Duration.ofHours(8).toMinutes()),
                 // 指定 key 策略
                 redisCacheConfigurationMap
         );
     }
 
     @Bean
-    public Map<String,RedisCacheConfiguration> redisCacheConfigurationMap(){
-        Map<String, RedisCacheConfiguration> redisCacheConfigurationMap = new HashMap<>(16);
-        redisCacheConfigurationMap.put("test",this.createRedisCacheConfigurationWithTtl(Duration.ofDays(1)));
+    public Map<String, RedisCacheConfiguration> redisCacheConfigurationMap() {
+        Map<String, RedisCacheConfiguration> redisCacheConfigurationMap = new HashMap<>(CustomRedisCacheService.CONFIG_MAP.size());
+        //遍历自定义缓存过期配置
+        CustomRedisCacheService.CONFIG_MAP.forEach((k,v) ->
+            redisCacheConfigurationMap.put(k,this.createRedisCacheConfigurationWithTtl(v.getMinutes()))
+        );
         return redisCacheConfigurationMap;
     }
 
     /**
-     *  创建redis缓存 key过期配置
-     * @param duration 过期时间
+     * 创建redis缓存 key过期配置
+     *
+     * @param minutes 过期时间分钟
      * @return RedisCacheConfiguration
      */
-    private RedisCacheConfiguration createRedisCacheConfigurationWithTtl(Duration duration) {
+    private RedisCacheConfiguration createRedisCacheConfigurationWithTtl(long minutes) {
         GenericFastJsonRedisSerializer fastSerializer = new GenericFastJsonRedisSerializer();
         RedisCacheConfiguration redisCacheConfiguration = RedisCacheConfiguration.defaultCacheConfig();
         redisCacheConfiguration = redisCacheConfiguration.serializeValuesWith(
                 RedisSerializationContext
                         .SerializationPair
                         .fromSerializer(fastSerializer)
-        ).entryTtl(duration);
+        ).entryTtl(Duration.ofMinutes(minutes));
         return redisCacheConfiguration;
     }
 
@@ -93,5 +98,10 @@ public class RedisConfig extends CachingConfigurerSupport {
         template.setConnectionFactory(redisConnectionFactory);
         template.afterPropertiesSet();
         return template;
+    }
+
+    @Bean
+    public CustomRedisCacheService customRedisCacheService(RedisTemplate<String, Object> redisTemplate){
+        return new CustomRedisCacheService(redisTemplate);
     }
 }
