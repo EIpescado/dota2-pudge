@@ -20,4 +20,6 @@ public class SystemUserTo {
     private String phone;
 
     private String dateCreated;
+
+    private Boolean enabled;
 }

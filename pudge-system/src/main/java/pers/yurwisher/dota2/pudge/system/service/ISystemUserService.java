@@ -58,4 +58,11 @@ public interface ISystemUserService extends BaseService<SystemUser> {
      * @return 用户详情
      */
     SystemUserVo get(Long id);
+
+    /**
+     * 重置密码
+     * @param id 用户ID
+     */
+    void resetPassword(Long id);
+
 }

@@ -1,6 +1,6 @@
 package pers.yurwisher.dota2.pudge.base.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import cn.hutool.core.lang.Assert;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -10,11 +10,14 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.Validator;
+import pers.yurwisher.dota2.pudge.base.BaseEntity;
 import pers.yurwisher.dota2.pudge.base.BasePageQo;
 import pers.yurwisher.dota2.pudge.base.BaseService;
 import pers.yurwisher.dota2.pudge.wrapper.PageR;
 
+import java.io.Serializable;
 import java.util.List;
 
 
@@ -24,13 +27,9 @@ import java.util.List;
  * @description 基础实现
  * @since V1.0.0
  */
-public class BaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceImpl<M, T> implements BaseService<T> {
+public class BaseServiceImpl<M extends BaseMapper<T>, T extends BaseEntity> extends ServiceImpl<M, T> implements BaseService<T> {
 
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
-
-    protected  LambdaQueryWrapper<T> buildLambdaQueryWrapper(){
-        return new LambdaQueryWrapper<>();
-    }
 
     @Autowired
     private Validator validator;
@@ -38,7 +37,7 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceImpl<M, 
     /**
      * 自定义分页参数转 mybatis-plus分页参数
      */
-    protected Page toPage(BasePageQo qo){
+    protected Page toPage(BasePageQo qo) {
         Page page = new Page();
         page.setSize(qo.getSize());
         page.setCurrent(qo.getPage());
@@ -49,7 +48,7 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceImpl<M, 
      * mybatis-plus 分页结果转自定义结果
      */
     @SuppressWarnings("unchecked")
-    protected PageR toPageR(IPage page){
+    protected PageR toPageR(IPage page) {
         PageR pageR = new PageR<>();
         pageR.setPages(page.getPages());
         pageR.setTotal(page.getTotal());
@@ -59,17 +58,27 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceImpl<M, 
 
     @Override
     public boolean haveFieldValueEq(SFunction<T, ?> function, Object value) {
-       Integer count = baseMapper.selectCount(Wrappers.<T>lambdaQuery().eq(function,value));
-       return count != null && count > 0;
+        Integer count = baseMapper.selectCount(Wrappers.<T>lambdaQuery().eq(function, value));
+        return count != null && count > 0;
     }
 
     @Override
     public T getOneByFieldValueEq(SFunction<T, ?> function, Object value) {
-        return baseMapper.selectOne(Wrappers.<T>lambdaQuery().eq(function,value));
+        return baseMapper.selectOne(Wrappers.<T>lambdaQuery().eq(function, value));
     }
 
     @Override
     public List<T> getByFieldValueEq(SFunction<T, ?> function, Object value) {
-        return baseMapper.selectList(Wrappers.<T>lambdaQuery().eq(function,value));
+        return baseMapper.selectList(Wrappers.<T>lambdaQuery().eq(function, value));
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void switchEnabled(Serializable id) {
+        //todo 事务未生效
+        T t = baseMapper.selectById(id);
+        Assert.notNull(t);
+        t.setEnabled(!t.getEnabled());
+        baseMapper.updateById(t);
     }
 }

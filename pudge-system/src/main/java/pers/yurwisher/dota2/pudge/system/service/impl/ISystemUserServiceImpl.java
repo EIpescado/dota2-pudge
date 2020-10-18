@@ -20,6 +20,7 @@ import pers.yurwisher.dota2.pudge.system.pojo.fo.SystemUserFo;
 import pers.yurwisher.dota2.pudge.system.pojo.qo.SystemUserQo;
 import pers.yurwisher.dota2.pudge.system.pojo.to.SystemUserTo;
 import pers.yurwisher.dota2.pudge.system.pojo.vo.SystemUserVo;
+import pers.yurwisher.dota2.pudge.system.service.CustomRedisCacheService;
 import pers.yurwisher.dota2.pudge.system.service.IRelationService;
 import pers.yurwisher.dota2.pudge.system.service.ISystemConfigService;
 import pers.yurwisher.dota2.pudge.system.service.ISystemRoleService;
@@ -27,6 +28,7 @@ import pers.yurwisher.dota2.pudge.system.service.ISystemUserService;
 import pers.yurwisher.dota2.pudge.utils.PudgeUtil;
 import pers.yurwisher.dota2.pudge.wrapper.PageR;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -43,6 +45,7 @@ public class ISystemUserServiceImpl extends BaseServiceImpl<SystemUserMapper, Sy
     private final ISystemRoleService systemRoleService;
     private final IRelationService relationService;
     private final ISystemConfigService systemConfigService;
+    private final CustomRedisCacheService customRedisCacheService;
 
     @Override
     @Cacheable(key = "#username")
@@ -95,7 +98,7 @@ public class ISystemUserServiceImpl extends BaseServiceImpl<SystemUserMapper, Sy
         SystemUser user = new SystemUser();
         BeanUtils.copyProperties(fo, user);
         //给予初始密码
-        user.setPassword(PudgeUtil.encodePwd(systemConfigService.getValByCode(SystemConfigEnum.DEFAULT_PASSWORD)));
+        user.setPassword(this.getCipherDefaultPassword());
         baseMapper.insert(user);
         //绑定角色
         relationService.userBindRoles(user.getId(), fo.getRoleIds());
@@ -124,5 +127,26 @@ public class ISystemUserServiceImpl extends BaseServiceImpl<SystemUserMapper, Sy
         SystemUserVo vo = baseMapper.get(id);
         vo.setRoleIds(relationService.getUserAlreadyBindRoleIds(id));
         return vo;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void resetPassword(Long id) {
+        SystemUser user = baseMapper.selectById(id);
+        Assert.notNull(user);
+        user.setPassword(this.getCipherDefaultPassword());
+        user.setLastPasswordResetDate(LocalDateTime.now());
+        baseMapper.updateById(user);
+        //移除在线用户缓存
+        customRedisCacheService.deleteCachePlus(CacheConstant.MaName.PC_ONLINE_USER,user.getUsername());
+        customRedisCacheService.deleteCachePlus(CacheConstant.AnName.SYSTEM_USER_INFO,user.getUsername());
+    }
+
+    /**
+     * 获取默认密码的密文
+     * @return 密码
+     */
+    private String getCipherDefaultPassword(){
+        return PudgeUtil.encodePwd(systemConfigService.getValByCode(SystemConfigEnum.DEFAULT_PASSWORD));
     }
 }

@@ -54,4 +54,17 @@ public class SystemUserController {
     public R<SystemUserVo> get(@PathVariable Long id){
         return R.ok(systemUserService.get(id));
     }
+
+    @PostMapping("/resetPassword/{id}")
+    public R<String> resetPassword(@PathVariable Long id){
+        systemUserService.resetPassword(id);
+        return R.ok();
+    }
+
+    @PostMapping("/switchEnabled/{id}")
+    @PreAuthorize("@el.check('user:switchEnabled')")
+    public R<String> switchEnabled(@PathVariable Long id){
+        systemUserService.switchEnabled(id);
+        return R.ok();
+    }
 }

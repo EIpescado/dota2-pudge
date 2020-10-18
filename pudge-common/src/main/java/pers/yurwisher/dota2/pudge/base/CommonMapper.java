@@ -8,6 +8,6 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * @description 通用mapper
  * @since V1.0.0
  */
-public interface CommonMapper<T> extends BaseMapper<T> {
+public interface CommonMapper<T extends BaseEntity> extends BaseMapper<T> {
 
 }
