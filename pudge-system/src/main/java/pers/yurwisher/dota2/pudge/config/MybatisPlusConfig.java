@@ -8,6 +8,7 @@ import org.apache.ibatis.reflection.MetaObject;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import pers.yurwisher.dota2.pudge.sqlInjector.CustomLogicSqlInjector;
 
 import java.time.LocalDateTime;
 
@@ -32,18 +33,6 @@ public class MybatisPlusConfig {
         return interceptor;
     }
 
-
-    /**
-     * 性能分析拦截器，不建议生产使用
-     */
-//    @Bean
-//    public PerformanceInterceptor performanceInterceptor(){
-//        PerformanceInterceptor performanceInterceptor = new PerformanceInterceptor();
-//        //格式化sql
-////        performanceInterceptor.setFormat(true);
-//        return performanceInterceptor;
-//    }
-
     /**
      * 自动填充值
      */
@@ -62,5 +51,10 @@ public class MybatisPlusConfig {
                 this.setFieldValByName("lastUpdated", LocalDateTime.now(), metaObject);
             }
         };
+    }
+
+    @Bean
+    public CustomLogicSqlInjector customLogicSqlInjector() {
+        return new CustomLogicSqlInjector();
     }
 }

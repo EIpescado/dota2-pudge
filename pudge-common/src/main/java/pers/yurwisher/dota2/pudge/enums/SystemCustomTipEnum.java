@@ -22,7 +22,9 @@ public enum SystemCustomTipEnum implements ICustomTipEnum {
     MENU_PID_NOT_ID(10010,"上级不能为自己"),
     MENU_COMPONENT_NOT_BE_NULL(10011,"菜单component不可为空"),
 
-    CONFIG_CODE_EXISTED(10012,"配置编码已存在")
+    CONFIG_CODE_EXISTED(10012,"配置编码已存在"),
+
+    DICT_FIXED_NOT_CHANGE(10013,"固定字典不可修改"),
     ;
 
     private CustomTip tip;

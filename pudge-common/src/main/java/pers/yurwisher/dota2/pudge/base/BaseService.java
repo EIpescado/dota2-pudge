@@ -3,7 +3,6 @@ package pers.yurwisher.dota2.pudge.base;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.baomidou.mybatisplus.extension.service.IService;
 
-import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -37,9 +36,4 @@ public interface BaseService<T extends BaseEntity> extends IService<T>{
      */
     List<T> getByFieldValueEq(SFunction<T,?> function, Object value);
 
-    /**
-     * 切换启用/禁用状态
-     * @param id ID
-     */
-    void switchEnabled(Serializable id);
 }

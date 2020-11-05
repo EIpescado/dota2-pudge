@@ -1,7 +1,5 @@
 package pers.yurwisher.dota2.pudge.base.impl;
 
-import cn.hutool.core.lang.Assert;
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
@@ -10,14 +8,13 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.Validator;
 import pers.yurwisher.dota2.pudge.base.BaseEntity;
 import pers.yurwisher.dota2.pudge.base.BasePageQo;
 import pers.yurwisher.dota2.pudge.base.BaseService;
+import pers.yurwisher.dota2.pudge.base.CommonMapper;
 import pers.yurwisher.dota2.pudge.wrapper.PageR;
 
-import java.io.Serializable;
 import java.util.List;
 
 
@@ -27,7 +24,7 @@ import java.util.List;
  * @description 基础实现
  * @since V1.0.0
  */
-public class BaseServiceImpl<M extends BaseMapper<T>, T extends BaseEntity> extends ServiceImpl<M, T> implements BaseService<T> {
+public class BaseServiceImpl<M extends CommonMapper<T>, T extends BaseEntity> extends ServiceImpl<M, T> implements BaseService<T> {
 
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -72,13 +69,4 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T extends BaseEntity> exte
         return baseMapper.selectList(Wrappers.<T>lambdaQuery().eq(function, value));
     }
 
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void switchEnabled(Serializable id) {
-        //todo 事务未生效
-        T t = baseMapper.selectById(id);
-        Assert.notNull(t);
-        t.setEnabled(!t.getEnabled());
-        baseMapper.updateById(t);
-    }
 }

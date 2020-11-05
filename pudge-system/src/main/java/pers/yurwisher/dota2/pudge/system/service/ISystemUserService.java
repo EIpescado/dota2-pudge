@@ -65,4 +65,9 @@ public interface ISystemUserService extends BaseService<SystemUser> {
      */
     void resetPassword(Long id);
 
+    /**
+     * 启用/禁用
+     * @param id 用户id
+     */
+    void switchEnabled(Long id);
 }

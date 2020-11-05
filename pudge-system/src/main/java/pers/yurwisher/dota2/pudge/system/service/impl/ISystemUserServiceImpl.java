@@ -1,6 +1,7 @@
 package pers.yurwisher.dota2.pudge.system.service.impl;
 
 import cn.hutool.core.lang.Assert;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.cache.annotation.CacheConfig;
@@ -134,12 +135,19 @@ public class ISystemUserServiceImpl extends BaseServiceImpl<SystemUserMapper, Sy
     public void resetPassword(Long id) {
         SystemUser user = baseMapper.selectById(id);
         Assert.notNull(user);
-        user.setPassword(this.getCipherDefaultPassword());
-        user.setLastPasswordResetDate(LocalDateTime.now());
-        baseMapper.updateById(user);
+        this.update(Wrappers.<SystemUser>lambdaUpdate()
+                .set(SystemUser::getPassword,this.getCipherDefaultPassword())
+                .set(SystemUser::getLastUpdated,LocalDateTime.now())
+                .eq(SystemUser::getId,id));
         //移除在线用户缓存
         customRedisCacheService.deleteCachePlus(CacheConstant.MaName.PC_ONLINE_USER,user.getUsername());
         customRedisCacheService.deleteCachePlus(CacheConstant.AnName.SYSTEM_USER_INFO,user.getUsername());
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void switchEnabled(Long id) {
+        baseMapper.switchEnabledById(id);
     }
 
     /**

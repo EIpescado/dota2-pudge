@@ -7,7 +7,6 @@ import cn.hutool.crypto.asymmetric.KeyType;
 import cn.hutool.crypto.asymmetric.RSA;
 import com.wf.captcha.base.Captcha;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
@@ -46,7 +45,6 @@ public class AuthorizationService {
     private final IOnlineUserService onlineUserService;
     private final SecurityProperties properties;
     private final LoginProperties loginProperties;
-    private final RedisTemplate<String,Object> redisTemplate;
     private final CustomRedisCacheService customRedisCacheService;
     private RSA loginRsa;
 

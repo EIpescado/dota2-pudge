@@ -15,7 +15,7 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 public class SystemRoleTo implements Serializable {
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 616430700585411048L;
     private String name;
     private String description;
     private Integer level;

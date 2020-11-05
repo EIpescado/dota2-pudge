@@ -16,10 +16,10 @@ public class MorphGenerator {
                 .setAuthor("yq")
                 .setModule("pudge-system")
                 .setBasePackage("pers.yurwisher.dota2.pudge")
-                .setEntityClass("pers.yurwisher.dota2.pudge.system.entity.SystemConfig")
-                .setDescription("系统配置");
+                .setEntityClass("pers.yurwisher.dota2.pudge.system.entity.SystemDict")
+                .setDescription("字典");
         morph.configBuilder().setServiceSuperClass("pers.yurwisher.dota2.pudge.base.BaseService")
-                .setSo(false).setVo(false).setFo(true).setTo(true).setQo(true)
+                .setSo(false).setVo(true).setFo(true).setTo(true).setQo(true)
                 .setQoSuperClass("pers.yurwisher.dota2.pudge.base.BasePageQo")
                 .setMapperSuperClass("pers.yurwisher.dota2.pudge.base.CommonMapper")
                 .setMapperLocation("mapper")

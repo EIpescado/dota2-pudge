@@ -1,9 +1,9 @@
 package pers.yurwisher.dota2.pudge.system.mapper;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.annotations.Param;
+import pers.yurwisher.dota2.pudge.base.CommonMapper;
 import pers.yurwisher.dota2.pudge.system.entity.SystemUser;
 import pers.yurwisher.dota2.pudge.system.pojo.qo.SystemUserQo;
 import pers.yurwisher.dota2.pudge.system.pojo.to.SystemUserTo;
@@ -15,7 +15,7 @@ import pers.yurwisher.dota2.pudge.system.pojo.vo.SystemUserVo;
  * @description 系统用户mapper
  * @since V1.0.0
  */
-public interface SystemUserMapper extends BaseMapper<SystemUser> {
+public interface SystemUserMapper extends CommonMapper<SystemUser> {
 
     /**
      * 分页查询对象
