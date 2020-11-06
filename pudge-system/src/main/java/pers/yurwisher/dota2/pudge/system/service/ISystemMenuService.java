@@ -31,11 +31,11 @@ public interface ISystemMenuService extends BaseService<SystemMenu> {
     void update(Long id, SystemMenuFo fo);
 
     /**
-     * 获取用户所有菜单
+     * 获取用户所有菜单权限
      * @param userId 用户ID
-     * @return 菜单集合
+     * @return 菜单权限集合
      */
-    List<SystemMenu> findAllByUserId(Long userId);
+    List<String> getUserMenuPermission(Long userId);
 
     /**
      * 用户的菜单树

@@ -101,8 +101,8 @@ public class SystemMenuServiceImpl extends BaseServiceImpl<SystemMenuMapper, Sys
 
 
     @Override
-    public List<SystemMenu> findAllByUserId(Long userId) {
-        return baseMapper.getUserMenus(userId);
+    public List<String> getUserMenuPermission(Long userId) {
+        return baseMapper.getUserMenuPermission(userId);
     }
 
     @Override

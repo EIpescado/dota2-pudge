@@ -68,6 +68,11 @@ public class SystemButtonServiceImpl extends BaseServiceImpl<SystemButtonMapper,
         return baseMapper.getAllButtonNodes();
     }
 
+    @Override
+    public List<String> getUserButtonPermission(Long userId) {
+        return baseMapper.getUserButtonPermission(userId);
+    }
+
     private void deleteCache(){
         //删除所有用户菜单缓存
         customRedisCacheService.batchDelete(CacheConstant.MaName.SYSTEM_USER_TREE);

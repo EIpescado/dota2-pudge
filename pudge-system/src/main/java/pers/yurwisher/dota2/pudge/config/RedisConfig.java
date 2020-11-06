@@ -4,6 +4,7 @@ import com.alibaba.fastjson.support.spring.GenericFastJsonRedisSerializer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CachingConfigurerSupport;
@@ -18,6 +19,8 @@ import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+import pers.yurwisher.dota2.pudge.security.bean.LoginProperties;
+import pers.yurwisher.dota2.pudge.security.bean.SecurityProperties;
 import pers.yurwisher.dota2.pudge.system.service.CustomRedisCacheService;
 
 import java.time.Duration;
@@ -36,6 +39,12 @@ import java.util.Map;
 @ConditionalOnClass(RedisOperations.class)
 @EnableConfigurationProperties(RedisProperties.class)
 public class RedisConfig extends CachingConfigurerSupport {
+
+    @Bean
+    @ConfigurationProperties(prefix = "login")
+    public LoginProperties loginProperties() {
+        return new LoginProperties();
+    }
 
     /**
      * 自定义redis 缓存管理
@@ -58,8 +67,8 @@ public class RedisConfig extends CachingConfigurerSupport {
     public Map<String, RedisCacheConfiguration> redisCacheConfigurationMap() {
         Map<String, RedisCacheConfiguration> redisCacheConfigurationMap = new HashMap<>(CustomRedisCacheService.CONFIG_MAP.size());
         //遍历自定义缓存过期配置
-        CustomRedisCacheService.CONFIG_MAP.forEach((k,v) ->
-            redisCacheConfigurationMap.put(k,this.createRedisCacheConfigurationWithTtl(v.getMinutes()))
+        CustomRedisCacheService.CONFIG_MAP.forEach((k, v) ->
+                redisCacheConfigurationMap.put(k, this.createRedisCacheConfigurationWithTtl(v.getMinutes()))
         );
         return redisCacheConfigurationMap;
     }
@@ -101,7 +110,9 @@ public class RedisConfig extends CachingConfigurerSupport {
     }
 
     @Bean
-    public CustomRedisCacheService customRedisCacheService(RedisTemplate<String, Object> redisTemplate){
-        return new CustomRedisCacheService(redisTemplate);
+    public CustomRedisCacheService customRedisCacheService(RedisTemplate<String, Object> redisTemplate,
+                                                           SecurityProperties securityProperties,
+                                                           LoginProperties loginProperties) {
+        return new CustomRedisCacheService(redisTemplate, securityProperties, loginProperties);
     }
 }

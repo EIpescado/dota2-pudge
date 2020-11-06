@@ -29,17 +29,17 @@ public class SecurityProperties {
     private String secret;
 
     /**
-     * 令牌过期时间 此处单位/毫秒
+     * 令牌过期时间 单位分钟
      */
     private Long expireTime;
 
     /**
-     * token 续期检查时间
+     * token 续期检查时间 分钟
      */
     private Long detectTime;
 
     /**
-     * 续期时间
+     * 续期时间 分钟
      */
     private Long renewTime;
 

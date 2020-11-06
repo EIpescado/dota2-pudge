@@ -41,4 +41,11 @@ public interface ISystemButtonService extends BaseService<SystemButton> {
      * @return 全部按钮
      */
     List<ButtonNode> getAllButtonNodes();
+
+    /**
+     * 获取用户所有按钮权限
+     * @param userId 用户ID
+     * @return 按钮权限集合
+     */
+    List<String> getUserButtonPermission(Long userId);
 }

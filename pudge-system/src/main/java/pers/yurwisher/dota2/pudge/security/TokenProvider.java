@@ -42,7 +42,8 @@ public class TokenProvider implements InitializingBean {
     private JwtParser jwtParser;
     private JwtBuilder jwtBuilder;
     private final ISystemUserService systemUserService;
-
+    private Long detectTimeMillisecond;
+    private Long renewTimeMillisecond;
 
     @Override
     public void afterPropertiesSet() {
@@ -53,6 +54,8 @@ public class TokenProvider implements InitializingBean {
                 .build();
         jwtBuilder = Jwts.builder()
                 .signWith(key, SignatureAlgorithm.HS512);
+        detectTimeMillisecond = properties.getDetectTime() * 60 * 1000;
+        renewTimeMillisecond = properties.getRenewTime() * 60 * 1000;
     }
 
     /**
@@ -102,12 +105,12 @@ public class TokenProvider implements InitializingBean {
         int timeInt = time != null ? time.intValue() : 0;
         Date now = new Date();
         //过期时间
-        Date expireDate = DateUtil.offset(now, DateField.MILLISECOND, timeInt);
+        Date expireDate = DateUtil.offset(now, DateField.SECOND, timeInt);
         // 判断当前时间与过期时间的时间差
         long differ = expireDate.getTime() - now.getTime();
         // 如果在续期检查的范围内，则续期
-        if (differ <= properties.getDetectTime()) {
-            long renew = timeInt + properties.getRenewTime();
+        if (differ <= detectTimeMillisecond) {
+            long renew = timeInt + renewTimeMillisecond;
             redisTemplate.expire(onlineKey, renew, TimeUnit.MILLISECONDS);
         }
     }

@@ -24,4 +24,12 @@
         SELECT id,button_name,sort_no,icon,click, menu_id as pid,position
         from system_button where enabled = 1 ORDER BY sort_no
     </select>
+    <select id="getUserButtonPermission" resultType="java.lang.String">
+        SELECT DISTINCT b.permission from user_role_relation r
+        INNER JOIN system_role sr ON sr.id = r.role_id
+        INNER JOIN role_button_relation br on br.role_id = sr.id
+        INNER JOIN system_button b ON b.id = br.button_id
+        where r.user_id = #{userId} AND b.permission is not null AND b.permission != '' AND sr.enabled = 1 AND b.enabled = 1
+        group by b.id
+    </select>
 </mapper>

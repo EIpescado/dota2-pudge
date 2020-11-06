@@ -18,6 +18,7 @@ import pers.yurwisher.dota2.pudge.system.pojo.to.SystemRoleTo;
 import pers.yurwisher.dota2.pudge.system.pojo.tree.MenuAndButtonTreeNode;
 import pers.yurwisher.dota2.pudge.system.service.CustomRedisCacheService;
 import pers.yurwisher.dota2.pudge.system.service.IRelationService;
+import pers.yurwisher.dota2.pudge.system.service.ISystemButtonService;
 import pers.yurwisher.dota2.pudge.system.service.ISystemMenuService;
 import pers.yurwisher.dota2.pudge.system.service.ISystemRoleService;
 import pers.yurwisher.dota2.pudge.wrapper.PageR;
@@ -38,6 +39,7 @@ import java.util.stream.Collectors;
 public class SystemRoleServiceImpl extends BaseServiceImpl<SystemRoleMapper, SystemRole> implements ISystemRoleService {
 
     private final ISystemMenuService menuService;
+    private final ISystemButtonService buttonService;
     private final IRelationService relationService;
     private final CustomRedisCacheService customRedisCacheService;
 
@@ -101,13 +103,11 @@ public class SystemRoleServiceImpl extends BaseServiceImpl<SystemRoleMapper, Sys
 
     @Override
     public List<String> getUserPermission(Long userId) {
-        //获取用户所有菜单
-        List<SystemMenu> list = menuService.findAllByUserId(userId);
-        if (CollectionUtil.isNotEmpty(list)) {
-            return list.stream().filter(m -> StrUtil.isNotBlank(m.getPermission()))
-                    .map(SystemMenu::getPermission).collect(Collectors.toList());
-        }
-        return null;
+        //获取用户所有菜单权限
+        List<String> menuPermissions = menuService.getUserMenuPermission(userId);
+        //获取用户所有按钮权限
+        List<String> buttonPermissions = buttonService.getUserButtonPermission(userId);
+        return CollectionUtil.unionAll(menuPermissions,buttonPermissions);
     }
 
     @Override

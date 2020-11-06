@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.data.redis.core.RedisTemplate;
 import pers.yurwisher.dota2.pudge.constants.CacheConstant;
+import pers.yurwisher.dota2.pudge.security.bean.LoginProperties;
+import pers.yurwisher.dota2.pudge.security.bean.SecurityProperties;
 import pers.yurwisher.dota2.pudge.utils.PudgeUtil;
 
 import java.time.Duration;
@@ -33,9 +35,13 @@ public class CustomRedisCacheService {
      */
     private static final long DEFAULT_EXPIRE_MINUTES = 640;
     private RedisTemplate<String, Object> redisTemplate;
+    private SecurityProperties securityProperties;
+    private LoginProperties loginProperties;
 
-    public CustomRedisCacheService(RedisTemplate<String, Object> redisTemplate) {
+    public CustomRedisCacheService(RedisTemplate<String, Object> redisTemplate,SecurityProperties securityProperties,LoginProperties loginProperties) {
         this.redisTemplate = redisTemplate;
+        this.securityProperties = securityProperties;
+        this.loginProperties = loginProperties;
         init();
     }
 
@@ -44,8 +50,8 @@ public class CustomRedisCacheService {
         put(CacheConstant.AnName.SYSTEM_USER_INFO, Duration.ofDays(10), true);
         put(CacheConstant.AnName.SYSTEM_CONFIG, Duration.ofDays(-1), true);
 
-        put(CacheConstant.MaName.LOGIN_CODE, Duration.ofMinutes(2), false);
-        put(CacheConstant.MaName.PC_ONLINE_USER, Duration.ofHours(4), false);
+        put(CacheConstant.MaName.LOGIN_CODE, Duration.ofMinutes(loginProperties.getCodeConfig().getExpiration()), false);
+        put(CacheConstant.MaName.PC_ONLINE_USER, Duration.ofMinutes(securityProperties.getExpireTime()), false);
         put(CacheConstant.MaName.SYSTEM_USER_TREE, Duration.ofDays(10), false);
 
         put(CacheConstant.Key.SYSTEM_WHOLE_TREE, Duration.ofDays(7), false);

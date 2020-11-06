@@ -2,7 +2,6 @@ package pers.yurwisher.dota2.pudge.config;
 
 import cn.hutool.core.collection.CollectionUtil;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,7 +24,6 @@ import pers.yurwisher.dota2.pudge.security.JwtAccessDeniedHandler;
 import pers.yurwisher.dota2.pudge.security.JwtAuthenticationEntryPoint;
 import pers.yurwisher.dota2.pudge.security.TokenConfigurer;
 import pers.yurwisher.dota2.pudge.security.TokenProvider;
-import pers.yurwisher.dota2.pudge.security.bean.LoginProperties;
 import pers.yurwisher.dota2.pudge.security.service.IOnlineUserService;
 import pers.yurwisher.dota2.pudge.utils.PudgeUtil;
 
@@ -52,12 +50,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final ApplicationContext applicationContext;
     private final IOnlineUserService onlineUserService;
     private final String ALL = "ALL";
-
-    @Bean
-    @ConfigurationProperties(prefix = "login")
-    public LoginProperties loginProperties(){
-        return new LoginProperties();
-    }
 
     @Bean
     GrantedAuthorityDefaults grantedAuthorityDefaults() {

@@ -17,11 +17,11 @@ import java.util.List;
 public interface SystemMenuMapper extends CommonMapper<SystemMenu> {
 
     /**
-     * 获取用户所有菜单
+     * 获取用户菜单权限
      * @param userId 用户ID
      * @return 菜单权限
      */
-    List<SystemMenu> getUserMenus(@Param("userId")Long userId);
+    List<String> getUserMenuPermission(@Param("userId")Long userId);
 
     /**
      * 获取用户所有菜单TreeNode

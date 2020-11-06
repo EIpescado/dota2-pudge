@@ -28,4 +28,12 @@ public interface SystemButtonMapper extends CommonMapper<SystemButton> {
      * @return 按钮集合
      */
     List<ButtonNode> getAllButtonNodes();
+
+    /**
+     * 获取用户按钮权限
+     * @param userId 用户ID
+     * @return 按钮权限
+     */
+    List<String> getUserButtonPermission(@Param("userId")Long userId);
+
 }

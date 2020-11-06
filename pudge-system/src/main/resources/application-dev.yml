@@ -38,12 +38,12 @@ jwt:
     header: Authorization
     prefix: Bearer
     secret: YWhycHQ3aXAyb3psdndwNnE0bXp6NDZvcnZ2bGRxZG40M3g1NGVlZHFkM2oxdzV2MGZlejM5aDg5aGYxM29iZ20zNTFjMzRiY3V0MTVmNXVkcXYyMzMyOWZsMm04bmN1Nmh2OGlsdmtodTdjb3VrdmpiM2M0dXB5M3Y1a3dwc3k=
-    #令牌过期时间 4小时
-    expire-time: 14400000
+    #令牌过期时间 240分钟
+    expire-time: 240
     #续期检查时间 30分钟
-    detect-time: 1800000
-    #续期时间 1小时
-    renew-time: 3600000
+    detect-time: 30
+    #续期时间 60分钟
+    renew-time: 60
 #登录配置
 login:
   single: false
@@ -52,7 +52,7 @@ login:
     #  验证码类型配置 查看 LoginProperties 类
     type: arithmetic
     #  登录图形验证码有效时间/分钟
-    expiration: 2
+    expiration: 3
     #  验证码高度
     width: 111
     #  验证码宽度
