@@ -7,6 +7,9 @@ import pers.yurwisher.dota2.pudge.system.pojo.qo.SystemDictQo;
 import pers.yurwisher.dota2.pudge.system.pojo.to.SystemDictTo;
 import pers.yurwisher.dota2.pudge.system.pojo.vo.SystemDictVo;
 import pers.yurwisher.dota2.pudge.wrapper.PageR;
+import pers.yurwisher.dota2.pudge.wrapper.Selector;
+
+import java.util.List;
 
 /**
  * @author yq
@@ -50,4 +53,16 @@ public interface ISystemDictService extends BaseService<SystemDict> {
      */
     void delete(Long id);
 
+    /**
+     * 根据字典类型删除字典
+     * @param typeCode 字典类型编码
+     */
+    void deleteByTypeCode(String typeCode);
+
+    /**
+     * 字典下拉框
+     * @param dictType 字典类型
+     * @return so
+     */
+    List<Selector<String>> select(String dictType);
 }

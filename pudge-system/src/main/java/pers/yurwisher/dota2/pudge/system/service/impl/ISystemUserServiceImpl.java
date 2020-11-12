@@ -5,7 +5,6 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.cache.annotation.CacheConfig;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -71,7 +70,6 @@ public class ISystemUserServiceImpl extends BaseServiceImpl<SystemUserMapper, Sy
         return vo;
     }
 
-
     @Override
     public SystemUser getUserByUsername(String username) {
         return super.getOneByFieldValueEq(SystemUser::getUsername, username);
@@ -103,11 +101,11 @@ public class ISystemUserServiceImpl extends BaseServiceImpl<SystemUserMapper, Sy
         baseMapper.insert(user);
         //绑定角色
         relationService.userBindRoles(user.getId(), fo.getRoleIds());
+        this.userInfoChangeRemoveCache(user.getUsername());
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @CacheEvict(key = "#fo.getUsername()")
     public void update(Long id, SystemUserFo fo) {
         SystemUser user = baseMapper.selectById(id);
         Assert.notNull(user);
@@ -136,25 +134,38 @@ public class ISystemUserServiceImpl extends BaseServiceImpl<SystemUserMapper, Sy
         SystemUser user = baseMapper.selectById(id);
         Assert.notNull(user);
         this.update(Wrappers.<SystemUser>lambdaUpdate()
-                .set(SystemUser::getPassword,this.getCipherDefaultPassword())
-                .set(SystemUser::getLastUpdated,LocalDateTime.now())
-                .eq(SystemUser::getId,id));
+                .set(SystemUser::getPassword, this.getCipherDefaultPassword())
+                .set(SystemUser::getLastUpdated, LocalDateTime.now())
+                .eq(SystemUser::getId, id));
         //移除在线用户缓存
-        customRedisCacheService.deleteCachePlus(CacheConstant.MaName.PC_ONLINE_USER,user.getUsername());
-        customRedisCacheService.deleteCachePlus(CacheConstant.AnName.SYSTEM_USER_INFO,user.getUsername());
+        this.userInfoChangeRemoveCache(user.getUsername());
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void switchEnabled(Long id) {
+        SystemUser user = baseMapper.selectById(id);
+        Assert.notNull(user);
         baseMapper.switchEnabledById(id);
+        this.userInfoChangeRemoveCache(user.getUsername());
     }
 
     /**
      * 获取默认密码的密文
+     *
      * @return 密码
      */
-    private String getCipherDefaultPassword(){
+    private String getCipherDefaultPassword() {
         return PudgeUtil.encodePwd(systemConfigService.getValByCode(SystemConfigEnum.DEFAULT_PASSWORD));
+    }
+
+    /**
+     * 用户信息变更 移除相应缓存
+     *
+     * @param username 用户名
+     */
+    private void userInfoChangeRemoveCache(String username) {
+        customRedisCacheService.deleteCachePlus(CacheConstant.MaName.ONLINE_USER, username);
+        customRedisCacheService.deleteCachePlus(CacheConstant.AnName.SYSTEM_USER_INFO, username);
     }
 }

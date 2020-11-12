@@ -38,20 +38,27 @@ public class CustomRedisCacheService {
     private SecurityProperties securityProperties;
     private LoginProperties loginProperties;
 
-    public CustomRedisCacheService(RedisTemplate<String, Object> redisTemplate,SecurityProperties securityProperties,LoginProperties loginProperties) {
+    public CustomRedisCacheService(RedisTemplate<String, Object> redisTemplate, SecurityProperties securityProperties, LoginProperties loginProperties) {
         this.redisTemplate = redisTemplate;
         this.securityProperties = securityProperties;
         this.loginProperties = loginProperties;
         init();
     }
 
-    /**统一初始化缓存过期时间*/
+    /**
+     * 统一初始化缓存过期时间
+     */
     private void init() {
         put(CacheConstant.AnName.SYSTEM_USER_INFO, Duration.ofDays(10), true);
         put(CacheConstant.AnName.SYSTEM_CONFIG, Duration.ofDays(-1), true);
 
         put(CacheConstant.MaName.LOGIN_CODE, Duration.ofMinutes(loginProperties.getCodeConfig().getExpiration()), false);
-        put(CacheConstant.MaName.PC_ONLINE_USER, Duration.ofMinutes(securityProperties.getExpireTime()), false);
+        //自定义的token 过期时间
+        if (CollectionUtil.isNotEmpty(securityProperties.getClientTokenConfigs())) {
+            securityProperties.getClientTokenConfigs().forEach(
+                    c -> put(PudgeUtil.generateKeyWithDoubleColon(CacheConstant.MaName.ONLINE_USER, c.getType().name()), c.getExpireTime(), false)
+            );
+        }
         put(CacheConstant.MaName.SYSTEM_USER_TREE, Duration.ofDays(10), false);
 
         put(CacheConstant.Key.SYSTEM_WHOLE_TREE, Duration.ofDays(7), false);
@@ -89,8 +96,8 @@ public class CustomRedisCacheService {
         }
     }
 
-    public <T> T cacheRound(String redisKey,RealDataGetter<T> getter){
-        return cacheRound(redisKey,getCacheExpireMinutes(redisKey),getter);
+    public <T> T cacheRound(String redisKey, RealDataGetter<T> getter) {
+        return cacheRound(redisKey, getCacheExpireMinutes(redisKey), getter);
     }
 
     /**
@@ -189,6 +196,41 @@ public class CustomRedisCacheService {
     }
 
     /**
+     * 是否存在指定缓存
+     *
+     * @param name 缓存名称 用于取缓存过期时间
+     * @param key  缓存名称后跟随的唯一表示 ,如 SYSTEM_USER_TREE::test 的test即为key
+     * @return boolean 是否存在
+     */
+    public boolean haveExistPlus(String name, String key) {
+        String redisKey = PudgeUtil.generateKeyWithDoubleColon(name, key);
+        Boolean has = redisTemplate.hasKey(redisKey);
+        return has != null && has;
+    }
+
+    /**
+     * 获取指定key的过期时间
+     *
+     * @param name 缓存名称 用于取缓存过期时间
+     * @param key  缓存名称后跟随的唯一表示 ,如 SYSTEM_USER_TREE::test 的test即为key
+     * @return 过期时间 单位s
+     */
+    public Long getExpireTimePlus(String name, String key) {
+        String redisKey = PudgeUtil.generateKeyWithDoubleColon(name, key);
+        return redisTemplate.getExpire(redisKey);
+    }
+
+    /**
+     * 获取指定key的过期时间
+     *
+     * @param redisKey 缓存key
+     * @return 过期时间 单位s
+     */
+    public Long getExpireTime(String redisKey) {
+        return redisTemplate.getExpire(redisKey);
+    }
+
+    /**
      * 获取缓存
      *
      * @param redisKey 缓存key
@@ -236,8 +278,8 @@ public class CustomRedisCacheService {
     }
 
     public void batchDelete(String name, List<String> keys) {
-        if(CollectionUtil.isNotEmpty(keys)){
-            Set<String> redisKeys = keys.stream().map(s -> PudgeUtil.generateKeyWithDoubleColon(name,s)).collect(Collectors.toSet());
+        if (CollectionUtil.isNotEmpty(keys)) {
+            Set<String> redisKeys = keys.stream().map(s -> PudgeUtil.generateKeyWithDoubleColon(name, s)).collect(Collectors.toSet());
             redisTemplate.delete(redisKeys);
         }
     }

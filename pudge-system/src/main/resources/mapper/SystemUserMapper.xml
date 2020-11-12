@@ -4,7 +4,7 @@
 
 
     <select id="list" resultType="pers.yurwisher.dota2.pudge.system.pojo.to.SystemUserTo">
-        select  * from system_user
+        select  id,username,nickname,phone,date_created,enabled from system_user
         <where>
             <if test="qo.username != null and qo.username != ''">
                 username = #{qo.username}
@@ -12,6 +12,6 @@
         </where>
     </select>
     <select id="get" resultType="pers.yurwisher.dota2.pudge.system.pojo.vo.SystemUserVo">
-        select  * from system_user where id = #{id}
+        select  username,nickname,phone from system_user where id = #{id}
     </select>
 </mapper>

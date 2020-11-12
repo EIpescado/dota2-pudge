@@ -1,6 +1,7 @@
 package pers.yurwisher.dota2.pudge.system.service.impl;
 
 import cn.hutool.core.lang.Assert;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,6 +12,7 @@ import pers.yurwisher.dota2.pudge.system.pojo.fo.SystemDictTypeFo;
 import pers.yurwisher.dota2.pudge.system.pojo.qo.SystemDictTypeQo;
 import pers.yurwisher.dota2.pudge.system.pojo.to.SystemDictTypeTo;
 import pers.yurwisher.dota2.pudge.system.pojo.vo.SystemDictTypeVo;
+import pers.yurwisher.dota2.pudge.system.service.ISystemDictService;
 import pers.yurwisher.dota2.pudge.system.service.ISystemDictTypeService;
 import pers.yurwisher.dota2.pudge.wrapper.PageR;
 
@@ -21,13 +23,11 @@ import pers.yurwisher.dota2.pudge.wrapper.PageR;
  * @since V1.0.0
  */
 @Service
+@RequiredArgsConstructor
 public class SystemDictTypeServiceImpl extends BaseServiceImpl<SystemDictTypeMapper, SystemDictType> implements ISystemDictTypeService {
 
-    /**
-     * 新增
-     *
-     * @param fo 参数
-     */
+    private final ISystemDictService systemDictService;
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void create(SystemDictTypeFo fo) {
@@ -36,12 +36,6 @@ public class SystemDictTypeServiceImpl extends BaseServiceImpl<SystemDictTypeMap
         baseMapper.insert(systemDictType);
     }
 
-    /**
-     * 更新
-     *
-     * @param id 主键
-     * @param fo 参数
-     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void update(Long id, SystemDictTypeFo fo) {
@@ -51,28 +45,20 @@ public class SystemDictTypeServiceImpl extends BaseServiceImpl<SystemDictTypeMap
         baseMapper.updateById(systemDictType);
     }
 
-    /**
-     * 列表
-     *
-     * @param qo 查询参数
-     * @return 分页对象
-     */
     @Override
     @SuppressWarnings("unchecked")
     public PageR<SystemDictTypeTo> list(SystemDictTypeQo qo) {
         return super.toPageR(baseMapper.list(super.toPage(qo), qo));
     }
 
-
-    /**
-     * 删除
-     *
-     * @param id 主键
-     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void delete(Long id) {
+        SystemDictType systemDictType = baseMapper.selectById(id);
+        Assert.notNull(systemDictType);
         baseMapper.deleteById(id);
+        //删除字典
+        systemDictService.deleteByTypeCode(systemDictType.getCode());
     }
 
     @Override

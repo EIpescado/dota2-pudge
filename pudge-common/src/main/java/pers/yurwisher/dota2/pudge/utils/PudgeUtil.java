@@ -58,7 +58,7 @@ public class PudgeUtil {
     private static final String APPLICATION_JSON_UTF_8 = "application/json;charset=UTF-8";
     private static final Digester SHA256_DIGESTER = new Digester(DigestAlgorithm.SHA256);
     private static final DES DES = SecureUtil.des();
-    private static final String DOUBLE_COLON = "::";
+    public static final String DOUBLE_COLON = "::";
 
     public static void responseJSON(HttpServletResponse response, R r) throws IOException {
         response.setStatus(HttpStatus.OK.value());
@@ -178,6 +178,7 @@ public class PudgeUtil {
 
     /**
      * 明文密码加密
+     *
      * @param plainText 明文密码
      * @return 加密后密码
      */
@@ -195,12 +196,13 @@ public class PudgeUtil {
 
     /**
      * 生成redisKey
+     *
      * @param prefix 前缀
-     * @param key key
+     * @param key    key
      * @return redis key
      */
-    public static String generateKeyWithDoubleColon(String prefix,String key){
-        return  StrUtil.builder(prefix,DOUBLE_COLON,key).toString();
+    public static String generateKeyWithDoubleColon(String prefix, String key) {
+        return StrUtil.builder(prefix, DOUBLE_COLON, key).toString();
     }
 
 }

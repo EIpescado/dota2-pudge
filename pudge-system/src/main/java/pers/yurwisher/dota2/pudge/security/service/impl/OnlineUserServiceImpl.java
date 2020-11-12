@@ -2,6 +2,7 @@ package pers.yurwisher.dota2.pudge.security.service.impl;
 
 import org.springframework.stereotype.Service;
 import pers.yurwisher.dota2.pudge.constants.CacheConstant;
+import pers.yurwisher.dota2.pudge.enums.UserClientType;
 import pers.yurwisher.dota2.pudge.security.CurrentUser;
 import pers.yurwisher.dota2.pudge.security.JwtUser;
 import pers.yurwisher.dota2.pudge.security.cache.OnlineUser;
@@ -28,20 +29,14 @@ public class OnlineUserServiceImpl implements IOnlineUserService {
     }
 
     @Override
-    public OnlineUser getOne(String username) {
-        return customRedisCacheService.getCachePlus(CacheConstant.MaName.PC_ONLINE_USER,username);
+    public Long getOnlineExpireTime(String subject) {
+        return customRedisCacheService.getExpireTimePlus(CacheConstant.MaName.ONLINE_USER, subject);
     }
 
     @Override
-    public OnlineUser getOneByType(String username, String type) {
-        //todo
-        return null;
-    }
-
-    @Override
-    public void save(HttpServletRequest request, String token, JwtUser user) {
+    public void save(HttpServletRequest request, String token, JwtUser user, UserClientType type) {
         //存入redis
-        customRedisCacheService.setCachePlus(CacheConstant.MaName.PC_ONLINE_USER, user.getUsername(), () -> {
+        customRedisCacheService.setCachePlus(PudgeUtil.generateKeyWithDoubleColon(CacheConstant.MaName.ONLINE_USER,type.name()), user.getUsername(), () -> {
             OnlineUser onlineUser = new OnlineUser();
             CurrentUser currentUser = user.getUser();
             onlineUser.setUsername(currentUser.getUsername());

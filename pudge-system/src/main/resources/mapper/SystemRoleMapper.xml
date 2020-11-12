@@ -2,7 +2,8 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="pers.yurwisher.dota2.pudge.system.mapper.SystemRoleMapper">
     <select id="list" resultType="pers.yurwisher.dota2.pudge.system.pojo.to.SystemRoleTo">
-      select * from system_role where enabled = 1
+      select id,name,description,level,enabled,date_created,last_updated
+        from system_role where enabled = 1
       <if test="qo.name != null and qo.name != ''">
         and name like concat('%',#{qo.name},'%')
       </if>

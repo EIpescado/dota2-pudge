@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import pers.yurwisher.dota2.pudge.base.BaseController;
 import pers.yurwisher.dota2.pudge.system.pojo.fo.SystemDictFo;
@@ -15,6 +16,9 @@ import pers.yurwisher.dota2.pudge.system.pojo.vo.SystemDictVo;
 import pers.yurwisher.dota2.pudge.system.service.ISystemDictService;
 import pers.yurwisher.dota2.pudge.wrapper.PageR;
 import pers.yurwisher.dota2.pudge.wrapper.R;
+import pers.yurwisher.dota2.pudge.wrapper.Selector;
+
+import java.util.List;
 
 /**
  * @author yq
@@ -24,7 +28,7 @@ import pers.yurwisher.dota2.pudge.wrapper.R;
  */
 @RestController
 @RequestMapping("/dict")
-public class SystemDictController extends BaseController{
+public class SystemDictController extends BaseController {
     private ISystemDictService systemDictService;
 
     public SystemDictController(ISystemDictService systemDictService) {
@@ -32,32 +36,35 @@ public class SystemDictController extends BaseController{
     }
 
     @PostMapping
-    public R<String> create(@RequestBody SystemDictFo fo){
+    public R<String> create(@RequestBody SystemDictFo fo) {
         systemDictService.create(fo);
         return R.ok();
     }
 
     @PostMapping("{id}")
-    public R<String> update(@PathVariable(name = "id")Long id, @RequestBody SystemDictFo fo){
-        systemDictService.update(id,fo);
+    public R<String> update(@PathVariable(name = "id") Long id, @RequestBody SystemDictFo fo) {
+        systemDictService.update(id, fo);
         return R.ok();
     }
 
     @GetMapping("{id}")
-    public R<SystemDictVo> get(@PathVariable(name = "id")Long id){
+    public R<SystemDictVo> get(@PathVariable(name = "id") Long id) {
         return R.ok(systemDictService.get(id));
     }
 
     @PostMapping("/delete/{id}")
-    public R<String> delete(@PathVariable(name = "id")Long id){
+    public R<String> delete(@PathVariable(name = "id") Long id) {
         systemDictService.delete(id);
         return R.ok();
     }
 
     @GetMapping
-    public R<PageR<SystemDictTo>> list(@ModelAttribute SystemDictQo qo){
+    public R<PageR<SystemDictTo>> list(@ModelAttribute SystemDictQo qo) {
         return R.ok(systemDictService.list(qo));
     }
 
-
+    @GetMapping("select")
+    public R<List<Selector<String>>> select(@RequestParam String dictType) {
+        return R.ok(systemDictService.select(dictType));
+    }
 }

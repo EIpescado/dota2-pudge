@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="pers.yurwisher.dota2.pudge.system.mapper.SystemDictTypeMapper">
     <select id="list" resultType="pers.yurwisher.dota2.pudge.system.pojo.to.SystemDictTypeTo">
-        SELECT * from system_dict_type
+        SELECT code,name,id,last_updated from system_dict_type
         WHERE enabled = 1
         <if test="qo.keyWord != null and qo.keyWord != ''">
             and (code like concat('%',#{qo.keyWord},'%') or name like concat('%',#{qo.keyWord},'%'))
@@ -10,7 +10,7 @@
         order by last_updated desc
     </select>
     <select id="get" resultType="pers.yurwisher.dota2.pudge.system.pojo.vo.SystemDictTypeVo">
-        select * from system_dict_type where id =#{id}
+        select code,name from system_dict_type where id =#{id}
     </select>
 
 

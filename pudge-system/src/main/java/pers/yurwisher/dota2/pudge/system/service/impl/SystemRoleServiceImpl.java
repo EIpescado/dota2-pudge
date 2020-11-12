@@ -54,7 +54,6 @@ public class SystemRoleServiceImpl extends BaseServiceImpl<SystemRoleMapper, Sys
         SystemRole systemRole = new SystemRole();
         BeanUtils.copyProperties(fo, systemRole);
         baseMapper.insert(systemRole);
-        this.deleteCache();
     }
 
     /**
@@ -70,7 +69,7 @@ public class SystemRoleServiceImpl extends BaseServiceImpl<SystemRoleMapper, Sys
         Assert.notNull(systemRole);
         BeanUtils.copyProperties(fo, systemRole,"name");
         baseMapper.updateById(systemRole);
-        this.deleteCache();
+        this.deleteCache(id,true);
     }
 
     /**
@@ -94,11 +93,7 @@ public class SystemRoleServiceImpl extends BaseServiceImpl<SystemRoleMapper, Sys
     @Transactional(rollbackFor = Exception.class)
     public void delete(Long id) {
         baseMapper.deleteById(id);
-        this.deleteCache();
-        //删除所有含有此角色的用户缓存信息 与 菜单缓存
-        List<String> usernameList = relationService.getAllHaveThisRoleIdUsername(id);
-        customRedisCacheService.batchDelete(CacheConstant.AnName.SYSTEM_USER_INFO,usernameList);
-        customRedisCacheService.batchDelete(CacheConstant.MaName.SYSTEM_USER_TREE,usernameList);
+        this.deleteCache(id,true);
     }
 
     @Override
@@ -131,6 +126,8 @@ public class SystemRoleServiceImpl extends BaseServiceImpl<SystemRoleMapper, Sys
             if (CollectionUtil.isNotEmpty(buttons)) {
                 relationService.roleBindButtons(roleId, buttons.stream().map(MenuAndButtonTreeNode::getId).collect(Collectors.toList()));
             }
+            //移除所有包含此角色的用户 缓存
+            this.deleteCache(roleId,false);
         }
     }
 
@@ -153,8 +150,14 @@ public class SystemRoleServiceImpl extends BaseServiceImpl<SystemRoleMapper, Sys
        return customRedisCacheService.cacheRound(CacheConstant.Key.ROLE_SELECT,() -> baseMapper.select());
     }
 
-    private void deleteCache(){
+    private void deleteCache(Long roleId, boolean deleteSelect){
         //删除缓存
-        customRedisCacheService.deleteCache(CacheConstant.Key.ROLE_SELECT);
+        if(deleteSelect){
+            customRedisCacheService.deleteCache(CacheConstant.Key.ROLE_SELECT);
+        }
+        //删除所有含有此角色的用户缓存信息 与 菜单缓存
+        List<String> usernameList = relationService.getAllHaveThisRoleIdUsername(roleId);
+        customRedisCacheService.batchDelete(CacheConstant.AnName.SYSTEM_USER_INFO,usernameList);
+        customRedisCacheService.batchDelete(CacheConstant.MaName.SYSTEM_USER_TREE,usernameList);
     }
 }

@@ -1,7 +1,7 @@
 package pers.yurwisher.dota2.pudge.security.service;
 
+import pers.yurwisher.dota2.pudge.enums.UserClientType;
 import pers.yurwisher.dota2.pudge.security.JwtUser;
-import pers.yurwisher.dota2.pudge.security.cache.OnlineUser;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -12,27 +12,23 @@ import javax.servlet.http.HttpServletRequest;
  * @since V1.0.0
  */
 public interface IOnlineUserService {
-    /**
-     * 根据key获取当前在线用户
-     * @param username 用户名
-     * @return 在线用户信息
-     */
-    OnlineUser getOne(String username);
 
     /**
-     * 根据key获取当前在线用户
-     * @param username 用户名
-     * @param type 客户端类型
-     * @return 在线用户信息
+     * 用户在线状态过期时间
+     *
+     * @param subject 用户::客户端类型 key
+     * @return time 单位s
      */
-    OnlineUser getOneByType(String username,String type);
+    Long getOnlineExpireTime(String subject);
 
     /**
      * 保存在线信息到redis
+     *
      * @param request 请求
-     * @param token 凭证
-     * @param user 用户
+     * @param token   凭证
+     * @param user    用户
+     * @param type, 用户客户端类型
      */
-    void save(HttpServletRequest request, String token, JwtUser user);
+    void save(HttpServletRequest request, String token, JwtUser user, UserClientType type);
 
 }

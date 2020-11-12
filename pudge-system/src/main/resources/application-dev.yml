@@ -20,6 +20,7 @@ spring:
         # 连接池中的最大空闲连接
         max-idle: 8
     database: 13
+    timeout: 5s
   #文件上传大小限制
   servlet:
     multipart:
@@ -38,12 +39,15 @@ jwt:
     header: Authorization
     prefix: Bearer
     secret: YWhycHQ3aXAyb3psdndwNnE0bXp6NDZvcnZ2bGRxZG40M3g1NGVlZHFkM2oxdzV2MGZlejM5aDg5aGYxM29iZ20zNTFjMzRiY3V0MTVmNXVkcXYyMzMyOWZsMm04bmN1Nmh2OGlsdmtodTdjb3VrdmpiM2M0dXB5M3Y1a3dwc3k=
-    #令牌过期时间 240分钟
-    expire-time: 240
-    #续期检查时间 30分钟
-    detect-time: 30
-    #续期时间 60分钟
-    renew-time: 60
+    client-token-configs:
+      - type: PC
+        expire-time: 4h
+        detect-time: 30m
+        renew-time: 2h
+      - type: H5
+        expire-time: 7d
+        detect-time: 1d
+        renew-time: 6d
 #登录配置
 login:
   single: false

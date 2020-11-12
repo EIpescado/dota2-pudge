@@ -8,6 +8,8 @@ import com.wf.captcha.GifCaptcha;
 import com.wf.captcha.SpecCaptcha;
 import com.wf.captcha.base.Captcha;
 import lombok.Data;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
 
 import java.awt.*;
 
@@ -17,6 +19,8 @@ import java.awt.*;
  * @author yq
  */
 @Data
+@Component
+@ConfigurationProperties(prefix = "login")
 public class LoginProperties {
 
     /**

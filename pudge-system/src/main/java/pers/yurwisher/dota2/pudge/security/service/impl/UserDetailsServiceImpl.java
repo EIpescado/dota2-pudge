@@ -28,7 +28,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        logger.info("UserDetailsServiceImpl > loadUserByUsername....");
         CurrentUser currentUser = systemUserService.findUserByUsername(username);
         return new JwtUser(currentUser);
     }

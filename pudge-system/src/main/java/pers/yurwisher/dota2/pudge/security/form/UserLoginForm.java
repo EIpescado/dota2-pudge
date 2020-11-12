@@ -1,6 +1,7 @@
 package pers.yurwisher.dota2.pudge.security.form;
 
 import lombok.Data;
+import pers.yurwisher.dota2.pudge.enums.UserClientType;
 
 import javax.validation.constraints.NotBlank;
 
@@ -22,4 +23,7 @@ public class UserLoginForm {
     private String code;
 
     private String uuid;
+
+    /**用户客户端类型 默认PC*/
+    private UserClientType type = UserClientType.PC;
 }

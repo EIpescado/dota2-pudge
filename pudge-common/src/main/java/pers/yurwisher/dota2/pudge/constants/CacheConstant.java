@@ -21,6 +21,11 @@ public interface CacheConstant {
          * 配置
          */
         String SYSTEM_CONFIG = "system_config";
+
+        /**
+         * 字典
+         */
+        String SYSTEM_DICT = "system_dict";
     }
 
     /**
@@ -32,16 +37,16 @@ public interface CacheConstant {
          */
         String LOGIN_CODE = "login_code";
         /**
-         * PC在线用户
+         * 在线用户
          */
-        String PC_ONLINE_USER = "pc_online_user";
+        String ONLINE_USER = "online_user";
         /**
          * 用户菜单树
          */
         String SYSTEM_USER_TREE = "system_user_tree";
     }
 
-    interface Key{
+    interface Key {
         /**
          * 系统完整菜单及按钮树
          */

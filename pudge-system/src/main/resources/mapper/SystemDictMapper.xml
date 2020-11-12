@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="pers.yurwisher.dota2.pudge.system.mapper.SystemDictMapper">
     <select id="list" resultType="pers.yurwisher.dota2.pudge.system.pojo.to.SystemDictTo">
-        SELECT * from system_dict
+        SELECT type_code,seq,name,val,fixed,id,last_updated from system_dict
         WHERE type_code = #{qo.typeCode}
         AND enabled = 1
         <if test="qo.keyWord != null and qo.keyWord != ''">
@@ -12,7 +12,11 @@
     </select>
 
     <select id="get" resultType="pers.yurwisher.dota2.pudge.system.pojo.vo.SystemDictVo">
-      select * from system_dict where id=#{id}
+      select seq,name,val,fixed,type_code from system_dict where id=#{id}
+    </select>
+    <select id="select" resultType="pers.yurwisher.dota2.pudge.wrapper.Selector">
+        select name as label,val as 'value' from system_dict
+        where type_code = #{dictType} and enabled = 1 ORDER BY seq
     </select>
 
 </mapper>
