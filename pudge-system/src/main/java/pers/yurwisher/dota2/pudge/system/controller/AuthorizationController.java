@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import pers.yurwisher.dota2.pudge.annotation.rest.AnonymousDeleteMapping;
 import pers.yurwisher.dota2.pudge.annotation.rest.AnonymousGetMapping;
 import pers.yurwisher.dota2.pudge.annotation.rest.AnonymousPostMapping;
 import pers.yurwisher.dota2.pudge.base.BaseController;
@@ -31,17 +30,17 @@ public class AuthorizationController extends BaseController {
     private final AuthorizationService authorizationService;
 
     @AnonymousGetMapping
-    public R test(HttpServletRequest request){
+    public R test(HttpServletRequest request) {
         return R.ok(PudgeUtil.getUserClientInfo(request));
     }
 
     @AnonymousPostMapping(value = "/login")
-    public R login(@RequestBody @Validated  UserLoginForm form, HttpServletRequest request){
-        return authorizationService.login(form,request);
+    public R login(@RequestBody @Validated UserLoginForm form, HttpServletRequest request) {
+        return authorizationService.login(form, request);
     }
 
     @GetMapping(value = "/info")
-    public R info(){
+    public R info() {
         return authorizationService.info();
     }
 
@@ -50,7 +49,7 @@ public class AuthorizationController extends BaseController {
         return authorizationService.getCode();
     }
 
-    @AnonymousDeleteMapping(value = "/logout")
+    @AnonymousPostMapping(value = "/logout")
     public R logout(HttpServletRequest request) {
         return authorizationService.logout(request);
     }
