@@ -73,5 +73,4 @@ public class SystemMenu extends BaseEntity {
      */
     private String activeMenu;
 
-
 }

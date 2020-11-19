@@ -48,5 +48,4 @@ public class MenuTreeNode extends TreeNode<Long,MenuTreeNode> {
      */
     private MenuMeta meta;
 
-
 }

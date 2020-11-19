@@ -153,7 +153,7 @@ public class SystemMenuServiceImpl extends BaseServiceImpl<SystemMenuMapper, Sys
 
     @Override
     public List<MenuAndButtonTreeNode> wholeTree() {
-        return customRedisCacheService.cacheRound(CacheConstant.Key.SYSTEM_WHOLE_TREE,()->{
+        return customRedisCacheService.cacheRound(CacheConstant.Key.SYSTEM_WHOLE_TREE, () -> {
             List<MenuAndButtonTreeNode> nodes = baseMapper.getAllNodes();
             return new Tree<Long, MenuAndButtonTreeNode>(-1L).build(nodes);
         });
@@ -179,7 +179,7 @@ public class SystemMenuServiceImpl extends BaseServiceImpl<SystemMenuMapper, Sys
         this.deleteCache();
     }
 
-    private void deleteCache(){
+    private void deleteCache() {
         //删除所有用户菜单缓存
         customRedisCacheService.batchDelete(CacheConstant.MaName.SYSTEM_USER_TREE);
         //删除完整树缓存

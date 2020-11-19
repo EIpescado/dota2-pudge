@@ -1,6 +1,7 @@
 package pers.yurwisher.dota2.pudge.utils;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.HexUtil;
 import cn.hutool.core.util.StrUtil;
@@ -27,6 +28,10 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 /**
@@ -59,8 +64,11 @@ public class PudgeUtil {
     private static final Digester SHA256_DIGESTER = new Digester(DigestAlgorithm.SHA256);
     private static final DES DES = SecureUtil.des();
     public static final String DOUBLE_COLON = "::";
+    public static final DateTimeFormatter DEFAULT_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    public static final DateTimeFormatter YYYY_MM_DD_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    public static final LocalTime END_OF_DAY = LocalTime.of(23, 59, 59);
 
-    public static void responseJSON(HttpServletResponse response, R r) throws IOException {
+   public static void responseJSON(HttpServletResponse response, R r) throws IOException {
         response.setStatus(HttpStatus.OK.value());
         response.setContentType(APPLICATION_JSON_UTF_8);
         response.getWriter().append(JSON.toJSONString(r));
@@ -205,4 +213,19 @@ public class PudgeUtil {
         return StrUtil.builder(prefix, DOUBLE_COLON, key).toString();
     }
 
+    public static LocalDate parseDate(String yyyyMMdd){
+        return LocalDateTimeUtil.parseDate(yyyyMMdd, YYYY_MM_DD_FORMATTER);
+    }
+
+    public static LocalDateTime getStartOfDay(String yyyyMMdd){
+        return LocalDateTimeUtil.parseDate(yyyyMMdd, YYYY_MM_DD_FORMATTER).atStartOfDay();
+    }
+
+    public static LocalDateTime getEndOfDay(String yyyyMMdd){
+        return LocalDateTimeUtil.parseDate(yyyyMMdd, YYYY_MM_DD_FORMATTER).atTime(END_OF_DAY);
+    }
+
+    public static LocalDateTime parseTime(String yyyyMMddHHmmss){
+        return LocalDateTimeUtil.parse(yyyyMMddHHmmss, DEFAULT_FORMATTER);
+    }
 }
