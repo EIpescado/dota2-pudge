@@ -26,6 +26,8 @@ import pers.yurwisher.dota2.pudge.wrapper.R;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.time.LocalDate;
@@ -113,10 +115,7 @@ public class PudgeUtil {
     static {
         SpringContextHolder.addCallBacks(() -> {
             String path = "ip2region/ip2region.db";
-            String name = "ip2region.db";
             try {
-                //File file = IoUtil.copy (new ClassPathResource(path).getInputStream(), name);
-                //IoUtil.close();
                 ipSearcher = new DbSearcher(new DbConfig(), IoUtil.readBytes(new ClassPathResource(path).getInputStream()));
             } catch (IOException | DbMakerConfigException e) {
                 logger.error("初始化ip2region DbSearcher 失败:[{}]", e.getLocalizedMessage());
@@ -227,5 +226,18 @@ public class PudgeUtil {
 
     public static LocalDateTime parseTime(String yyyyMMddHHmmss){
         return LocalDateTimeUtil.parse(yyyyMMddHHmmss, DEFAULT_FORMATTER);
+    }
+
+    /**
+     * 获取异常堆栈信息
+     * @param throwable 异常
+     * @return 字符串
+     */
+    public static String getStackTrace(Throwable throwable){
+        StringWriter sw = new StringWriter();
+        try (PrintWriter pw = new PrintWriter(sw)) {
+            throwable.printStackTrace(pw);
+            return sw.toString();
+        }
     }
 }
