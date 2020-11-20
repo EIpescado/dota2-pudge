@@ -26,8 +26,5 @@ public class SystemNoticeTo implements Serializable {
     private Integer type;
     private LocalDateTime dateCreated;
     private LocalDateTime lastUpdated;
-    @JSONField(format = "yyyy-MM-dd")
-    private LocalDateTime startDate;
-    @JSONField(format = "yyyy-MM-dd")
-    private LocalDateTime endDate;
+    private String expiredDate;
 }

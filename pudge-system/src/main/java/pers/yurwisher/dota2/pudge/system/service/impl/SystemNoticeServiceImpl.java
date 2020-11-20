@@ -15,8 +15,6 @@ import pers.yurwisher.dota2.pudge.system.service.ISystemNoticeService;
 import pers.yurwisher.dota2.pudge.utils.PudgeUtil;
 import pers.yurwisher.dota2.pudge.wrapper.PageR;
 
-import java.time.LocalTime;
-
 
 /**
  * @author yq
@@ -36,9 +34,8 @@ public class SystemNoticeServiceImpl extends BaseServiceImpl<SystemNoticeMapper,
     @Transactional(rollbackFor = Exception.class)
     public void create(SystemNoticeFo fo) {
         SystemNotice systemNotice = new SystemNotice();
-        BeanUtils.copyProperties(fo, systemNotice, "startDate", "endDate");
-        systemNotice.setStartDate(PudgeUtil.getStartOfDay(fo.getStartDate()));
-        systemNotice.setEndDate(PudgeUtil.getEndOfDay(fo.getEndDate()));
+        BeanUtils.copyProperties(fo, systemNotice, "expiredDate");
+        systemNotice.setExpiredDate(PudgeUtil.parseTime(fo.getExpiredDate()));
         baseMapper.insert(systemNotice);
     }
 
@@ -53,9 +50,8 @@ public class SystemNoticeServiceImpl extends BaseServiceImpl<SystemNoticeMapper,
     public void update(Long id, SystemNoticeFo fo) {
         SystemNotice systemNotice = baseMapper.selectById(id);
         Assert.notNull(systemNotice);
-        BeanUtils.copyProperties(fo, systemNotice, "startDate", "endDate");
-        systemNotice.setStartDate(PudgeUtil.getStartOfDay(fo.getStartDate()));
-        systemNotice.setEndDate(PudgeUtil.getEndOfDay(fo.getEndDate()));
+        BeanUtils.copyProperties(fo, systemNotice, "expiredDate");
+        systemNotice.setExpiredDate(PudgeUtil.parseTime(fo.getExpiredDate()));
         baseMapper.updateById(systemNotice);
     }
 

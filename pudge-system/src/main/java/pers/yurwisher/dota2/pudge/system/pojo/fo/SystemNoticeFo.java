@@ -25,8 +25,6 @@ public class SystemNoticeFo implements Serializable {
     private String title;
     @NotBlank(message = "公告内容必填")
     private String content;
-    @NotBlank(message = "公告生效时间必填")
-    private String startDate;
-    @NotBlank(message = "公告失效时间必填")
-    private String endDate;
+    @NotBlank(message = "失效日期必填")
+    private String expiredDate;
 }

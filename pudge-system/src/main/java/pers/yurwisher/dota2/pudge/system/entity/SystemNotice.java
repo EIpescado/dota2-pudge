@@ -23,11 +23,6 @@ public class SystemNotice extends BaseEntity {
     private String title;
     /**内容*/
     private String content;
-    /**生效日期*/
-    private LocalDateTime startDate;
     /**失效日期*/
-    private LocalDateTime endDate;
-
-    /**状态*/
-    private Integer status;
+    private LocalDateTime expiredDate;
 }

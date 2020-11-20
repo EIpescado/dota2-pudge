@@ -25,8 +25,5 @@ public class SystemNoticeVo implements Serializable {
     private LocalDateTime dateCreated;
     @JSONField(serializeUsing = ToStringSerializer.class)
     private Integer type;
-    @JSONField(format = "yyyy-MM-dd")
-    private LocalDateTime startDate;
-    @JSONField(format = "yyyy-MM-dd")
-    private LocalDateTime endDate;
+    private String expiredDate;
 }
