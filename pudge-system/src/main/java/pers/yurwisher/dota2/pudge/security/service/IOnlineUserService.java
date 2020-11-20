@@ -27,7 +27,7 @@ public interface IOnlineUserService {
      * @param request 请求
      * @param token   凭证
      * @param user    用户
-     * @param type, 用户客户端类型
+     * @param type,   用户客户端类型
      */
     void save(HttpServletRequest request, String token, JwtUser user, UserClientType type);
 

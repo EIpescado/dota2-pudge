@@ -36,7 +36,7 @@ public class OnlineUserServiceImpl implements IOnlineUserService {
     @Override
     public void save(HttpServletRequest request, String token, JwtUser user, UserClientType type) {
         //存入redis
-        customRedisCacheService.setCachePlus(PudgeUtil.generateKeyWithDoubleColon(CacheConstant.MaName.ONLINE_USER,type.name()), user.getUsername(), () -> {
+        customRedisCacheService.setCachePlus(PudgeUtil.generateKeyWithDoubleColon(CacheConstant.MaName.ONLINE_USER, type.name()), user.getUsername(), () -> {
             OnlineUser onlineUser = new OnlineUser();
             CurrentUser currentUser = user.getUser();
             onlineUser.setUsername(currentUser.getUsername());

@@ -35,6 +35,7 @@ public class TokenFilter extends GenericFilterBean {
     private final IOnlineUserService onlineUserService;
     /**subject中元素的数量 subject构成 username::clientType*/
     private static final int SUBJECT_ELEMENT_NUMBER = 2;
+    private static final long REDIS_KEY_NOT_EXIST = -2L;
 
     public TokenFilter(TokenProvider tokenProvider, IOnlineUserService onlineUserService) {
         this.onlineUserService = onlineUserService;
@@ -50,9 +51,9 @@ public class TokenFilter extends GenericFilterBean {
             //用户名::客户端类型 key,形如 yq::pc
             String subject = tokenProvider.getSubjectFromToken(token);
             if (StrUtil.isNotBlank(subject)) {
-                // 用户是否已登录,存在key 且未过期
+                // 用户是否已登录,存在key 且未过期, key值不存在TTL返回 -2
                 Long onlineExpireTime = onlineUserService.getOnlineExpireTime(subject);
-                if (onlineExpireTime != null) {
+                if (onlineExpireTime != null && onlineExpireTime != REDIS_KEY_NOT_EXIST) {
                     //从subject 获取用户名和用户客户端类型
                     String[] array = subject.split(PudgeUtil.DOUBLE_COLON);
                     //subject结构正确
