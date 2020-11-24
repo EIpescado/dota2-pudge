@@ -21,6 +21,7 @@ public class CurrentUser {
     private String nickname;
     private String avatar;
     private String phone;
+    private String mail;
     private Boolean enabled;
 
     /**角色*/

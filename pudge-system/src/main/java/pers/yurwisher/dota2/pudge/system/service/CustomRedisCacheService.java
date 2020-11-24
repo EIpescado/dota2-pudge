@@ -33,7 +33,7 @@ public class CustomRedisCacheService {
     /**
      * 默认缓存过期时间 8小时
      */
-    private static final long DEFAULT_EXPIRE_MINUTES = 640;
+    private static final long DEFAULT_EXPIRE_MINUTES = 8 * 60;
     private RedisTemplate<String, Object> redisTemplate;
     private SecurityProperties securityProperties;
     private LoginProperties loginProperties;
@@ -63,6 +63,7 @@ public class CustomRedisCacheService {
 
         put(CacheConstant.Key.SYSTEM_WHOLE_TREE, Duration.ofDays(7), false);
         put(CacheConstant.Key.ROLE_SELECT, Duration.ofDays(5), false);
+        put(CacheConstant.MaName.CHANGE_MAIL_CODE, Duration.ofMinutes(5), false);
     }
 
     public RedisTemplate<String, Object> redisTemplate() {

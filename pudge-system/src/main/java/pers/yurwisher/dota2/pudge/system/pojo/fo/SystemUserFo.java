@@ -3,6 +3,7 @@ package pers.yurwisher.dota2.pudge.system.pojo.fo;
 import lombok.Data;
 import pers.yurwisher.dota2.pudge.validator.annotation.Phone;
 
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import java.io.Serializable;
@@ -35,6 +36,12 @@ public class SystemUserFo implements Serializable {
      */
     @Phone(message = "手机号无效")
     private String phone;
+
+    /**
+     * 邮箱
+     */
+    @Email(message = "邮箱无效")
+    private String mail;
 
     /**
      * 角色ID集合

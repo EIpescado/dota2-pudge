@@ -25,6 +25,10 @@ public enum SystemCustomTipEnum implements ICustomTipEnum {
     CONFIG_CODE_EXISTED(10012,"配置编码已存在"),
 
     DICT_FIXED_NOT_CHANGE(10013,"固定字典不可修改"),
+    AUTH_TWO_PASS_NOT_EQUAL(10014,"新密码与确认密码不一致"),
+    AUTH_OLD_PASS_ERROR(10015,"旧密码错误"),
+    AUTH_NEW_MAIL_EQUAL_OLD(10016,"新邮箱与旧邮箱不能相同"),
+    AUTH_CURRENT_PASS_ERROR(10017,"帐号密码错误"),
     ;
 
     private CustomTip tip;
@@ -37,4 +41,6 @@ public enum SystemCustomTipEnum implements ICustomTipEnum {
     public CustomTip tip() {
         return tip;
     }
+
+
 }

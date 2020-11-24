@@ -1,6 +1,11 @@
 package pers.yurwisher.dota2.pudge.system.service.impl;
 
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.RandomUtil;
+import cn.hutool.core.util.StrUtil;
+import cn.hutool.crypto.SecureUtil;
+import cn.hutool.crypto.asymmetric.KeyType;
+import cn.hutool.crypto.asymmetric.RSA;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
@@ -13,9 +18,13 @@ import pers.yurwisher.dota2.pudge.constants.CacheConstant;
 import pers.yurwisher.dota2.pudge.enums.SystemConfigEnum;
 import pers.yurwisher.dota2.pudge.enums.SystemCustomTipEnum;
 import pers.yurwisher.dota2.pudge.security.CurrentUser;
+import pers.yurwisher.dota2.pudge.security.JwtUser;
+import pers.yurwisher.dota2.pudge.security.bean.LoginProperties;
 import pers.yurwisher.dota2.pudge.system.entity.SystemUser;
 import pers.yurwisher.dota2.pudge.system.exception.SystemCustomException;
 import pers.yurwisher.dota2.pudge.system.mapper.SystemUserMapper;
+import pers.yurwisher.dota2.pudge.system.pojo.fo.ChangeMailFo;
+import pers.yurwisher.dota2.pudge.system.pojo.fo.ResetPasswordFo;
 import pers.yurwisher.dota2.pudge.system.pojo.fo.SystemUserFo;
 import pers.yurwisher.dota2.pudge.system.pojo.qo.SystemUserQo;
 import pers.yurwisher.dota2.pudge.system.pojo.to.SystemUserTo;
@@ -28,6 +37,7 @@ import pers.yurwisher.dota2.pudge.system.service.ISystemUserService;
 import pers.yurwisher.dota2.pudge.utils.PudgeUtil;
 import pers.yurwisher.dota2.pudge.wrapper.PageR;
 
+import javax.annotation.PostConstruct;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -46,6 +56,14 @@ public class ISystemUserServiceImpl extends BaseServiceImpl<SystemUserMapper, Sy
     private final IRelationService relationService;
     private final ISystemConfigService systemConfigService;
     private final CustomRedisCacheService customRedisCacheService;
+    private final LoginProperties loginProperties;
+    private RSA loginRsa;
+
+    @PostConstruct
+    public void init() {
+        //只传入私钥解密
+        loginRsa = SecureUtil.rsa(loginProperties.getPasswordPrivateKey(), null);
+    }
 
     @Override
     @Cacheable(key = "#username")
@@ -150,6 +168,77 @@ public class ISystemUserServiceImpl extends BaseServiceImpl<SystemUserMapper, Sy
         this.userInfoChangeRemoveCache(user.getUsername());
     }
 
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void changePassword(ResetPasswordFo resetPasswordFo) {
+        CurrentUser currentUser = JwtUser.current();
+        // 密码解密
+        String oldPass = this.decryptRsaPassword(resetPasswordFo.getOldPass());
+        //旧密码错误
+        if (!currentUser.getPassword().equals(PudgeUtil.encodePwd(oldPass))) {
+            throw new SystemCustomException(SystemCustomTipEnum.AUTH_OLD_PASS_ERROR);
+        }
+        //2次密码不一致
+        if (!resetPasswordFo.getNewPass().equals(resetPasswordFo.getConfirmPass())) {
+            throw new SystemCustomException(SystemCustomTipEnum.AUTH_TWO_PASS_NOT_EQUAL);
+        }
+        String newPass = this.decryptRsaPassword(resetPasswordFo.getNewPass());
+        String currentUsername = currentUser.getUsername();
+        this.update(Wrappers.<SystemUser>lambdaUpdate()
+                .set(SystemUser::getPassword, PudgeUtil.encodePwd(newPass))
+                .set(SystemUser::getLastUpdated, LocalDateTime.now())
+                .eq(SystemUser::getId, currentUser.getId())
+        );
+        //移除缓存
+        this.userInfoChangeRemoveCache(currentUsername);
+    }
+
+    @Override
+    public void sendChangeMailCode(String mail) {
+        if (StrUtil.isNotBlank(mail)) {
+            //6位验证码
+            String mailValidCode = RandomUtil.randomNumbers(6);
+            logger.info("变更邮箱发送验证码 [{}] 到 [{}]", mailValidCode, mail);
+            //存入redis
+            customRedisCacheService.setCachePlus(CacheConstant.MaName.CHANGE_MAIL_CODE, mail, () -> mailValidCode);
+        }
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void changeMail(ChangeMailFo changeMailFo) {
+        CurrentUser currentUser = JwtUser.current();
+        //新邮箱与旧邮箱相同
+        if(changeMailFo.getMail().equals(currentUser.getMail())){
+            throw new SystemCustomException(SystemCustomTipEnum.AUTH_NEW_MAIL_EQUAL_OLD);
+        }
+        // 密码解密
+        String oldPass = this.decryptRsaPassword(changeMailFo.getPassword());
+        //判断密码
+        if(!PudgeUtil.encodePwd(oldPass).equals(currentUser.getPassword())){
+            throw new SystemCustomException(SystemCustomTipEnum.AUTH_CURRENT_PASS_ERROR);
+        }
+        //判断验证码
+        customRedisCacheService.getCacheAndDeletePlus(CacheConstant.MaName.CHANGE_MAIL_CODE, changeMailFo.getMail(),(String code) ->{
+            if (StrUtil.isBlank(code)) {
+                //验证码过期
+                throw new SystemCustomException(SystemCustomTipEnum.AUTH_CODE_NOT_EXIST_OR_EXPIRED);
+            }
+            String codeVal = changeMailFo.getCode();
+            if (StrUtil.isBlank(codeVal) || !codeVal.equalsIgnoreCase(code)) {
+                //验证码错误
+                throw new SystemCustomException(SystemCustomTipEnum.AUTH_CODE_ERROR);
+            }
+        });
+        this.update(Wrappers.<SystemUser>lambdaUpdate()
+                .set(SystemUser::getMail, changeMailFo.getMail())
+                .set(SystemUser::getLastUpdated, LocalDateTime.now())
+                .eq(SystemUser::getId, currentUser.getId())
+        );
+        //移除缓存
+        this.userInfoChangeRemoveCache(currentUser.getUsername());
+    }
+
     /**
      * 获取默认密码的密文
      *
@@ -157,6 +246,10 @@ public class ISystemUserServiceImpl extends BaseServiceImpl<SystemUserMapper, Sy
      */
     private String getCipherDefaultPassword() {
         return PudgeUtil.encodePwd(systemConfigService.getValByCode(SystemConfigEnum.DEFAULT_PASSWORD));
+    }
+
+    private String decryptRsaPassword(String rsaPassword){
+        return loginRsa.decryptStr(rsaPassword, KeyType.PrivateKey);
     }
 
     /**

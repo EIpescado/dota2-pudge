@@ -32,6 +32,11 @@ public class SystemUserVo implements Serializable {
     private String phone;
 
     /**
+     * 邮箱
+     */
+    private String mail;
+
+    /**
      * 角色ID集合
      */
     List<Long> roleIds;

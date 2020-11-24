@@ -9,7 +9,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import pers.yurwisher.dota2.pudge.system.pojo.fo.ChangeMailFo;
+import pers.yurwisher.dota2.pudge.system.pojo.fo.ResetPasswordFo;
 import pers.yurwisher.dota2.pudge.system.pojo.fo.SystemUserFo;
 import pers.yurwisher.dota2.pudge.system.pojo.qo.SystemUserQo;
 import pers.yurwisher.dota2.pudge.system.pojo.to.SystemUserTo;
@@ -32,39 +35,57 @@ public class SystemUserController {
     private final ISystemUserService systemUserService;
 
     @GetMapping
-    public R<PageR<SystemUserTo>> list(@ModelAttribute SystemUserQo qo){
+    public R<PageR<SystemUserTo>> list(@ModelAttribute SystemUserQo qo) {
         return R.ok(systemUserService.list(qo));
     }
 
     @PostMapping
     @PreAuthorize("@el.check('user:create')")
-    public R<String> create(@RequestBody @Validated SystemUserFo fo){
+    public R<String> create(@RequestBody @Validated SystemUserFo fo) {
         systemUserService.create(fo);
         return R.ok();
     }
 
     @PostMapping("/{id}")
     @PreAuthorize("@el.check('user:update')")
-    public R<String> update(@RequestBody @Validated SystemUserFo fo, @PathVariable Long id){
-        systemUserService.update(id,fo);
+    public R<String> update(@RequestBody @Validated SystemUserFo fo, @PathVariable Long id) {
+        systemUserService.update(id, fo);
         return R.ok();
     }
 
     @GetMapping("/{id}")
-    public R<SystemUserVo> get(@PathVariable Long id){
+    public R<SystemUserVo> get(@PathVariable Long id) {
         return R.ok(systemUserService.get(id));
     }
 
     @PostMapping("/resetPassword/{id}")
-    public R<String> resetPassword(@PathVariable Long id){
+    public R<String> resetPassword(@PathVariable Long id) {
         systemUserService.resetPassword(id);
         return R.ok();
     }
 
     @PostMapping("/switchEnabled/{id}")
     @PreAuthorize("@el.check('user:switchEnabled')")
-    public R<String> switchEnabled(@PathVariable Long id){
+    public R<String> switchEnabled(@PathVariable Long id) {
         systemUserService.switchEnabled(id);
+        return R.ok();
+    }
+
+    @PostMapping("changePassword")
+    public R<String> changePassword(@RequestBody @Validated ResetPasswordFo resetPasswordFo) {
+        systemUserService.changePassword(resetPasswordFo);
+        return R.ok();
+    }
+
+    @GetMapping(value = "/sendChangeMailCode")
+    public R<String> sendChangeMailCode(@RequestParam String mail) {
+        systemUserService.sendChangeMailCode(mail);
+        return R.ok();
+    }
+
+    @PostMapping("changeMail")
+    public R<String> changeMail(@RequestBody @Validated ChangeMailFo changeMailFo) {
+        systemUserService.changeMail(changeMailFo);
         return R.ok();
     }
 }

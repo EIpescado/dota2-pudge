@@ -31,7 +31,6 @@ public class SystemUser extends BaseEntity {
      */
     private String password;
 
-
     /**
      * 头像
      */
@@ -42,5 +41,9 @@ public class SystemUser extends BaseEntity {
      */
     private String phone;
 
+    /**
+     * 邮箱
+     */
+    private String mail;
 
 }

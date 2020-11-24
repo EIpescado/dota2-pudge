@@ -56,10 +56,10 @@ public class AuthorizationService {
     }
 
     public R login(UserLoginForm form, HttpServletRequest request) {
-        // 密码解密
-        String password = loginRsa.decryptStr(form.getPassword(), KeyType.PrivateKey);
         //校验验证码
         this.verifyCode(form.getUuid(), form.getCode());
+        // 密码解密
+        String password = loginRsa.decryptStr(form.getPassword(), KeyType.PrivateKey);
         //校验用户帐号密码 调用对应 UserDetailsService 获取用户信息 存入授权信息
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(form.getUsername(), password);
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);

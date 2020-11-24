@@ -44,6 +44,11 @@ public interface CacheConstant {
          * 用户菜单树
          */
         String SYSTEM_USER_TREE = "system_user_tree";
+
+        /**
+         * 变更邮箱
+         */
+        String CHANGE_MAIL_CODE = "change_mail_code";
     }
 
     interface Key {

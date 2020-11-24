@@ -3,6 +3,8 @@ package pers.yurwisher.dota2.pudge.system.service;
 import pers.yurwisher.dota2.pudge.base.BaseService;
 import pers.yurwisher.dota2.pudge.security.CurrentUser;
 import pers.yurwisher.dota2.pudge.system.entity.SystemUser;
+import pers.yurwisher.dota2.pudge.system.pojo.fo.ChangeMailFo;
+import pers.yurwisher.dota2.pudge.system.pojo.fo.ResetPasswordFo;
 import pers.yurwisher.dota2.pudge.system.pojo.fo.SystemUserFo;
 import pers.yurwisher.dota2.pudge.system.pojo.qo.SystemUserQo;
 import pers.yurwisher.dota2.pudge.system.pojo.to.SystemUserTo;
@@ -78,4 +80,22 @@ public interface ISystemUserService extends BaseService<SystemUser> {
      * @param id 用户id
      */
     void switchEnabled(Long id);
+
+    /**
+     * 修改密码
+     * @param resetPasswordFo 参数
+     */
+    void changePassword(ResetPasswordFo resetPasswordFo);
+
+    /**
+     * 发送变更邮箱验证邮件
+     * @param mail 邮箱
+     */
+    void sendChangeMailCode(String mail);
+
+    /**
+     * 变更邮箱
+     * @param changeMailFo 参数
+     */
+    void changeMail(ChangeMailFo changeMailFo);
 }

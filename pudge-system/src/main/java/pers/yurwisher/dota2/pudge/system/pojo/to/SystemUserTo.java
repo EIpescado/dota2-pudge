@@ -19,6 +19,8 @@ public class SystemUserTo {
 
     private String phone;
 
+    private String mail;
+
     private String dateCreated;
 
     private Boolean enabled;
