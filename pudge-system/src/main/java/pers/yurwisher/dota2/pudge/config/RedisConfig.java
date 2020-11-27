@@ -20,8 +20,8 @@ import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
-import pers.yurwisher.dota2.pudge.security.bean.LoginProperties;
-import pers.yurwisher.dota2.pudge.security.bean.SecurityProperties;
+import pers.yurwisher.dota2.pudge.properties.LoginProperties;
+import pers.yurwisher.dota2.pudge.properties.SecurityProperties;
 import pers.yurwisher.dota2.pudge.system.service.CustomRedisCacheService;
 
 import java.time.Duration;

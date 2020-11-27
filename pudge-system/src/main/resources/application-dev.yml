@@ -29,6 +29,22 @@ spring:
   #404直接抛出异常 方便统一处理
   mvc:
     throw-exception-if-no-handler-found: true
+  #自定义@Async异步线程池,使用默认可能导致内存溢出,多个线程池则实现 AsyncConfigurer,或自定义注入Bean ThreadPoolTaskExecutor
+  task:
+    execution:
+      #异步线程前缀
+      thread-name-prefix: pudge-hook-
+      pool:
+        #核心线程数量
+        core-size: 2
+        #线程池线程最大数量
+        max-size: 8
+        #线程最大空闲时间
+        keep-alive: 60s
+        #队列容量
+        queue-capacity: 128
+        #线程池中corePoolSize线程空闲时间达到keepAliveTime也将关闭
+        allow-core-thread-timeout: true
 #日志
 log:
   path: d:/logs/hfy-box/dev
@@ -39,6 +55,7 @@ jwt:
     header: Authorization
     prefix: Bearer
     secret: YWhycHQ3aXAyb3psdndwNnE0bXp6NDZvcnZ2bGRxZG40M3g1NGVlZHFkM2oxdzV2MGZlejM5aDg5aGYxM29iZ20zNTFjMzRiY3V0MTVmNXVkcXYyMzMyOWZsMm04bmN1Nmh2OGlsdmtodTdjb3VrdmpiM2M0dXB5M3Y1a3dwc3k=
+    #客户端token过期/刷新/到期时间
     client-token-configs:
       - type: PC
         expire-time: 4h

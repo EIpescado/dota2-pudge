@@ -1,4 +1,4 @@
-package pers.yurwisher.dota2.pudge.security.bean;
+package pers.yurwisher.dota2.pudge.properties.obj;
 
 /**
  * 验证码类型编码

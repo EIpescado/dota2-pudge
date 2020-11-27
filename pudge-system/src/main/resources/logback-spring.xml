@@ -76,12 +76,15 @@
         </filter>
     </appender>
 
-    <logger name="org.springframework.jms" level="ERROR" additivity="false">
-    </logger>
 
     <logger name="org.springframework" level="ERROR" additivity="false">
         <appender-ref ref="STDOUT" />
         <appender-ref ref="ERROR" />
+    </logger>
+
+    <logger name="org.springframework.boot" level="INFO" additivity="false">
+        <appender-ref ref="STDOUT" />
+        <appender-ref ref="INFO" />
     </logger>
 
     <logger name="com.baomidou" level="ERROR" additivity="false">
@@ -89,11 +92,6 @@
         <appender-ref ref="ERROR" />
     </logger>
 
-    <logger name="org.springframework.security" level="ERROR" additivity="false">
-        <appender-ref ref="STDOUT" />
-        <appender-ref ref="INFO" />
-        <appender-ref ref="ERROR" />
-    </logger>
 
     <logger name="pers.yurwisher" level="INFO" additivity="false">
         <appender-ref ref="STDOUT" />
@@ -101,14 +99,7 @@
         <appender-ref ref="INFO" />
         <appender-ref ref="ERROR" />
     </logger>
-
-    <logger name="com.hfy" level="INFO" additivity="false">
-        <appender-ref ref="STDOUT" />
-        <appender-ref ref="DEBUG" />
-        <appender-ref ref="INFO" />
-        <appender-ref ref="ERROR" />
-    </logger>
-
+    
     <!-- 日志输出级别 -->
     <root level="${log.level}"/>
 </configuration>

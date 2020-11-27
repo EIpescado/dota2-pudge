@@ -1,4 +1,4 @@
-package pers.yurwisher.dota2.pudge.security.bean;
+package pers.yurwisher.dota2.pudge.properties;
 
 import cn.hutool.core.util.StrUtil;
 import com.wf.captcha.ArithmeticCaptcha;
@@ -10,6 +10,7 @@ import com.wf.captcha.base.Captcha;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
+import pers.yurwisher.dota2.pudge.properties.obj.LoginCode;
 
 import java.awt.*;
 

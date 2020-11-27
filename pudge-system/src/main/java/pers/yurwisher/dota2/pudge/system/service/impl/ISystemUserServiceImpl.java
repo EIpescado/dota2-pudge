@@ -19,7 +19,7 @@ import pers.yurwisher.dota2.pudge.enums.SystemConfigEnum;
 import pers.yurwisher.dota2.pudge.enums.SystemCustomTipEnum;
 import pers.yurwisher.dota2.pudge.security.CurrentUser;
 import pers.yurwisher.dota2.pudge.security.JwtUser;
-import pers.yurwisher.dota2.pudge.security.bean.LoginProperties;
+import pers.yurwisher.dota2.pudge.properties.LoginProperties;
 import pers.yurwisher.dota2.pudge.system.entity.SystemUser;
 import pers.yurwisher.dota2.pudge.system.exception.SystemCustomException;
 import pers.yurwisher.dota2.pudge.system.mapper.SystemUserMapper;

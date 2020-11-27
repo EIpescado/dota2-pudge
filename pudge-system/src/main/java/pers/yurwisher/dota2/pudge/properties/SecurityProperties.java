@@ -1,4 +1,4 @@
-package pers.yurwisher.dota2.pudge.security.bean;
+package pers.yurwisher.dota2.pudge.properties;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

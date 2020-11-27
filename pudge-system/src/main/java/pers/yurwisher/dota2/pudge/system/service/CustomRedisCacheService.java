@@ -5,8 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.data.redis.core.RedisTemplate;
 import pers.yurwisher.dota2.pudge.constants.CacheConstant;
-import pers.yurwisher.dota2.pudge.security.bean.LoginProperties;
-import pers.yurwisher.dota2.pudge.security.bean.SecurityProperties;
+import pers.yurwisher.dota2.pudge.properties.LoginProperties;
+import pers.yurwisher.dota2.pudge.properties.SecurityProperties;
 import pers.yurwisher.dota2.pudge.utils.PudgeUtil;
 
 import java.time.Duration;

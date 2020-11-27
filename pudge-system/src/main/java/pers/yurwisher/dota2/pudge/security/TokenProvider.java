@@ -17,9 +17,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 import pers.yurwisher.dota2.pudge.enums.UserClientType;
-import pers.yurwisher.dota2.pudge.security.bean.SecurityProperties;
+import pers.yurwisher.dota2.pudge.properties.SecurityProperties;
 import pers.yurwisher.dota2.pudge.system.service.ISystemUserService;
-import pers.yurwisher.dota2.pudge.utils.PudgeUtil;
 
 import javax.servlet.http.HttpServletRequest;
 import java.security.Key;

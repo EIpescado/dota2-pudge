@@ -1,5 +1,8 @@
 package pers.yurwisher.dota2.pudge.security.service.impl;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import pers.yurwisher.dota2.pudge.constants.CacheConstant;
 import pers.yurwisher.dota2.pudge.enums.UserClientType;
@@ -23,6 +26,7 @@ import java.time.LocalDateTime;
 public class OnlineUserServiceImpl implements IOnlineUserService {
 
     private final CustomRedisCacheService customRedisCacheService;
+    private static final Logger logger = LoggerFactory.getLogger(OnlineUserServiceImpl.class);
 
     public OnlineUserServiceImpl(CustomRedisCacheService customRedisCacheService) {
         this.customRedisCacheService = customRedisCacheService;
@@ -52,5 +56,11 @@ public class OnlineUserServiceImpl implements IOnlineUserService {
             onlineUser.setType(clientInfo.getSystem());
             return onlineUser;
         });
+    }
+
+    @Override
+    @Async
+    public void test() {
+        logger.info("1111111111");
     }
 }
