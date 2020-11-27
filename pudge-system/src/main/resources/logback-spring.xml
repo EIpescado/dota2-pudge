@@ -99,7 +99,7 @@
         <appender-ref ref="INFO" />
         <appender-ref ref="ERROR" />
     </logger>
-    
+
     <!-- 日志输出级别 -->
     <root level="${log.level}"/>
 </configuration>
