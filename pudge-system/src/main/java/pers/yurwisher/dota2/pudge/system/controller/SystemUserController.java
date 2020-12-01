@@ -14,9 +14,12 @@ import org.springframework.web.bind.annotation.RestController;
 import pers.yurwisher.dota2.pudge.system.pojo.fo.ChangeMailFo;
 import pers.yurwisher.dota2.pudge.system.pojo.fo.ResetPasswordFo;
 import pers.yurwisher.dota2.pudge.system.pojo.fo.SystemUserFo;
+import pers.yurwisher.dota2.pudge.system.pojo.qo.SystemLogQo;
 import pers.yurwisher.dota2.pudge.system.pojo.qo.SystemUserQo;
 import pers.yurwisher.dota2.pudge.system.pojo.to.SystemUserTo;
+import pers.yurwisher.dota2.pudge.system.pojo.to.UserSystemLogTo;
 import pers.yurwisher.dota2.pudge.system.pojo.vo.SystemUserVo;
+import pers.yurwisher.dota2.pudge.system.service.ISystemLogService;
 import pers.yurwisher.dota2.pudge.system.service.ISystemUserService;
 import pers.yurwisher.dota2.pudge.wrapper.PageR;
 import pers.yurwisher.dota2.pudge.wrapper.R;
@@ -33,6 +36,7 @@ import pers.yurwisher.dota2.pudge.wrapper.R;
 public class SystemUserController {
 
     private final ISystemUserService systemUserService;
+    private final ISystemLogService systemLogService;
 
     @GetMapping
     public R<PageR<SystemUserTo>> list(@ModelAttribute SystemUserQo qo) {
@@ -87,5 +91,10 @@ public class SystemUserController {
     public R<String> changeMail(@RequestBody @Validated ChangeMailFo changeMailFo) {
         systemUserService.changeMail(changeMailFo);
         return R.ok();
+    }
+
+    @GetMapping("log")
+    public R<PageR<UserSystemLogTo>> log(@ModelAttribute SystemLogQo qo) {
+        return R.ok(systemLogService.userLogList(qo));
     }
 }

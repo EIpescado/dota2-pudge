@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 public class SystemNotice extends BaseEntity {
     private static final long serialVersionUID = 9136059269221837333L;
 
-    /**公告类型*/
+    /**公告类型 详见字典*/
     private Integer type;
     /**标题*/
     private String title;

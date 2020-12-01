@@ -19,13 +19,18 @@ public class ElPermissionServiceImpl {
 
     public Boolean check(String ...permissions){
         CurrentUser currentUser = JwtUser.current();
-        if(permissions == null || permissions.length == 0){
-            return currentUser.isAdmin();
+        if(currentUser.isAdmin()){
+            return true;
+        }else{
+            //未配置 permission标识
+            if(permissions == null || permissions.length == 0){
+                return false;
+            }else{
+                // 获取当前用户的所有权限
+                List<String> elPermissions = currentUser.getPermissions();
+                // 判断当前用户的所有权限是否包含接口上定义的权限
+                return CollectionUtil.isNotEmpty(elPermissions) && Arrays.stream(permissions).anyMatch(elPermissions::contains);
+            }
         }
-        // 获取当前用户的所有权限
-        List<String> elPermissions = JwtUser.current().getPermissions();
-        // 判断当前用户的所有权限是否包含接口上定义的权限
-        return currentUser.isAdmin()
-                || (CollectionUtil.isNotEmpty(elPermissions) && Arrays.stream(permissions).anyMatch(elPermissions::contains));
     }
 }

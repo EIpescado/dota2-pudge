@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="pers.yurwisher.dota2.pudge.system.mapper.SystemLogMapper">
+    <select id="list" resultType="pers.yurwisher.dota2.pudge.system.pojo.to.SystemLogTo">
+        SELECT
+        action, date_created, ip, address, user_id,
+        nickname, method, params, time_cost, error_info, type
+        from system_log
+        <where>
+            <if test="qo.logUserId != null">
+                user_id = #{qo.logUserId}
+            </if>
+            <if test="qo.type != null">
+              and type = #{qo.type}
+            </if>
+            <if test="qo.keyWord != null and qo.keyWord != ''">
+                and (
+                  method like concat('%',#{qo.keyWord},'%') or
+                  action like concat('%',#{qo.keyWord},'%') or
+                  params like concat('%',#{qo.keyWord},'%') or
+                  error_info like concat('%',#{qo.keyWord},'%')
+                )
+            </if>
+        </where>
+        ORDER BY date_created DESC
+    </select>
+
+    <select id="get" resultType="pers.yurwisher.dota2.pudge.system.pojo.vo.SystemLogVo">
+
+    </select>
+    <select id="userLogList" resultType="pers.yurwisher.dota2.pudge.system.pojo.to.UserSystemLogTo">
+        SELECT
+        action, date_created, ip, address
+        from system_log
+        where user_id = #{qo.userId}
+        and type = 1
+        ORDER BY date_created DESC
+    </select>
+
+</mapper>
