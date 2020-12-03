@@ -16,9 +16,7 @@ public class SystemLog extends BaseEntity {
     private static final long serialVersionUID = -3283462691884708202L;
 
     /**操作用户ID*/
-    private String userId;
-    /**用户昵称*/
-    private String nickname;
+    private Long userId;
     /**操作名称*/
     private String action;
     /**接口对应方法*/
@@ -32,8 +30,14 @@ public class SystemLog extends BaseEntity {
     /**请求地址*/
     private String address;
 
+    /**浏览器*/
+    private String browser;
+
+    /**系统*/
+    private String system;
+
     /**消耗时间 单位ms*/
-    private Integer timeCost;
+    private Long timeCost;
 
     /**日志类型 详见字典*/
     private Integer type;

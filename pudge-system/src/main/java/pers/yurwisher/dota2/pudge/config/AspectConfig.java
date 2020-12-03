@@ -1,15 +1,34 @@
 package pers.yurwisher.dota2.pudge.config;
 
+import cn.hutool.core.text.StrBuilder;
 import cn.hutool.core.util.StrUtil;
+import io.netty.util.internal.ThrowableUtil;
+import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.AfterThrowing;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Pointcut;
+import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import pers.yurwisher.dota2.pudge.annotation.Log;
 import pers.yurwisher.dota2.pudge.base.BasePageQo;
 import pers.yurwisher.dota2.pudge.security.CurrentUser;
 import pers.yurwisher.dota2.pudge.security.JwtUser;
+import pers.yurwisher.dota2.pudge.system.entity.SystemLog;
+import pers.yurwisher.dota2.pudge.system.exception.SystemCustomException;
+import pers.yurwisher.dota2.pudge.system.service.ISystemLogService;
+import pers.yurwisher.dota2.pudge.utils.PudgeUtil;
+import pers.yurwisher.dota2.pudge.utils.RequestHolder;
+
+import javax.servlet.http.HttpServletRequest;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 
 /**
@@ -21,16 +40,19 @@ import pers.yurwisher.dota2.pudge.security.JwtUser;
 public class AspectConfig {
 
     private final Logger logger = LoggerFactory.getLogger(AspectConfig.class);
+    private static final ThreadLocal<Long> CURRENT_TIME = new ThreadLocal<>();
+
+    private  ISystemLogService systemLogService;
+
+    public AspectConfig(ISystemLogService systemLogService) {
+        this.systemLogService = systemLogService;
+    }
 
     /**
-     * 查询参数 转化aop
+     * 分页列表参数设置切面
      */
     @Around("execution(public * *(pers.yurwisher.dota2.pudge.base.BasePageQo+))")
     public Object aroundPageQo(ProceedingJoinPoint pjp) throws Throwable {
-        return around(pjp);
-    }
-
-    private Object around(ProceedingJoinPoint pjp) throws Throwable {
         BasePageQo qo = (BasePageQo) pjp.getArgs()[0];
         if (qo != null) {
             if (StrUtil.isEmpty(qo.getUsername())) {
@@ -40,6 +62,41 @@ public class AspectConfig {
             }
         }
         return pjp.proceed();
+    }
+
+    /**日志切点*/
+    @Pointcut("@annotation(pers.yurwisher.dota2.pudge.annotation.Log)")
+    public void logPointcut() {}
+
+    /**日志环绕增强*/
+    @Around("logPointcut()")
+    public Object logAround(ProceedingJoinPoint joinPoint) throws Throwable {
+        Object result;
+        CURRENT_TIME.set(System.currentTimeMillis());
+        result = joinPoint.proceed();
+        long timeCost = System.currentTimeMillis() - CURRENT_TIME.get();
+        CURRENT_TIME.remove();
+        HttpServletRequest request = RequestHolder.currentRequest();
+        Long userId;
+        try{
+            userId = JwtUser.currentUserId();
+        }catch (SystemCustomException e){
+            userId = 1L;
+        }
+        PudgeUtil.UserClientInfo userClientInfo = PudgeUtil.getUserClientInfo(request);
+        //异步保存日志
+        systemLogService.saveLog(joinPoint,userClientInfo,userId,timeCost);
+        return result;
+    }
+
+    /**
+     * 配置异常通知
+     *
+     * @param joinPoint join point for advice
+     * @param e exception
+     */
+    @AfterThrowing(pointcut = "logPointcut()", throwing = "e")
+    public void logAfterThrowing(JoinPoint joinPoint, Throwable e) {
     }
 
 }

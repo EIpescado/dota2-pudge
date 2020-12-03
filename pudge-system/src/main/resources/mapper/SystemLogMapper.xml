@@ -4,7 +4,7 @@
     <select id="list" resultType="pers.yurwisher.dota2.pudge.system.pojo.to.SystemLogTo">
         SELECT
         action, date_created, ip, address, user_id,
-        nickname, method, params, time_cost, error_info, type
+        method, params, time_cost, error_info, type
         from system_log
         <where>
             <if test="qo.logUserId != null">

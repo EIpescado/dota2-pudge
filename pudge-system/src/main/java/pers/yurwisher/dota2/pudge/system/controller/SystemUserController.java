@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import pers.yurwisher.dota2.pudge.annotation.Log;
 import pers.yurwisher.dota2.pudge.system.pojo.fo.ChangeMailFo;
 import pers.yurwisher.dota2.pudge.system.pojo.fo.ResetPasswordFo;
 import pers.yurwisher.dota2.pudge.system.pojo.fo.SystemUserFo;
@@ -38,6 +39,7 @@ public class SystemUserController {
     private final ISystemUserService systemUserService;
     private final ISystemLogService systemLogService;
 
+    @Log("用户列表")
     @GetMapping
     public R<PageR<SystemUserTo>> list(@ModelAttribute SystemUserQo qo) {
         return R.ok(systemUserService.list(qo));
