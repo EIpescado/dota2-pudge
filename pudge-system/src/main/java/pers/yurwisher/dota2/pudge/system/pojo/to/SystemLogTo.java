@@ -31,4 +31,6 @@ public class SystemLogTo implements Serializable {
     private Integer type;
     private String errorInfo;
     private LocalDateTime dateCreated;
+    private String browser;
+    private String system;
 }

@@ -9,8 +9,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pers.yurwisher.dota2.pudge.annotation.Log;
 import pers.yurwisher.dota2.pudge.base.impl.BaseServiceImpl;
-import pers.yurwisher.dota2.pudge.security.CurrentUser;
-import pers.yurwisher.dota2.pudge.security.JwtUser;
 import pers.yurwisher.dota2.pudge.system.entity.SystemLog;
 import pers.yurwisher.dota2.pudge.system.mapper.SystemLogMapper;
 import pers.yurwisher.dota2.pudge.system.pojo.qo.SystemLogQo;
@@ -19,10 +17,8 @@ import pers.yurwisher.dota2.pudge.system.pojo.to.UserSystemLogTo;
 import pers.yurwisher.dota2.pudge.system.pojo.vo.SystemLogVo;
 import pers.yurwisher.dota2.pudge.system.service.ISystemLogService;
 import pers.yurwisher.dota2.pudge.utils.PudgeUtil;
-import pers.yurwisher.dota2.pudge.utils.RequestHolder;
 import pers.yurwisher.dota2.pudge.wrapper.PageR;
 
-import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -73,7 +69,7 @@ public class SystemLogServiceImpl extends BaseServiceImpl<SystemLogMapper, Syste
         //操作名称
         log.setAction(aopLog.value());
         // 方法
-        String methodName = StrBuilder.create(joinPoint.getTarget().getClass().getSimpleName(), StrUtil.DOT,signature.getName()).toString();
+        String methodName = StrBuilder.create(joinPoint.getTarget().getClass().getSimpleName(), StrUtil.DOT, signature.getName()).toString();
         log.setMethod(methodName);
 
         StringBuilder params = new StringBuilder("{");
@@ -86,6 +82,7 @@ public class SystemLogServiceImpl extends BaseServiceImpl<SystemLogMapper, Syste
         log.setParams(params.toString());
         //正常
         log.setType(1);
+        logger.info("保持日志: [{}]", log.getAction());
         baseMapper.insert(log);
     }
 }

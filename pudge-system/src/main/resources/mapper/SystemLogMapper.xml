@@ -3,26 +3,28 @@
 <mapper namespace="pers.yurwisher.dota2.pudge.system.mapper.SystemLogMapper">
     <select id="list" resultType="pers.yurwisher.dota2.pudge.system.pojo.to.SystemLogTo">
         SELECT
-        action, date_created, ip, address, user_id,
-        method, params, time_cost, error_info, type
-        from system_log
+        s.action, s.date_created, s.ip, s.address, s.user_id,
+        s.method, s.params, s.time_cost, s.error_info, s.type, s.system,browser,
+        u.nickname
+        FROM system_log s
+        LEFT JOIN system_user u ON u.id = s.user_id
         <where>
             <if test="qo.logUserId != null">
-                user_id = #{qo.logUserId}
+                s.user_id = #{qo.logUserId}
             </if>
             <if test="qo.type != null">
-              and type = #{qo.type}
+              and s.type = #{qo.type}
             </if>
             <if test="qo.keyWord != null and qo.keyWord != ''">
                 and (
-                  method like concat('%',#{qo.keyWord},'%') or
-                  action like concat('%',#{qo.keyWord},'%') or
-                  params like concat('%',#{qo.keyWord},'%') or
-                  error_info like concat('%',#{qo.keyWord},'%')
+                  s.method like concat('%',#{qo.keyWord},'%') or
+                  s.action like concat('%',#{qo.keyWord},'%') or
+                  s.params like concat('%',#{qo.keyWord},'%') or
+                  s.error_info like concat('%',#{qo.keyWord},'%')
                 )
             </if>
         </where>
-        ORDER BY date_created DESC
+        ORDER BY s.date_created DESC
     </select>
 
     <select id="get" resultType="pers.yurwisher.dota2.pudge.system.pojo.vo.SystemLogVo">
