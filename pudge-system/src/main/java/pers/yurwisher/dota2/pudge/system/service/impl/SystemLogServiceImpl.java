@@ -2,6 +2,8 @@ package pers.yurwisher.dota2.pudge.system.service.impl;
 
 import cn.hutool.core.text.StrBuilder;
 import cn.hutool.core.util.StrUtil;
+import com.alibaba.fastjson.JSON;
+import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.scheduling.annotation.Async;
@@ -20,9 +22,6 @@ import pers.yurwisher.dota2.pudge.utils.PudgeUtil;
 import pers.yurwisher.dota2.pudge.wrapper.PageR;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * @author yq
@@ -54,6 +53,17 @@ public class SystemLogServiceImpl extends BaseServiceImpl<SystemLogMapper, Syste
     @Transactional(rollbackFor = Exception.class)
     @Async
     public void saveLog(ProceedingJoinPoint joinPoint, PudgeUtil.UserClientInfo userClientInfo, Long userId, long timeCost) throws Throwable {
+        this.saveLog(joinPoint, userClientInfo, userId, timeCost, 1, null);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    @Async
+    public void saveErrorLog(JoinPoint joinPoint, PudgeUtil.UserClientInfo userClientInfo, Long userId, long timeCost, String errorInfo) {
+        this.saveLog(joinPoint, userClientInfo, userId, timeCost, 2, errorInfo);
+    }
+
+    public void saveLog(JoinPoint joinPoint, PudgeUtil.UserClientInfo userClientInfo, Long userId, long timeCost, Integer type, String errorInfo) {
         SystemLog log = new SystemLog();
         log.setTimeCost(timeCost);
         log.setUserId(userId);
@@ -72,17 +82,13 @@ public class SystemLogServiceImpl extends BaseServiceImpl<SystemLogMapper, Syste
         String methodName = StrBuilder.create(joinPoint.getTarget().getClass().getSimpleName(), StrUtil.DOT, signature.getName()).toString();
         log.setMethod(methodName);
 
-        StringBuilder params = new StringBuilder("{");
         //参数值
-        List<Object> argValues = new ArrayList<>(Arrays.asList(joinPoint.getArgs()));
-        //参数名称
-        for (Object argValue : argValues) {
-            params.append(argValue).append(" ");
-        }
-        log.setParams(params.toString());
-        //正常
-        log.setType(1);
-        logger.info("保持日志: [{}]", log.getAction());
+        log.setParams(JSON.toJSONString(joinPoint.getArgs()));
+        //日志类型
+        log.setType(type);
+        log.setErrorInfo(errorInfo);
+        logger.info("用户:[{}],[{}]", userId, log.getAction());
         baseMapper.insert(log);
     }
+
 }

@@ -74,8 +74,7 @@ public class AspectConfig {
         Object result;
         CURRENT_TIME.set(System.currentTimeMillis());
         result = joinPoint.proceed();
-        long timeCost = System.currentTimeMillis() - CURRENT_TIME.get();
-        CURRENT_TIME.remove();
+        long timeCost = getTimeCost();
         HttpServletRequest request = RequestHolder.currentRequest();
         Long userId;
         try{
@@ -91,12 +90,26 @@ public class AspectConfig {
 
     /**
      * 配置异常通知
-     *
-     * @param joinPoint join point for advice
-     * @param e exception
      */
-    @AfterThrowing(pointcut = "logPointcut()", throwing = "e")
-    public void logAfterThrowing(JoinPoint joinPoint, Throwable e) {
+    @AfterThrowing(pointcut = "logPointcut()", throwing = "throwable")
+    public void logAfterThrowing(JoinPoint joinPoint, Throwable throwable) {
+        HttpServletRequest request = RequestHolder.currentRequest();
+        PudgeUtil.UserClientInfo userClientInfo = PudgeUtil.getUserClientInfo(request);
+        long timeCost = getTimeCost();
+        Long userId;
+        try{
+            userId = JwtUser.currentUserId();
+        }catch (SystemCustomException e){
+            userId = 1L;
+        }
+        //异步保存日志
+        systemLogService.saveErrorLog(joinPoint,userClientInfo,userId,timeCost,throwable.getLocalizedMessage());
+    }
+
+    private long getTimeCost(){
+        long timeCost = System.currentTimeMillis() - CURRENT_TIME.get();
+        CURRENT_TIME.remove();
+        return timeCost;
     }
 
 }

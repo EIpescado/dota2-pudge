@@ -1,5 +1,6 @@
 package pers.yurwisher.dota2.pudge.system.service;
 
+import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import pers.yurwisher.dota2.pudge.base.BaseService;
 import pers.yurwisher.dota2.pudge.system.entity.SystemLog;
@@ -56,5 +57,15 @@ public interface ISystemLogService extends BaseService<SystemLog> {
      * @throws Throwable 异常
      */
     void saveLog(ProceedingJoinPoint joinPoint, PudgeUtil.UserClientInfo userClientInfo, Long userId, long timeCost) throws Throwable ;
+
+    /**
+     * 保存异常日志
+     * @param joinPoint 切面
+     * @param userClientInfo 请求客户端信息
+     * @param userId 用户ID
+     * @param timeCost 接口耗时
+     * @param errorInfo 异常信息
+     */
+    void saveErrorLog(JoinPoint joinPoint, PudgeUtil.UserClientInfo userClientInfo, Long userId, long timeCost, String errorInfo);
 
 }
