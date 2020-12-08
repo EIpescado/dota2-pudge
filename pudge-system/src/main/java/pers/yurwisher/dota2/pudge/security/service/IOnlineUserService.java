@@ -31,6 +31,4 @@ public interface IOnlineUserService {
      */
     void save(HttpServletRequest request, String token, JwtUser user, UserClientType type);
 
-    void test();
-
 }

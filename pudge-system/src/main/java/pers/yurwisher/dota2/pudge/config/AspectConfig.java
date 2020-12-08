@@ -75,16 +75,8 @@ public class AspectConfig {
         CURRENT_TIME.set(System.currentTimeMillis());
         result = joinPoint.proceed();
         long timeCost = getTimeCost();
-        HttpServletRequest request = RequestHolder.currentRequest();
-        Long userId;
-        try{
-            userId = JwtUser.currentUserId();
-        }catch (SystemCustomException e){
-            userId = 1L;
-        }
-        PudgeUtil.UserClientInfo userClientInfo = PudgeUtil.getUserClientInfo(request);
         //异步保存日志
-        systemLogService.saveLog(joinPoint,userClientInfo,userId,timeCost);
+        systemLogService.saveLog(joinPoint,this.getUserClientInfo(),this.getUserId(),timeCost);
         return result;
     }
 
@@ -93,23 +85,30 @@ public class AspectConfig {
      */
     @AfterThrowing(pointcut = "logPointcut()", throwing = "throwable")
     public void logAfterThrowing(JoinPoint joinPoint, Throwable throwable) {
-        HttpServletRequest request = RequestHolder.currentRequest();
-        PudgeUtil.UserClientInfo userClientInfo = PudgeUtil.getUserClientInfo(request);
         long timeCost = getTimeCost();
-        Long userId;
-        try{
-            userId = JwtUser.currentUserId();
-        }catch (SystemCustomException e){
-            userId = 1L;
-        }
         //异步保存日志
-        systemLogService.saveErrorLog(joinPoint,userClientInfo,userId,timeCost,throwable.getLocalizedMessage());
+        systemLogService.saveErrorLog(joinPoint,this.getUserClientInfo(),this.getUserId(),timeCost,throwable.getLocalizedMessage());
     }
 
     private long getTimeCost(){
         long timeCost = System.currentTimeMillis() - CURRENT_TIME.get();
         CURRENT_TIME.remove();
         return timeCost;
+    }
+
+    private Long getUserId(){
+        Long userId;
+        try{
+            userId = JwtUser.currentUserId();
+        }catch (SystemCustomException e){
+            userId = 1L;
+        }
+        return userId;
+    }
+
+    private PudgeUtil.UserClientInfo getUserClientInfo(){
+        HttpServletRequest request = RequestHolder.currentRequest();
+        return  PudgeUtil.getUserClientInfo(request);
     }
 
 }

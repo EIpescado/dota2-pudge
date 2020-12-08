@@ -3,7 +3,7 @@
 <mapper namespace="pers.yurwisher.dota2.pudge.system.mapper.SystemLogMapper">
     <select id="list" resultType="pers.yurwisher.dota2.pudge.system.pojo.to.SystemLogTo">
         SELECT
-        s.action, s.date_created, s.ip, s.address, s.user_id,
+        s.id,s.action, s.date_created, s.ip, s.address, s.user_id,
         s.method, s.params, s.time_cost, s.error_info, s.type, s.system,browser,
         u.nickname
         FROM system_log s

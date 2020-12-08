@@ -48,7 +48,7 @@ public class TokenFilter extends GenericFilterBean {
         HttpServletRequest httpServletRequest = (HttpServletRequest) servletRequest;
         String token = tokenProvider.getToken(httpServletRequest);
         if (StrUtil.isNotBlank(token)) {
-            //用户名::客户端类型 key,形如 yq::pc
+            //客户端类型::用户名 key,形如 PC::yq
             String subject = tokenProvider.getSubjectFromToken(token);
             if (StrUtil.isNotBlank(subject)) {
                 // 用户是否已登录,存在key 且未过期, key值不存在TTL返回 -2

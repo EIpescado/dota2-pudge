@@ -19,6 +19,7 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class SystemLogTo implements Serializable {
     private static final long serialVersionUID = 6600822090324708328L;
+    private Long id;
     private String userId;
     private String nickname;
     private String action;

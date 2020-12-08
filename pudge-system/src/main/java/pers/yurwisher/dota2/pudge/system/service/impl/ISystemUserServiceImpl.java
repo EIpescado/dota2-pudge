@@ -96,7 +96,6 @@ public class ISystemUserServiceImpl extends BaseServiceImpl<SystemUserMapper, Sy
     @Override
     @SuppressWarnings("unchecked")
     public PageR<SystemUserTo> list(SystemUserQo qo) {
-        int x = 1/0;
         return super.toPageR(baseMapper.list(super.toPage(qo), qo));
     }
 

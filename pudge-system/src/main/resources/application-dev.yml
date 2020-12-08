@@ -58,9 +58,12 @@ jwt:
     #客户端token过期/刷新/到期时间
     client-token-configs:
       - type: PC
-        expire-time: 4h
-        detect-time: 30m
-        renew-time: 2h
+#        expire-time: 2h
+#        detect-time: 30m
+#        renew-time: 2h
+        expire-time: 10m
+        detect-time: 5m
+        renew-time: 10m
       - type: H5
         expire-time: 7d
         detect-time: 1d

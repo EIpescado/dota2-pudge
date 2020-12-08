@@ -50,28 +50,21 @@ public class SecurityProperties {
         private UserClientType type;
 
         /**
-         * 令牌过期时间 单位分钟
+         * 令牌过期时间
          */
-        private Duration expireTime = Duration.ofHours(4);
-        private Long expireTimeMills;
+        private Duration expireTime;
 
         /**
-         * token 续期检查时间 分钟
+         * token 续期检查时间
          */
-        private Duration detectTime = Duration.ofMinutes(30);
-        private Long detectTimeMills;
+        private Duration detectTime;
+        private Long detectTimeSeconds;
 
         /**
-         * 续期时间 分钟
+         * 续期时间
          */
-        private Duration renewTime = Duration.ofHours(2);
-        private Long renewTimeMills;
-
-        public ClientTokenConfig() {
-            this.expireTimeMills = expireTime.toMillis();
-            this.detectTimeMills = detectTime.toMillis();
-            this.renewTimeMills = renewTime.toMillis();
-        }
+        private Duration renewTime;
+        private Long renewTimeSeconds;
 
         public UserClientType getType() {
             return type;
@@ -79,26 +72,6 @@ public class SecurityProperties {
 
         public Duration getExpireTime() {
             return expireTime;
-        }
-
-        public Long getExpireTimeMills() {
-            return expireTimeMills;
-        }
-
-        public Duration getDetectTime() {
-            return detectTime;
-        }
-
-        public Long getDetectTimeMills() {
-            return detectTimeMills;
-        }
-
-        public Duration getRenewTime() {
-            return renewTime;
-        }
-
-        public Long getRenewTimeMills() {
-            return renewTimeMills;
         }
 
         public void setType(UserClientType type) {
@@ -111,10 +84,28 @@ public class SecurityProperties {
 
         public void setDetectTime(Duration detectTime) {
             this.detectTime = detectTime;
+            this.detectTimeSeconds = detectTime.getSeconds();
         }
 
         public void setRenewTime(Duration renewTime) {
             this.renewTime = renewTime;
+            this.renewTimeSeconds = renewTime.getSeconds();
+        }
+
+        public Duration getDetectTime() {
+            return detectTime;
+        }
+
+        public Long getDetectTimeSeconds() {
+            return detectTimeSeconds;
+        }
+
+        public Duration getRenewTime() {
+            return renewTime;
+        }
+
+        public Long getRenewTimeSeconds() {
+            return renewTimeSeconds;
         }
     }
 }

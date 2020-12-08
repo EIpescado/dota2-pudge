@@ -299,6 +299,19 @@ public class CustomRedisCacheService {
     }
 
     /**
+     * 设置key过期时间
+     *
+     * @param name 缓存名称
+     * @param key  缓存名称后跟随的唯一表示 ,如 SYSTEM_USER_TREE::test 的test即为key
+     * @param ttl  过期时间
+     * @param unit 时间单位
+     */
+    public void expirePlus(String name, String key, long ttl, TimeUnit unit) {
+        String redisKey = PudgeUtil.generateKeyWithDoubleColon(name, key);
+        redisTemplate.expire(redisKey,ttl,unit);
+    }
+
+    /**
      * @author yq
      * @date 2020/10/15 17:51
      * @description 自定义缓存名称

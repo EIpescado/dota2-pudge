@@ -12,12 +12,13 @@ import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
+import pers.yurwisher.dota2.pudge.constants.CacheConstant;
 import pers.yurwisher.dota2.pudge.enums.UserClientType;
 import pers.yurwisher.dota2.pudge.properties.SecurityProperties;
+import pers.yurwisher.dota2.pudge.system.service.CustomRedisCacheService;
 import pers.yurwisher.dota2.pudge.system.service.ISystemUserService;
 
 import javax.servlet.http.HttpServletRequest;
@@ -40,7 +41,7 @@ import java.util.stream.Collectors;
 public class TokenProvider implements InitializingBean {
 
     private final SecurityProperties properties;
-    private final RedisTemplate<String, Object> redisTemplate;
+    private final CustomRedisCacheService customRedisCacheService;
     private JwtParser jwtParser;
     private JwtBuilder jwtBuilder;
     private final ISystemUserService systemUserService;
@@ -91,21 +92,17 @@ public class TokenProvider implements InitializingBean {
      * 检查续期
      *
      * @param onlineKey        用户在线key
-     * @param onlineExpireTime 用户在线过期时间
+     * @param onlineExpireTime 用户在线过期时间 单位秒
      */
     public void checkRenewal(String onlineKey, Long onlineExpireTime, UserClientType type) {
         // 判断是否续期token,计算token的过期时间
-        long timeInt = onlineExpireTime != null ? onlineExpireTime.intValue() : 0;
-        LocalDateTime now = LocalDateTime.now();
-        //过期时间
-        LocalDateTime expireDate = now.plusSeconds(timeInt);
-        // 判断当前时间与过期时间的时间差
-        Duration differ = Duration.between(expireDate, now);
+        long timeInt = onlineExpireTime.intValue();
         SecurityProperties.ClientTokenConfig clientTokenConfig = userTokenConfigMap.get(type).get(0);
         // 如果在续期检查的范围内，则续期
-        if (differ.toMillis() <= clientTokenConfig.getDetectTimeMills()) {
-            long renew = timeInt + clientTokenConfig.getRenewTimeMills();
-            redisTemplate.expire(onlineKey, renew, TimeUnit.MILLISECONDS);
+        if(timeInt <= clientTokenConfig.getDetectTimeSeconds()){
+            log.info("[{}] 续期", onlineKey);
+            long renew = timeInt + clientTokenConfig.getRenewTimeSeconds();
+            customRedisCacheService.expirePlus(CacheConstant.MaName.ONLINE_USER, onlineKey, renew, TimeUnit.SECONDS);
         }
     }
 
