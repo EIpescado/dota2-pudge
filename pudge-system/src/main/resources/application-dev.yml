@@ -33,7 +33,7 @@ spring:
   task:
     execution:
       #异步线程前缀
-      thread-name-prefix: pudge-hook-
+      thread-name-prefix: little-pudge-
       pool:
         #核心线程数量
         core-size: 2
@@ -58,12 +58,9 @@ jwt:
     #客户端token过期/刷新/到期时间
     client-token-configs:
       - type: PC
-#        expire-time: 2h
-#        detect-time: 30m
-#        renew-time: 2h
-        expire-time: 10m
-        detect-time: 5m
-        renew-time: 10m
+        expire-time: 2h
+        detect-time: 30m
+        renew-time: 2h
       - type: H5
         expire-time: 7d
         detect-time: 1d
