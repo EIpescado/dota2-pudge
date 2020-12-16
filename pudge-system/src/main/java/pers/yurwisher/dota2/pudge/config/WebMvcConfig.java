@@ -13,6 +13,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
+import pers.yurwisher.dota2.pudge.filter.DictValueFastJSONFilter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,11 +54,13 @@ public class WebMvcConfig extends WebMvcConfigurationSupport {
         //整型转字符串 防止前端精度丢失
         SerializeConfig serializeConfig = SerializeConfig.globalInstance;
         serializeConfig.put(Long.class, ToStringSerializer.instance);
-        serializeConfig.put(Long.TYPE , ToStringSerializer.instance);
+        serializeConfig.put(Long.TYPE, ToStringSerializer.instance);
         fastConverter.setFastJsonConfig(fastJsonConfig);
         fastJsonConfig.setSerializeConfig(serializeConfig);
         //日期格式 yyyy-MM-dd
         fastJsonConfig.setDateFormat("yyyy-MM-dd HH:mm:ss");
+        //注册自定义json过滤器
+        fastJsonConfig.setSerializeFilters(new DictValueFastJSONFilter());
         converters.add(fastConverter);
     }
 
