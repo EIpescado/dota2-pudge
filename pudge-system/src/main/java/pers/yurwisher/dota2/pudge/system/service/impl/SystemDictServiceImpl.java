@@ -3,6 +3,7 @@ package pers.yurwisher.dota2.pudge.system.service.impl;
 import cn.hutool.core.lang.Assert;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.RequiredArgsConstructor;
+import lombok.val;
 import org.springframework.beans.BeanUtils;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
@@ -21,6 +22,7 @@ import pers.yurwisher.dota2.pudge.system.pojo.to.SystemDictTo;
 import pers.yurwisher.dota2.pudge.system.pojo.vo.SystemDictVo;
 import pers.yurwisher.dota2.pudge.system.service.CustomRedisCacheService;
 import pers.yurwisher.dota2.pudge.system.service.ISystemDictService;
+import pers.yurwisher.dota2.pudge.utils.PudgeUtil;
 import pers.yurwisher.dota2.pudge.wrapper.PageR;
 import pers.yurwisher.dota2.pudge.wrapper.Selector;
 
@@ -34,7 +36,7 @@ import java.util.List;
  */
 @Service
 @RequiredArgsConstructor
-@CacheConfig(cacheNames = CacheConstant.AnName.SYSTEM_DICT)
+@CacheConfig(cacheNames = {CacheConstant.AnName.SYSTEM_DICT, CacheConstant.MaName.SYSTEM_DICT_MAP})
 public class SystemDictServiceImpl extends BaseServiceImpl<SystemDictMapper, SystemDict> implements ISystemDictService {
 
     private final CustomRedisCacheService customRedisCacheService;
@@ -79,20 +81,30 @@ public class SystemDictServiceImpl extends BaseServiceImpl<SystemDictMapper, Sys
         SystemDict dict = baseMapper.selectById(id);
         Assert.notNull(dict);
         baseMapper.deleteById(id);
-        customRedisCacheService.deleteCachePlus(CacheConstant.AnName.SYSTEM_DICT,dict.getTypeCode());
+        this.deleteCache(dict.getTypeCode());
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void deleteByTypeCode(String typeCode) {
         baseMapper.delete(Wrappers.<SystemDict>lambdaQuery().eq(SystemDict::getTypeCode,typeCode).eq(SystemDict::getEnabled,true));
-        customRedisCacheService.deleteCachePlus(CacheConstant.AnName.SYSTEM_DICT,typeCode);
+        this.deleteCache(typeCode);
     }
 
     @Override
     @Cacheable(key = "#dictType", unless = "#result == null || #result.size() == 0")
     public List<Selector<String>> select(String dictType) {
         return baseMapper.select(dictType);
+    }
+
+    @Override
+    public String getNameByTypeAndVal(String dictType,String val) {
+        String redisKey = PudgeUtil.generateKeyWithDoubleColon(CacheConstant.MaName.SYSTEM_DICT_MAP,dictType,val);
+        return customRedisCacheService.cacheRound(redisKey,() -> baseMapper.getNameByTypeAndVal(dictType,val));
+    }
+
+    private void deleteCache(String typeCode){
+        customRedisCacheService.deleteCachePlus(CacheConstant.AnName.SYSTEM_DICT,typeCode);
     }
 
 }

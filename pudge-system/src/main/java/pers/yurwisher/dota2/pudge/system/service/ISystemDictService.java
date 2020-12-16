@@ -1,5 +1,6 @@
 package pers.yurwisher.dota2.pudge.system.service;
 
+import lombok.val;
 import pers.yurwisher.dota2.pudge.system.entity.SystemDict;
 import pers.yurwisher.dota2.pudge.base.BaseService;
 import pers.yurwisher.dota2.pudge.system.pojo.fo.SystemDictFo;
@@ -65,4 +66,12 @@ public interface ISystemDictService extends BaseService<SystemDict> {
      * @return so
      */
     List<Selector<String>> select(String dictType);
+
+    /**
+     * 根据字典值 获取描述
+     * @param dictType 字典类型
+     * @param val 字典值
+     * @return 描述
+     */
+    String getNameByTypeAndVal(String dictType,String val);
 }

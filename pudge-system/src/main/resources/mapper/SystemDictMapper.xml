@@ -18,5 +18,8 @@
         select name as label,val as 'value' from system_dict
         where type_code = #{dictType} and enabled = 1 ORDER BY seq
     </select>
+    <select id="getNameByTypeAndVal" resultType="java.lang.String">
+        SELECT name from system_dict where type_code = #{dictType} AND val = #{val}
+    </select>
 
 </mapper>

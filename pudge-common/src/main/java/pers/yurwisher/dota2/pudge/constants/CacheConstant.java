@@ -49,6 +49,11 @@ public interface CacheConstant {
          * 变更邮箱
          */
         String CHANGE_MAIL_CODE = "change_mail_code";
+
+        /**
+         * 系统字典值 / 描述 MAP
+         */
+        String SYSTEM_DICT_MAP = "system_dict_map";
     }
 
     interface Key {

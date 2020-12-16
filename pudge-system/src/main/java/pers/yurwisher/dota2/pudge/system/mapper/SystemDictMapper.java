@@ -42,4 +42,12 @@ public interface SystemDictMapper extends CommonMapper<SystemDict> {
      */
     List<Selector<String>> select(@Param("dictType")String dictType);
 
+    /**
+     * 根据字典类型和值 获取描述
+     * @param dictType 字典类型
+     * @param val 值
+     * @return 描述
+     */
+    String getNameByTypeAndVal(@Param("dictType")String dictType,@Param("val")String val);
+
 }

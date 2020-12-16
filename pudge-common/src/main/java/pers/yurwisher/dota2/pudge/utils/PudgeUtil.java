@@ -205,11 +205,18 @@ public class PudgeUtil {
      * 生成redisKey
      *
      * @param prefix 前缀
-     * @param key    key
+     * @param keys   keys
      * @return redis key
      */
-    public static String generateKeyWithDoubleColon(String prefix, String key) {
-        return StrUtil.builder(prefix, DOUBLE_COLON, key).toString();
+    public static String generateKeyWithDoubleColon(String prefix, String... keys) {
+        StringBuilder sb =  StrUtil.builder(prefix, DOUBLE_COLON);
+        for (int i = 0,length = keys.length; i < length; i++) {
+            sb.append(keys[i]);
+            if(i != length - 1){
+                sb.append(DOUBLE_COLON);
+            }
+        }
+        return sb.toString();
     }
 
     public static LocalDate parseDate(String yyyyMMdd){
