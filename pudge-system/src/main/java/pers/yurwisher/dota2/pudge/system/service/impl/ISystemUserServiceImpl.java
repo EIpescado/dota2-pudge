@@ -23,6 +23,7 @@ import pers.yurwisher.dota2.pudge.properties.LoginProperties;
 import pers.yurwisher.dota2.pudge.system.entity.SystemUser;
 import pers.yurwisher.dota2.pudge.system.exception.SystemCustomException;
 import pers.yurwisher.dota2.pudge.system.mapper.SystemUserMapper;
+import pers.yurwisher.dota2.pudge.system.pojo.fo.ChangeAccountInfoFo;
 import pers.yurwisher.dota2.pudge.system.pojo.fo.ChangeMailFo;
 import pers.yurwisher.dota2.pudge.system.pojo.fo.ResetPasswordFo;
 import pers.yurwisher.dota2.pudge.system.pojo.fo.SystemUserFo;
@@ -232,6 +233,23 @@ public class ISystemUserServiceImpl extends BaseServiceImpl<SystemUserMapper, Sy
         });
         this.update(Wrappers.<SystemUser>lambdaUpdate()
                 .set(SystemUser::getMail, changeMailFo.getMail())
+                .set(SystemUser::getLastUpdated, LocalDateTime.now())
+                .eq(SystemUser::getId, currentUser.getId())
+        );
+        //移除缓存
+        this.userInfoChangeRemoveCache(currentUser.getUsername());
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void changeAccountInfo(ChangeAccountInfoFo changeAccountInfoFo) {
+        CurrentUser currentUser = JwtUser.current();
+        //昵称没改 直接返回
+        if(currentUser.getNickname().equals(changeAccountInfoFo.getNickname())){
+            return;
+        }
+        this.update(Wrappers.<SystemUser>lambdaUpdate()
+                .set(SystemUser::getNickname, changeAccountInfoFo.getNickname())
                 .set(SystemUser::getLastUpdated, LocalDateTime.now())
                 .eq(SystemUser::getId, currentUser.getId())
         );

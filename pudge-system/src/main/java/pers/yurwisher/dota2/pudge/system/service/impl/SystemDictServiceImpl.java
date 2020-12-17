@@ -41,7 +41,7 @@ public class SystemDictServiceImpl extends BaseServiceImpl<SystemDictMapper, Sys
     @Transactional(rollbackFor = Exception.class)
     public void create(SystemDictFo fo) {
         SystemDict systemDict = new SystemDict();
-        BeanUtils.copyProperties(fo, systemDict);
+        BeanUtils.copyProperties(fo, systemDict,"typeCode");
         baseMapper.insert(systemDict);
         this.deleteCache(fo.getTypeCode());
     }
@@ -55,7 +55,7 @@ public class SystemDictServiceImpl extends BaseServiceImpl<SystemDictMapper, Sys
             //固定字典不可修改
             throw new SystemCustomException(SystemCustomTipEnum.DICT_FIXED_NOT_CHANGE);
         }
-        BeanUtils.copyProperties(fo, systemDict);
+        BeanUtils.copyProperties(fo, systemDict,"typeCode");
         baseMapper.updateById(systemDict);
         this.deleteCache(fo.getTypeCode());
     }

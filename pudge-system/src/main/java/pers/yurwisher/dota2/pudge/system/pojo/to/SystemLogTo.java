@@ -4,7 +4,6 @@ import com.alibaba.fastjson.annotation.JSONField;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
-import pers.yurwisher.dota2.pudge.annotation.DictValueToName;
 import pers.yurwisher.dota2.pudge.serializer.DictSerializer;
 
 import java.io.Serializable;
@@ -26,14 +25,11 @@ public class SystemLogTo implements Serializable {
     private String nickname;
     private String action;
     private String method;
-    private String params;
     private String ip;
     private String address;
     private Integer timeCost;
-    //@DictValueToName("system_log_type")
-    @JSONField(format = "system_log_type",serializeUsing = DictSerializer.class)
+    @JSONField(format = "system_log_type", serializeUsing = DictSerializer.class)
     private Integer type;
-    private String errorInfo;
     private LocalDateTime dateCreated;
     private String browser;
     private String system;

@@ -4,7 +4,7 @@
     <select id="list" resultType="pers.yurwisher.dota2.pudge.system.pojo.to.SystemLogTo">
         SELECT
         s.id,s.action, s.date_created, s.ip, s.address, s.user_id,
-        s.method, s.params, s.time_cost, s.error_info, s.type, s.system,browser,
+        s.method, s.time_cost, s.type, s.system,browser,
         u.nickname
         FROM system_log s
         LEFT JOIN system_user u ON u.id = s.user_id
@@ -28,7 +28,7 @@
     </select>
 
     <select id="get" resultType="pers.yurwisher.dota2.pudge.system.pojo.vo.SystemLogVo">
-
+      SELECT params,error_info from system_log WHERE id = #{id}
     </select>
     <select id="userLogList" resultType="pers.yurwisher.dota2.pudge.system.pojo.to.UserSystemLogTo">
         SELECT

@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import pers.yurwisher.dota2.pudge.annotation.Log;
+import pers.yurwisher.dota2.pudge.system.pojo.fo.ChangeAccountInfoFo;
 import pers.yurwisher.dota2.pudge.system.pojo.fo.ChangeMailFo;
 import pers.yurwisher.dota2.pudge.system.pojo.fo.ResetPasswordFo;
 import pers.yurwisher.dota2.pudge.system.pojo.fo.SystemUserFo;
@@ -92,6 +93,12 @@ public class SystemUserController {
     @PostMapping("changeMail")
     public R<String> changeMail(@RequestBody @Validated ChangeMailFo changeMailFo) {
         systemUserService.changeMail(changeMailFo);
+        return R.ok();
+    }
+
+    @PostMapping("changeAccountInfo")
+    public R<String> changeAccountInfo(@RequestBody @Validated ChangeAccountInfoFo changeAccountInfoFo) {
+        systemUserService.changeAccountInfo(changeAccountInfoFo);
         return R.ok();
     }
 
