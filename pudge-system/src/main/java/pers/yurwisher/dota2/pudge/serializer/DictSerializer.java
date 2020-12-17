@@ -23,10 +23,18 @@ public class DictSerializer implements ContextObjectSerializer {
 
     @Override
     public void write(JSONSerializer serializer, Object object, Object fieldName, Type type, int i) throws IOException {
+        //@JSONField无自定义属性则执行此
+        SerializeWriter out = serializer.out;
+        if(object == null){
+            out.writeNull();
+            return;
+        }
+        out.writeString(object.toString());
     }
 
     @Override
     public void write(JSONSerializer serializer, Object object, BeanContext beanContext) throws IOException {
+        //@JSONField 含自定义属性则执行此
         SerializeWriter out = serializer.out;
         if(object == null){
             out.writeNull();
@@ -35,7 +43,6 @@ public class DictSerializer implements ContextObjectSerializer {
         //字典类型
         String dictType = beanContext.getFormat();
         if (StrUtil.isNotBlank(dictType)) {
-            //todo 转化
             if (dictService == null) {
                 dictService = SpringContextHolder.getBean(ISystemDictService.class);
             }

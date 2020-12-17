@@ -51,6 +51,7 @@ public class CustomRedisCacheService {
     private void init() {
         put(CacheConstant.AnName.SYSTEM_USER_INFO, Duration.ofDays(10), true);
         put(CacheConstant.AnName.SYSTEM_CONFIG, Duration.ofDays(-1), true);
+        put(CacheConstant.AnName.SYSTEM_DICT, Duration.ofDays(-1), true);
 
         put(CacheConstant.MaName.LOGIN_CODE, Duration.ofMinutes(loginProperties.getCodeConfig().getExpiration()), false);
         //自定义的token 过期时间
@@ -64,6 +65,7 @@ public class CustomRedisCacheService {
         put(CacheConstant.Key.SYSTEM_WHOLE_TREE, Duration.ofDays(7), false);
         put(CacheConstant.Key.ROLE_SELECT, Duration.ofDays(5), false);
         put(CacheConstant.MaName.CHANGE_MAIL_CODE, Duration.ofMinutes(5), false);
+        put(CacheConstant.MaName.SYSTEM_DICT_MAP, Duration.ofDays(-1), false);
     }
 
     public RedisTemplate<String, Object> redisTemplate() {
@@ -99,6 +101,33 @@ public class CustomRedisCacheService {
 
     public <T> T cacheRound(String redisKey, RealDataGetter<T> getter) {
         return cacheRound(redisKey, getCacheExpireMinutes(redisKey), getter);
+    }
+
+    /**
+     * redis 缓存环绕增强
+     *
+     * @param redisKey   缓存key
+     * @param hashKey    hashKey
+     * @param getter     数据获取
+     * @param <T>        类型
+     * @return 需要的数据
+     */
+    @SuppressWarnings("unchecked")
+    public <T> T hashCacheRound(String redisKey,String hashKey,RealDataGetter<T> getter) {
+        //从缓存中提取数据
+        T result = (T) redisTemplate.opsForHash().get(redisKey,hashKey);
+        if (result != null) {
+            return result;
+        } else {
+            if (getter != null) {
+                result = getter.get();
+            }
+            if (result != null) {
+                //将数据存入redis
+                redisTemplate.opsForHash().put(redisKey,hashKey,result);
+            }
+            return result;
+        }
     }
 
     /**

@@ -57,7 +57,7 @@ public class WebMvcConfig extends WebMvcConfigurationSupport {
         serializeConfig.put(Long.TYPE, ToStringSerializer.instance);
         fastConverter.setFastJsonConfig(fastJsonConfig);
         fastJsonConfig.setSerializeConfig(serializeConfig);
-        //日期格式 yyyy-MM-dd
+        //全局日期格式
         fastJsonConfig.setDateFormat("yyyy-MM-dd HH:mm:ss");
         //注册自定义json过滤器
         fastJsonConfig.setSerializeFilters(new DictValueFastJSONFilter());

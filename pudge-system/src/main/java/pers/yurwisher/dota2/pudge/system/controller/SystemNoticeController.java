@@ -46,6 +46,7 @@ public class SystemNoticeController extends BaseController {
     }
 
     @GetMapping("{id}")
+    @Log("公告详情")
     public R<SystemNoticeVo> get(@PathVariable(name = "id") Long id) {
         return R.ok(systemNoticeService.get(id));
     }

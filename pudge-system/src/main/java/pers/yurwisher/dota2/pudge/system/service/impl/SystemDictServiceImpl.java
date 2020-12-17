@@ -3,10 +3,7 @@ package pers.yurwisher.dota2.pudge.system.service.impl;
 import cn.hutool.core.lang.Assert;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.RequiredArgsConstructor;
-import lombok.val;
 import org.springframework.beans.BeanUtils;
-import org.springframework.cache.annotation.CacheConfig;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,23 +33,21 @@ import java.util.List;
  */
 @Service
 @RequiredArgsConstructor
-@CacheConfig(cacheNames = {CacheConstant.AnName.SYSTEM_DICT, CacheConstant.MaName.SYSTEM_DICT_MAP})
 public class SystemDictServiceImpl extends BaseServiceImpl<SystemDictMapper, SystemDict> implements ISystemDictService {
 
     private final CustomRedisCacheService customRedisCacheService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @CacheEvict(key = "#fo.getTypeCode()")
     public void create(SystemDictFo fo) {
         SystemDict systemDict = new SystemDict();
         BeanUtils.copyProperties(fo, systemDict);
         baseMapper.insert(systemDict);
+        this.deleteCache(fo.getTypeCode());
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @CacheEvict(key = "#fo.getTypeCode()")
     public void update(Long id, SystemDictFo fo) {
         SystemDict systemDict = baseMapper.selectById(id);
         Assert.notNull(systemDict);
@@ -62,6 +57,7 @@ public class SystemDictServiceImpl extends BaseServiceImpl<SystemDictMapper, Sys
         }
         BeanUtils.copyProperties(fo, systemDict);
         baseMapper.updateById(systemDict);
+        this.deleteCache(fo.getTypeCode());
     }
 
     @Override
@@ -87,24 +83,30 @@ public class SystemDictServiceImpl extends BaseServiceImpl<SystemDictMapper, Sys
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void deleteByTypeCode(String typeCode) {
-        baseMapper.delete(Wrappers.<SystemDict>lambdaQuery().eq(SystemDict::getTypeCode,typeCode).eq(SystemDict::getEnabled,true));
+        baseMapper.delete(Wrappers.<SystemDict>lambdaQuery().eq(SystemDict::getTypeCode, typeCode).eq(SystemDict::getEnabled, true));
         this.deleteCache(typeCode);
     }
 
     @Override
-    @Cacheable(key = "#dictType", unless = "#result == null || #result.size() == 0")
+    @Cacheable(cacheNames = CacheConstant.AnName.SYSTEM_DICT, key = "#dictType", unless = "#result == null || #result.size() == 0")
     public List<Selector<String>> select(String dictType) {
         return baseMapper.select(dictType);
     }
 
     @Override
-    public String getNameByTypeAndVal(String dictType,String val) {
-        String redisKey = PudgeUtil.generateKeyWithDoubleColon(CacheConstant.MaName.SYSTEM_DICT_MAP,dictType,val);
-        return customRedisCacheService.cacheRound(redisKey,() -> baseMapper.getNameByTypeAndVal(dictType,val));
+    public String getNameByTypeAndVal(String dictType, String val) {
+        String redisKey = PudgeUtil.generateKeyWithDoubleColon(CacheConstant.MaName.SYSTEM_DICT_MAP, dictType);
+        return customRedisCacheService.hashCacheRound(redisKey, val, () -> baseMapper.getNameByTypeAndVal(dictType, val));
     }
 
-    private void deleteCache(String typeCode){
-        customRedisCacheService.deleteCachePlus(CacheConstant.AnName.SYSTEM_DICT,typeCode);
+    /**
+     * 删除指定字典类型的缓存
+     *
+     * @param typeCode 字典类型编码
+     */
+    private void deleteCache(String typeCode) {
+        customRedisCacheService.deleteCachePlus(CacheConstant.AnName.SYSTEM_DICT, typeCode);
+        customRedisCacheService.deleteCachePlus(CacheConstant.MaName.SYSTEM_DICT_MAP, typeCode);
     }
 
 }
