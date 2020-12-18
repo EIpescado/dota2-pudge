@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import pers.yurwisher.dota2.pudge.annotation.Log;
 import pers.yurwisher.dota2.pudge.system.pojo.fo.ChangeAccountInfoFo;
 import pers.yurwisher.dota2.pudge.system.pojo.fo.ChangeMailFo;
+import pers.yurwisher.dota2.pudge.system.pojo.fo.ChangePhoneFo;
 import pers.yurwisher.dota2.pudge.system.pojo.fo.ResetPasswordFo;
 import pers.yurwisher.dota2.pudge.system.pojo.fo.SystemUserFo;
 import pers.yurwisher.dota2.pudge.system.pojo.qo.SystemLogQo;
@@ -78,6 +79,7 @@ public class SystemUserController {
         return R.ok();
     }
 
+    @Log("更改密码")
     @PostMapping("changePassword")
     public R<String> changePassword(@RequestBody @Validated ResetPasswordFo resetPasswordFo) {
         systemUserService.changePassword(resetPasswordFo);
@@ -90,12 +92,27 @@ public class SystemUserController {
         return R.ok();
     }
 
+    @Log("更改邮箱")
     @PostMapping("changeMail")
     public R<String> changeMail(@RequestBody @Validated ChangeMailFo changeMailFo) {
         systemUserService.changeMail(changeMailFo);
         return R.ok();
     }
 
+    @GetMapping(value = "/sendChangePhoneCode")
+    public R<String> sendChangePhoneCode(@RequestParam String phone) {
+        systemUserService.sendChangePhoneCode(phone);
+        return R.ok();
+    }
+
+    @Log("换绑手机")
+    @PostMapping("changePhone")
+    public R<String> changePhone(@RequestBody @Validated ChangePhoneFo changePhoneFo) {
+        systemUserService.changePhone(changePhoneFo);
+        return R.ok();
+    }
+
+    @Log("更改个人信息")
     @PostMapping("changeAccountInfo")
     public R<String> changeAccountInfo(@RequestBody @Validated ChangeAccountInfoFo changeAccountInfoFo) {
         systemUserService.changeAccountInfo(changeAccountInfoFo);

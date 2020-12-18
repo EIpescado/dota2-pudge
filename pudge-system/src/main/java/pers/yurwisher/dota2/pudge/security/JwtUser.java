@@ -107,8 +107,8 @@ public class JwtUser implements UserDetails {
     }
 
     /**
-     * 当前用户账号
-     * @return 用户账号
+     * 当前用户帐号
+     * @return 用户帐号
      */
     public static String currentUsername(){
        return current().getUsername();

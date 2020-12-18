@@ -51,6 +51,11 @@ public interface CacheConstant {
         String CHANGE_MAIL_CODE = "change_mail_code";
 
         /**
+         * 变更手机
+         */
+        String CHANGE_PHONE_CODE = "change_phone_code";
+
+        /**
          * 系统字典值 / 描述 MAP
          */
         String SYSTEM_DICT_MAP = "system_dict_map";

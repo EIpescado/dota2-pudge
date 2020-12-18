@@ -5,6 +5,7 @@ import pers.yurwisher.dota2.pudge.security.CurrentUser;
 import pers.yurwisher.dota2.pudge.system.entity.SystemUser;
 import pers.yurwisher.dota2.pudge.system.pojo.fo.ChangeAccountInfoFo;
 import pers.yurwisher.dota2.pudge.system.pojo.fo.ChangeMailFo;
+import pers.yurwisher.dota2.pudge.system.pojo.fo.ChangePhoneFo;
 import pers.yurwisher.dota2.pudge.system.pojo.fo.ResetPasswordFo;
 import pers.yurwisher.dota2.pudge.system.pojo.fo.SystemUserFo;
 import pers.yurwisher.dota2.pudge.system.pojo.qo.SystemUserQo;
@@ -30,9 +31,9 @@ public interface ISystemUserService extends BaseService<SystemUser> {
     CurrentUser findUserByUsername(String username);
 
     /**
-     * 根据账号获取用户
+     * 根据帐号获取用户
      *
-     * @param username 账号
+     * @param username 帐号
      * @return 用户
      */
     SystemUser getUserByUsername(String username);
@@ -105,5 +106,17 @@ public interface ISystemUserService extends BaseService<SystemUser> {
      * @param changeAccountInfoFo 帐号信息
      */
     void changeAccountInfo(ChangeAccountInfoFo changeAccountInfoFo);
+
+    /**
+     * 发送变更手机验证短信
+     * @param phone 手机
+     */
+    void sendChangePhoneCode(String phone);
+
+    /**
+     * 变更绑定手机
+     * @param changePhoneFo 参数
+     */
+    void changePhone(ChangePhoneFo changePhoneFo);
 
 }

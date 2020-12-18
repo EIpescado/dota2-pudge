@@ -25,6 +25,7 @@ import pers.yurwisher.dota2.pudge.system.exception.SystemCustomException;
 import pers.yurwisher.dota2.pudge.system.mapper.SystemUserMapper;
 import pers.yurwisher.dota2.pudge.system.pojo.fo.ChangeAccountInfoFo;
 import pers.yurwisher.dota2.pudge.system.pojo.fo.ChangeMailFo;
+import pers.yurwisher.dota2.pudge.system.pojo.fo.ChangePhoneFo;
 import pers.yurwisher.dota2.pudge.system.pojo.fo.ResetPasswordFo;
 import pers.yurwisher.dota2.pudge.system.pojo.fo.SystemUserFo;
 import pers.yurwisher.dota2.pudge.system.pojo.qo.SystemUserQo;
@@ -71,11 +72,11 @@ public class ISystemUserServiceImpl extends BaseServiceImpl<SystemUserMapper, Sy
     public CurrentUser findUserByUsername(String username) {
         SystemUser user = getUserByUsername(username);
         if (user == null) {
-            //账号或密码错误
+            //帐号或密码错误
             throw new SystemCustomException(SystemCustomTipEnum.AUTH_USERNAME_OR_PASSWORD_ERROR);
         }
         if (!user.getEnabled()) {
-            //账号未激活
+            //帐号未激活
             throw new SystemCustomException(SystemCustomTipEnum.AUTH_USERNAME_NOT_ENABLED);
         }
         CurrentUser vo = new CurrentUser();
@@ -250,6 +251,52 @@ public class ISystemUserServiceImpl extends BaseServiceImpl<SystemUserMapper, Sy
         }
         this.update(Wrappers.<SystemUser>lambdaUpdate()
                 .set(SystemUser::getNickname, changeAccountInfoFo.getNickname())
+                .set(SystemUser::getLastUpdated, LocalDateTime.now())
+                .eq(SystemUser::getId, currentUser.getId())
+        );
+        //移除缓存
+        this.userInfoChangeRemoveCache(currentUser.getUsername());
+    }
+
+    @Override
+    public void sendChangePhoneCode(String phone) {
+        if (StrUtil.isNotBlank(phone)) {
+            //6位验证码
+            String phoneValidCode = RandomUtil.randomNumbers(6);
+            logger.info("更换绑定手机发送验证码 [{}] 到 [{}]", phoneValidCode, phone);
+            //存入redis
+            customRedisCacheService.setCachePlus(CacheConstant.MaName.CHANGE_PHONE_CODE, phone, () -> phoneValidCode);
+        }
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void changePhone(ChangePhoneFo changePhoneFo) {
+        CurrentUser currentUser = JwtUser.current();
+        //新旧手机相同
+        if(changePhoneFo.getPhone().equals(currentUser.getPhone())){
+            throw new SystemCustomException(SystemCustomTipEnum.AUTH_NEW_PHONE_EQUAL_OLD);
+        }
+        // 密码解密
+        String oldPass = this.decryptRsaPassword(changePhoneFo.getPassword());
+        //判断密码
+        if(!PudgeUtil.encodePwd(oldPass).equals(currentUser.getPassword())){
+            throw new SystemCustomException(SystemCustomTipEnum.AUTH_CURRENT_PASS_ERROR);
+        }
+        //判断验证码
+        customRedisCacheService.getCacheAndDeletePlus(CacheConstant.MaName.CHANGE_PHONE_CODE, changePhoneFo.getPhone(),(String code) ->{
+            if (StrUtil.isBlank(code)) {
+                //验证码过期
+                throw new SystemCustomException(SystemCustomTipEnum.AUTH_CODE_NOT_EXIST_OR_EXPIRED);
+            }
+            String codeVal = changePhoneFo.getCode();
+            if (StrUtil.isBlank(codeVal) || !codeVal.equalsIgnoreCase(code)) {
+                //验证码错误
+                throw new SystemCustomException(SystemCustomTipEnum.AUTH_CODE_ERROR);
+            }
+        });
+        this.update(Wrappers.<SystemUser>lambdaUpdate()
+                .set(SystemUser::getPhone, changePhoneFo.getPhone())
                 .set(SystemUser::getLastUpdated, LocalDateTime.now())
                 .eq(SystemUser::getId, currentUser.getId())
         );

@@ -25,7 +25,7 @@ import java.awt.*;
 public class LoginProperties {
 
     /**
-     * 账号单用户 登录
+     * 帐号单用户 登录
      */
     private boolean single = false;
 

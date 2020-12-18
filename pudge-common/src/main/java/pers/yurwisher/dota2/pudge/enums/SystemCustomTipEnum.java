@@ -9,8 +9,8 @@ import pers.yurwisher.dota2.pudge.wrapper.CustomTip;
  * @since V1.0.0
  */
 public enum SystemCustomTipEnum implements ICustomTipEnum {
-    AUTH_USERNAME_OR_PASSWORD_ERROR(10001,"账号或密码错误"),
-    AUTH_USERNAME_NOT_ENABLED(10002,"账号未激活"),
+    AUTH_USERNAME_OR_PASSWORD_ERROR(10001,"帐号或密码错误"),
+    AUTH_USERNAME_NOT_ENABLED(10002,"帐号未激活"),
     AUTH_NOR_RIGHT(10003,"无权操作"),
     AUTH_LOGIN_EXPIRED(10004,"登录已过期"),
     AUTH_CODE_NOT_EXIST_OR_EXPIRED(10005,"验证码已过期"),
@@ -29,6 +29,7 @@ public enum SystemCustomTipEnum implements ICustomTipEnum {
     AUTH_OLD_PASS_ERROR(10015,"旧密码错误"),
     AUTH_NEW_MAIL_EQUAL_OLD(10016,"新邮箱与旧邮箱不能相同"),
     AUTH_CURRENT_PASS_ERROR(10017,"帐号密码错误"),
+    AUTH_NEW_PHONE_EQUAL_OLD(10019,"新手机与旧手机不能相同"),
     ;
 
     private CustomTip tip;
