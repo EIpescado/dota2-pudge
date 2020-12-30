@@ -9,5 +9,9 @@ package pers.yurwisher.dota2.pudge.function;
 @FunctionalInterface
 public interface TreeNodeParser<T> {
 
+    /**
+     * 节点转化
+     * @param t 数据
+     */
     void parse(T t);
 }
