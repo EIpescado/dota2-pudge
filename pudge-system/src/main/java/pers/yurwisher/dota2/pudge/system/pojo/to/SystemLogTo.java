@@ -1,10 +1,10 @@
 package pers.yurwisher.dota2.pudge.system.pojo.to;
 
 import com.alibaba.fastjson.annotation.JSONField;
+import com.alibaba.fastjson.serializer.ToStringSerializer;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
-import pers.yurwisher.dota2.pudge.serializer.DictSerializer;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -28,7 +28,7 @@ public class SystemLogTo implements Serializable {
     private String ip;
     private String address;
     private Integer timeCost;
-    @JSONField(format = "system_log_type", serializeUsing = DictSerializer.class)
+    @JSONField(serializeUsing = ToStringSerializer.class)
     private Integer type;
     private LocalDateTime dateCreated;
     private String browser;

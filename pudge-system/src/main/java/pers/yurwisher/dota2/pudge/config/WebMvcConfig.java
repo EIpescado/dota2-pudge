@@ -13,7 +13,6 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
-import pers.yurwisher.dota2.pudge.filter.DictValueFastJSONFilter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,8 +58,6 @@ public class WebMvcConfig extends WebMvcConfigurationSupport {
         fastJsonConfig.setSerializeConfig(serializeConfig);
         //全局日期格式
         fastJsonConfig.setDateFormat("yyyy-MM-dd HH:mm:ss");
-        //注册自定义json过滤器
-        fastJsonConfig.setSerializeFilters(new DictValueFastJSONFilter());
         converters.add(fastConverter);
     }
 

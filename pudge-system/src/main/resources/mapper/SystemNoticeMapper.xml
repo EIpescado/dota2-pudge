@@ -3,14 +3,13 @@
 <mapper namespace="pers.yurwisher.dota2.pudge.system.mapper.SystemNoticeMapper">
     <select id="list" resultType="pers.yurwisher.dota2.pudge.system.pojo.to.SystemNoticeTo">
         SELECT id,title,date_created,last_updated,expired_date,type from system_notice
-        <where>
-            <if test="qo.type != null and qo.type != ''">
-                type = #{qo.type}
-            </if>
-            <if test="qo.title != null and qo.title != ''">
-                AND title like concat('%',#{qo.title},'%')
-            </if>
-        </where>
+        where enabled = 1
+        <if test="qo.type != null and qo.type != ''">
+            AND type = #{qo.type}
+        </if>
+        <if test="qo.title != null and qo.title != ''">
+            AND title like concat('%',#{qo.title},'%')
+        </if>
         ORDER BY date_created DESC
     </select>
 
