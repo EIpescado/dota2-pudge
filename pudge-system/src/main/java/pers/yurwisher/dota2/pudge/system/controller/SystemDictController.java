@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import pers.yurwisher.dota2.pudge.annotation.Log;
 import pers.yurwisher.dota2.pudge.base.BaseController;
 import pers.yurwisher.dota2.pudge.system.pojo.fo.SystemDictFo;
 import pers.yurwisher.dota2.pudge.system.pojo.qo.SystemDictQo;
@@ -36,12 +37,14 @@ public class SystemDictController extends BaseController {
     }
 
     @PostMapping
+    @Log("创建字典")
     public R<String> create(@RequestBody SystemDictFo fo) {
         systemDictService.create(fo);
         return R.ok();
     }
 
     @PostMapping("{id}")
+    @Log("修改字典")
     public R<String> update(@PathVariable(name = "id") Long id, @RequestBody SystemDictFo fo) {
         systemDictService.update(id, fo);
         return R.ok();

@@ -1,6 +1,5 @@
 package pers.yurwisher.dota2.pudge.system.service;
 
-import lombok.val;
 import pers.yurwisher.dota2.pudge.system.entity.SystemDict;
 import pers.yurwisher.dota2.pudge.base.BaseService;
 import pers.yurwisher.dota2.pudge.system.pojo.fo.SystemDictFo;

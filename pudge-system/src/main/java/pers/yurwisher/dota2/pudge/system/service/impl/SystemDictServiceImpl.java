@@ -41,7 +41,7 @@ public class SystemDictServiceImpl extends BaseServiceImpl<SystemDictMapper, Sys
     @Transactional(rollbackFor = Exception.class)
     public void create(SystemDictFo fo) {
         SystemDict systemDict = new SystemDict();
-        BeanUtils.copyProperties(fo, systemDict,"typeCode");
+        BeanUtils.copyProperties(fo, systemDict);
         baseMapper.insert(systemDict);
         this.deleteCache(fo.getTypeCode());
     }
