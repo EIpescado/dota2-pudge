@@ -2,7 +2,10 @@ package pers.yurwisher.dota2.pudge.utils;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
+import cn.hutool.core.io.FileTypeUtil;
+import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.IoUtil;
+import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.HexUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.SecureUtil;
@@ -25,6 +28,7 @@ import pers.yurwisher.dota2.pudge.wrapper.R;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -34,7 +38,10 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author yq
@@ -66,9 +73,16 @@ public class PudgeUtil {
     private static final Digester SHA256_DIGESTER = new Digester(DigestAlgorithm.SHA256);
     private static final DES DES = SecureUtil.des();
     public static final String DOUBLE_COLON = "::";
-    public static final DateTimeFormatter DEFAULT_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-    public static final DateTimeFormatter YYYY_MM_DD_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-    public static final LocalTime END_OF_DAY = LocalTime.of(23, 59, 59);
+    private static final DateTimeFormatter DEFAULT_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private static final DateTimeFormatter YYYY_MM_DD_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    private static final LocalTime END_OF_DAY = LocalTime.of(23, 59, 59);
+    private static final Map<String,String[]> FILE_TYPE_MAP = new ConcurrentHashMap<String,String[]>(){
+        private static final long serialVersionUID = 1997234982651928201L;
+        {
+            put("xls",new String[]{"doc","msi"});
+            put("zip",new String[]{"docx","xlsx","pptx","jar","war"});
+        }
+    };
 
    public static void responseJSON(HttpServletResponse response, R r) throws IOException {
         response.setStatus(HttpStatus.OK.value());
@@ -246,5 +260,36 @@ public class PudgeUtil {
             throwable.printStackTrace(pw);
             return sw.toString();
         }
+    }
+
+    /**
+     * 取文件内容的前28个字节.判定文件类型
+     * @param bytes 文件内容字节数据
+     * @return 文件类型
+     */
+    public static String getFileType(String fileName, byte[] bytes){
+        //取前28个字节
+        byte[] bytes28 = ArrayUtil.sub(bytes,0,28);
+        //根据文件内容获取的文件类型
+        String typeName = FileTypeUtil.getType(HexUtil.encodeHexStr(bytes28,false));
+        if(StrUtil.isNotBlank(typeName)){
+            String[] mayMatchTypeArray = FILE_TYPE_MAP.get(typeName);
+            //部分文件根据文件内容读取类型与扩展名不符,需转化
+            if(ArrayUtil.isNotEmpty(mayMatchTypeArray)){
+                String extName = FileUtil.extName(fileName);
+                if(Arrays.stream(mayMatchTypeArray).anyMatch(s -> s.equalsIgnoreCase(extName))){
+                    return extName;
+                }
+            }
+            return typeName;
+        }else{
+            //部分文件根据内容无法获取文件名 直接获取扩展名
+            return FileUtil.extName(fileName);
+        }
+    }
+
+    public static void main(String[] args) throws Exception{
+        System.out.println(getFileType("D:\\tmp\\1.txt",IoUtil.readBytes(new FileInputStream("D:\\tmp\\1.txt"))));
+        System.out.println(getFileType("D:\\tmp\\1.txt",IoUtil.readBytes(new FileInputStream("D:\\tmp\\1.txt"))));
     }
 }

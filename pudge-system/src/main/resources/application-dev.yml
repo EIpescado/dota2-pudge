@@ -21,11 +21,12 @@ spring:
         max-idle: 8
     database: 13
     timeout: 5s
-  #文件上传大小限制
   servlet:
     multipart:
+      #文件上传大小限制
       max-file-size: 15MB
-      max-request-size: 15MB
+      #最大支持请求大小
+      max-request-size: 30MB
   #404直接抛出异常 方便统一处理
   mvc:
     throw-exception-if-no-handler-found: true

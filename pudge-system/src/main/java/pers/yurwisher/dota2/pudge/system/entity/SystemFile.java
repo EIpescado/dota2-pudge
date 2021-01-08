@@ -19,8 +19,8 @@ public class SystemFile extends BaseEntity {
 
     /**原始文件名称*/
     private String fileName;
-    /**文件MimeType*/
-    private String mimeType;
+    /**文件类型*/
+    private String fileType;
     /**文件大小,单位字节(B)*/
     private Long fileSize;
     /**文件MD5*/

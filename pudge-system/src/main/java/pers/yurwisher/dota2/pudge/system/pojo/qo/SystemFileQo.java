@@ -17,7 +17,7 @@ import lombok.experimental.Accessors;
 public class SystemFileQo extends BasePageQo {
     private static final long serialVersionUID = 3779387221225971949L;
     private String fileName;
-    private String mimeType;
+    private String fileType;
     private Long fileSize;
     private String fileHash;
     private String filePath;

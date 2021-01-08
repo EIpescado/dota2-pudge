@@ -12,5 +12,9 @@ public enum SystemConfigEnum {
      * 默认密码
      */
     DEFAULT_PASSWORD,
+    /**
+     * 文件存储根路径
+     */
+    SYSTEM_FILE_ROOT_PATH,
     ;
 }

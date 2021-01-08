@@ -17,7 +17,7 @@ import lombok.experimental.Accessors;
 public class SystemFileTo implements Serializable {
     private static final long serialVersionUID = 1L;
     private String fileName;
-    private String mimeType;
+    private String fileType;
     private Long fileSize;
     private String fileHash;
     private String filePath;
