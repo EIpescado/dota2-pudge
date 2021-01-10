@@ -17,6 +17,7 @@ import pers.yurwisher.dota2.pudge.enums.SystemCustomTipEnum;
 import pers.yurwisher.dota2.pudge.system.entity.SystemFile;
 import pers.yurwisher.dota2.pudge.system.exception.SystemCustomException;
 import pers.yurwisher.dota2.pudge.system.mapper.SystemFileMapper;
+import pers.yurwisher.dota2.pudge.system.pojo.SystemFileUploadBack;
 import pers.yurwisher.dota2.pudge.system.pojo.qo.SystemFileQo;
 import pers.yurwisher.dota2.pudge.system.pojo.to.SystemFileTo;
 import pers.yurwisher.dota2.pudge.system.service.ISystemConfigService;
@@ -55,16 +56,20 @@ public class SystemFileServiceImpl extends BaseServiceImpl<SystemFileMapper, Sys
     }
 
     @Override
-    public List<SystemFile> upload(MultipartFile[] files, Integer fileTag, HttpServletRequest request) {
+    public List<SystemFileUploadBack> upload(MultipartFile[] files, Integer fileTag, List<String> uidList, HttpServletRequest request) {
         if (ArrayUtil.isNotEmpty(files)) {
-            logger.info("上传文件开始,数量[{}]",files.length);
+            logger.info("上传文件开始,数量[{}]", files.length);
             try {
                 //文件存储根路径
                 String root = systemConfigService.getValByCode(SystemConfigEnum.SYSTEM_FILE_ROOT_PATH);
                 SystemFile entity;
-                List<SystemFile> resultList = new ArrayList<>(files.length);
+                List<SystemFileUploadBack> resultList = new ArrayList<>(files.length);
+                String uid;
+                int index = 0;
                 for (MultipartFile file : files) {
-                    logger.info("开始上传[{}]",file.getOriginalFilename());
+                    logger.info("开始上传[{}]", file.getOriginalFilename());
+                    uid = uidList.get(index);
+                    index++;
                     //读取文件流, 并关闭流
                     byte[] fileBytes = IoUtil.readBytes(file.getInputStream());
                     //文件MD5
@@ -72,20 +77,20 @@ public class SystemFileServiceImpl extends BaseServiceImpl<SystemFileMapper, Sys
                     //判断是否已经上传过
                     entity = super.getOneByFieldValueEq(SystemFile::getFileHash, fileMd5);
                     if (entity != null) {
-                        logger.info("结束上传[{}],存在相同文件[{}]",file.getOriginalFilename(),fileMd5);
-                        resultList.add(entity);
+                        logger.info("结束上传[{}],存在相同文件[{}]", file.getOriginalFilename(), fileMd5);
+                        resultList.add(this.toBack(entity,uid));
                         continue;
                     }
                     //文件类型
                     String fileType = PudgeUtil.getFileType(file.getOriginalFilename(), fileBytes);
                     //文件存储路径
-                    String filePath = generateFileFinalSavePath(fileTag,fileType);
+                    String filePath = generateFileFinalSavePath(fileTag, fileType);
                     //保存文件基础信息到mysql
-                    entity = this.saveEntity(file, fileType,fileTag, fileMd5,filePath);
+                    entity = this.saveEntity(file, fileType, fileTag, fileMd5, filePath);
                     //存储文件到目标地址
-                    FileUtil.writeBytes(fileBytes,root + filePath);
-                    logger.info("结束上传[{}]",file.getOriginalFilename());
-                    resultList.add(entity);
+                    FileUtil.writeBytes(fileBytes, root + filePath);
+                    logger.info("结束上传[{}]", file.getOriginalFilename());
+                    resultList.add(this.toBack(entity,uid));
                 }
                 logger.info("上传文件结束");
                 return resultList;
@@ -97,13 +102,21 @@ public class SystemFileServiceImpl extends BaseServiceImpl<SystemFileMapper, Sys
         return null;
     }
 
+    private SystemFileUploadBack toBack(SystemFile file,String uid){
+        SystemFileUploadBack back = new SystemFileUploadBack();
+        back.setId(file.getId());
+        back.setUid(uid);
+        back.setFileName(file.getFileName());
+        return back;
+    }
+
     @Transactional(rollbackFor = Exception.class)
-    public SystemFile saveEntity(MultipartFile file, String fileType,Integer fileTag, String fileMd5,String filePath) {
+    public SystemFile saveEntity(MultipartFile file, String fileType, Integer fileTag, String fileMd5, String filePath) {
         SystemFile entity = new SystemFile();
         //原始文件名称
         entity.setFileName(file.getOriginalFilename());
         //类型
-        entity.setFileType(fileType);
+        entity.setFileType(fileType.toLowerCase());
         //大小
         entity.setFileSize(file.getSize());
         //文件标记 区分用途

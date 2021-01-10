@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import pers.yurwisher.dota2.pudge.base.BaseController;
-import pers.yurwisher.dota2.pudge.system.entity.SystemFile;
+import pers.yurwisher.dota2.pudge.system.pojo.SystemFileUploadBack;
 import pers.yurwisher.dota2.pudge.system.pojo.qo.SystemFileQo;
 import pers.yurwisher.dota2.pudge.system.pojo.to.SystemFileTo;
 import pers.yurwisher.dota2.pudge.system.service.ISystemFileService;
@@ -27,7 +27,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/file")
 public class SystemFileController extends BaseController {
-    private ISystemFileService systemFileService;
+    private final ISystemFileService systemFileService;
 
     public SystemFileController(ISystemFileService systemFileService) {
         this.systemFileService = systemFileService;
@@ -39,11 +39,11 @@ public class SystemFileController extends BaseController {
     }
 
     @PostMapping("upload")
-    public R<List<SystemFile>> upload(@RequestParam("files") MultipartFile[] files,
-                                      @RequestParam("fileTag") Integer fileTag,
-                                      HttpServletRequest request) {
-        return R.ok(systemFileService.upload(files, fileTag, request));
+    public R<List<SystemFileUploadBack>> upload(@RequestParam("files") MultipartFile[] files,
+                                                @RequestParam("fileTag") Integer fileTag,
+                                                @RequestParam("uidList") List<String> uidList,
+                                                HttpServletRequest request) {
+        return R.ok(systemFileService.upload(files, fileTag, uidList, request));
     }
-
 
 }
