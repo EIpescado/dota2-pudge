@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.annotations.Param;
 import pers.yurwisher.dota2.pudge.base.CommonMapper;
 import pers.yurwisher.dota2.pudge.system.entity.SystemFile;
+import pers.yurwisher.dota2.pudge.system.pojo.SystemFileUploadBack;
 import pers.yurwisher.dota2.pudge.system.pojo.qo.SystemFileQo;
 import pers.yurwisher.dota2.pudge.system.pojo.to.SystemFileTo;
 
@@ -24,5 +25,12 @@ public interface SystemFileMapper extends CommonMapper<SystemFile> {
      * @return 列表
      */
     IPage<SystemFileTo> list(Page page, @Param("qo") SystemFileQo qo);
+
+    /**
+     * 根据文件hash获取文件信息
+     * @param fileHash 文件摘要值
+     * @return SystemFileUploadBack
+     */
+    SystemFileUploadBack findByFileHash(@Param("fileHash") String fileHash);
 
 }

@@ -32,6 +32,8 @@ public enum SystemCustomTipEnum implements ICustomTipEnum {
     AUTH_NEW_PHONE_EQUAL_OLD(10019,"新手机与旧手机不能相同"),
 
     QUERY_PAGE_SIZE_OVER_MAX(10020,"单页查询超出最大数量"),
+
+    FILE_UPLOAD_ERROR(10021,"上传文件失败"),
     ;
 
     private CustomTip tip;

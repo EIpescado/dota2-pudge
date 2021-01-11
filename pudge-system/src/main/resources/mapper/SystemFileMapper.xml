@@ -4,5 +4,8 @@
     <select id="list" resultType="pers.yurwisher.dota2.pudge.system.pojo.to.SystemFileTo">
      SELECT * from system_file
     </select>
+    <select id="findByFileHash" resultType="pers.yurwisher.dota2.pudge.system.pojo.SystemFileUploadBack">
+        select id, file_hash as hash, file_name from system_file where file_hash = #{fileHash}
+    </select>
 
 </mapper>

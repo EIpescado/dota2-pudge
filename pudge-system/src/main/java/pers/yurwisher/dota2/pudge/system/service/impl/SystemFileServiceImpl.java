@@ -3,7 +3,6 @@ package pers.yurwisher.dota2.pudge.system.service.impl;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.text.StrBuilder;
-import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.digest.MD5;
@@ -29,8 +28,6 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author yq
@@ -56,62 +53,49 @@ public class SystemFileServiceImpl extends BaseServiceImpl<SystemFileMapper, Sys
     }
 
     @Override
-    public List<SystemFileUploadBack> upload(MultipartFile[] files, Integer fileTag, List<String> uidList, HttpServletRequest request) {
-        if (ArrayUtil.isNotEmpty(files)) {
-            logger.info("上传文件开始,数量[{}]", files.length);
-            try {
-                //文件存储根路径
-                String root = systemConfigService.getValByCode(SystemConfigEnum.SYSTEM_FILE_ROOT_PATH);
-                SystemFile entity;
-                List<SystemFileUploadBack> resultList = new ArrayList<>(files.length);
-                String uid;
-                int index = 0;
-                for (MultipartFile file : files) {
-                    logger.info("开始上传[{}]", file.getOriginalFilename());
-                    uid = uidList.get(index);
-                    index++;
-                    //读取文件流, 并关闭流
-                    byte[] fileBytes = IoUtil.readBytes(file.getInputStream());
-                    //文件MD5
-                    String fileMd5 = MD5_INSTANCE.digestHex(fileBytes);
-                    //判断是否已经上传过
-                    entity = super.getOneByFieldValueEq(SystemFile::getFileHash, fileMd5);
-                    if (entity != null) {
-                        logger.info("结束上传[{}],存在相同文件[{}]", file.getOriginalFilename(), fileMd5);
-                        resultList.add(this.toBack(entity,uid));
-                        continue;
-                    }
-                    //文件类型
-                    String fileType = PudgeUtil.getFileType(file.getOriginalFilename(), fileBytes);
-                    //文件存储路径
-                    String filePath = generateFileFinalSavePath(fileTag, fileType);
-                    //保存文件基础信息到mysql
-                    entity = this.saveEntity(file, fileType, fileTag, fileMd5, filePath);
-                    //存储文件到目标地址
-                    FileUtil.writeBytes(fileBytes, root + filePath);
-                    logger.info("结束上传[{}]", file.getOriginalFilename());
-                    resultList.add(this.toBack(entity,uid));
-                }
-                logger.info("上传文件结束");
-                return resultList;
-            } catch (IOException e) {
-                logger.info("上传文件异常: [{}]", e.getLocalizedMessage());
-                throw new SystemCustomException(SystemCustomTipEnum.AUTH_CODE_NOT_EXIST_OR_EXPIRED);
-            }
+    @Transactional(rollbackFor = Exception.class)
+    public SystemFileUploadBack upload(MultipartFile file, Integer fileTag, HttpServletRequest request) {
+        logger.info("开始上传[{}]", file.getOriginalFilename());
+        //读取文件流, 并关闭流
+        byte[] fileBytes;
+        try {
+            fileBytes = IoUtil.readBytes(file.getInputStream());
+        } catch (IOException e) {
+            logger.info("上传文件失败: [{}]", e.getLocalizedMessage());
+            throw new SystemCustomException(SystemCustomTipEnum.FILE_UPLOAD_ERROR);
         }
-        return null;
+        //文件MD5
+        String fileMd5 = MD5_INSTANCE.digestHex(fileBytes);
+        //判断是否已经上传过
+        SystemFileUploadBack back = baseMapper.findByFileHash(fileMd5);
+        if (back != null) {
+            logger.info("结束上传[{}],存在相同文件[{}]", file.getOriginalFilename(), fileMd5);
+            return back;
+        }
+        //文件类型
+        String fileType = PudgeUtil.getFileType(file.getOriginalFilename(), fileBytes);
+        //文件存储路径
+        String filePath = generateFileFinalSavePath(fileTag, fileType);
+        //文件存储根路径
+        String root = systemConfigService.getValByCode(SystemConfigEnum.SYSTEM_FILE_ROOT_PATH);
+        //存储文件到目标地址
+        FileUtil.writeBytes(fileBytes, root + filePath);
+        logger.info("文件[{}]上传结束", file.getOriginalFilename());
+        //保存文件基础信息到mysql
+        SystemFile entity = this.saveEntity(file, fileType, fileTag, fileMd5, filePath);
+        logger.info("文件[{}]信息保存完毕", file.getOriginalFilename());
+        return this.toBack(entity);
     }
 
-    private SystemFileUploadBack toBack(SystemFile file,String uid){
+    private SystemFileUploadBack toBack(SystemFile entity) {
         SystemFileUploadBack back = new SystemFileUploadBack();
-        back.setId(file.getId());
-        back.setUid(uid);
-        back.setFileName(file.getFileName());
+        back.setFileName(entity.getFileName());
+        back.setId(entity.getId());
+        back.setHash(entity.getFileHash());
         return back;
     }
 
-    @Transactional(rollbackFor = Exception.class)
-    public SystemFile saveEntity(MultipartFile file, String fileType, Integer fileTag, String fileMd5, String filePath) {
+    private SystemFile saveEntity(MultipartFile file, String fileType, Integer fileTag, String fileMd5, String filePath) {
         SystemFile entity = new SystemFile();
         //原始文件名称
         entity.setFileName(file.getOriginalFilename());

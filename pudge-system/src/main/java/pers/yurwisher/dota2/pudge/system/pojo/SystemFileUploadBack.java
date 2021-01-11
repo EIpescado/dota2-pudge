@@ -14,8 +14,8 @@ import java.io.Serializable;
 public class SystemFileUploadBack implements Serializable {
     private static final long serialVersionUID = 7303968798567828582L;
 
-    /**文件上传标识ID*/
-    private String uid;
+    /**文件hash*/
+    private String hash;
 
     /**文件ID*/
     private Long id;

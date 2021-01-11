@@ -32,12 +32,10 @@ public interface ISystemFileService extends BaseService<SystemFile> {
     /**
      * 上传文件
      *
-     * @param files   文件集合
+     * @param file    文件
      * @param fileTag 文件标记,区分用途,详见字典system_file_tag
-     * @param uidList 前端文件id集合,用于区分是否已经上传
      * @param request 当前请求
      * @return 文件集合
      */
-    List<SystemFileUploadBack> upload(MultipartFile[] files, Integer fileTag, List<String> uidList, HttpServletRequest request);
-
+    SystemFileUploadBack upload(MultipartFile file, Integer fileTag, HttpServletRequest request);
 }

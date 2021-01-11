@@ -16,7 +16,6 @@ import pers.yurwisher.dota2.pudge.wrapper.PageR;
 import pers.yurwisher.dota2.pudge.wrapper.R;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.List;
 
 /**
  * @author yq
@@ -39,11 +38,9 @@ public class SystemFileController extends BaseController {
     }
 
     @PostMapping("upload")
-    public R<List<SystemFileUploadBack>> upload(@RequestParam("files") MultipartFile[] files,
-                                                @RequestParam("fileTag") Integer fileTag,
-                                                @RequestParam("uidList") List<String> uidList,
-                                                HttpServletRequest request) {
-        return R.ok(systemFileService.upload(files, fileTag, uidList, request));
+    public R<SystemFileUploadBack> upload(@RequestParam("file") MultipartFile file,
+                                          @RequestParam("fileTag") Integer fileTag,
+                                          HttpServletRequest request) {
+        return R.ok(systemFileService.upload(file, fileTag, request));
     }
-
 }
