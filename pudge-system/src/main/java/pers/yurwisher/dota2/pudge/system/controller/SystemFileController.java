@@ -2,6 +2,7 @@ package pers.yurwisher.dota2.pudge.system.controller;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -11,11 +12,13 @@ import pers.yurwisher.dota2.pudge.base.BaseController;
 import pers.yurwisher.dota2.pudge.system.pojo.SystemFileUploadBack;
 import pers.yurwisher.dota2.pudge.system.pojo.qo.SystemFileQo;
 import pers.yurwisher.dota2.pudge.system.pojo.to.SystemFileTo;
+import pers.yurwisher.dota2.pudge.system.pojo.vo.SystemFileVo;
 import pers.yurwisher.dota2.pudge.system.service.ISystemFileService;
 import pers.yurwisher.dota2.pudge.wrapper.PageR;
 import pers.yurwisher.dota2.pudge.wrapper.R;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
  * @author yq
@@ -40,7 +43,13 @@ public class SystemFileController extends BaseController {
     @PostMapping("upload")
     public R<SystemFileUploadBack> upload(@RequestParam("file") MultipartFile file,
                                           @RequestParam("fileTag") Integer fileTag,
+                                          @RequestParam("mimeType") String mimeType,
                                           HttpServletRequest request) {
-        return R.ok(systemFileService.upload(file, fileTag, request));
+        return R.ok(systemFileService.upload(file, fileTag, mimeType,request));
+    }
+
+    @GetMapping("{entityId}")
+    public R<List<SystemFileVo>> getEntityFiles(@PathVariable Long entityId) {
+        return R.ok(systemFileService.getEntityFiles(entityId));
     }
 }

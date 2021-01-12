@@ -1,7 +1,6 @@
 package pers.yurwisher.dota2.pudge.system.pojo.qo;
 
 import pers.yurwisher.dota2.pudge.base.BasePageQo;
-import java.time.LocalDateTime;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
@@ -17,10 +16,5 @@ import lombok.experimental.Accessors;
 public class SystemFileQo extends BasePageQo {
     private static final long serialVersionUID = 3779387221225971949L;
     private String fileName;
-    private String fileType;
-    private Long fileSize;
-    private String fileHash;
-    private String filePath;
-    private LocalDateTime uploadDate;
     private Integer fileTag;
 }

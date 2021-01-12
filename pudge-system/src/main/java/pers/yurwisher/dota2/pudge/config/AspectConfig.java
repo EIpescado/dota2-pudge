@@ -51,13 +51,16 @@ public class AspectConfig {
         BasePageQo qo = (BasePageQo) pjp.getArgs()[0];
         if (qo != null) {
             //限制分页查询最大单页数量
-            if(qo.getSize() > maxPageSize){
+            if (qo.getSize() > maxPageSize) {
                 throw new SystemCustomException(SystemCustomTipEnum.QUERY_PAGE_SIZE_OVER_MAX);
             }
             if (StrUtil.isEmpty(qo.getUsername())) {
                 CurrentUser currentUser = JwtUser.current();
-                qo.setUsername(currentUser.getUsername());
-                qo.setUserId(currentUser.getId());
+                //admin 查看所有
+                if (!currentUser.isAdmin()) {
+                    qo.setUsername(currentUser.getUsername());
+                    qo.setUserId(currentUser.getId());
+                }
             }
         }
         return pjp.proceed();

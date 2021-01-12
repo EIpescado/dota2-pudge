@@ -13,12 +13,15 @@ import org.springframework.web.multipart.MultipartFile;
 import pers.yurwisher.dota2.pudge.base.impl.BaseServiceImpl;
 import pers.yurwisher.dota2.pudge.enums.SystemConfigEnum;
 import pers.yurwisher.dota2.pudge.enums.SystemCustomTipEnum;
+import pers.yurwisher.dota2.pudge.security.JwtUser;
 import pers.yurwisher.dota2.pudge.system.entity.SystemFile;
 import pers.yurwisher.dota2.pudge.system.exception.SystemCustomException;
 import pers.yurwisher.dota2.pudge.system.mapper.SystemFileMapper;
 import pers.yurwisher.dota2.pudge.system.pojo.SystemFileUploadBack;
 import pers.yurwisher.dota2.pudge.system.pojo.qo.SystemFileQo;
 import pers.yurwisher.dota2.pudge.system.pojo.to.SystemFileTo;
+import pers.yurwisher.dota2.pudge.system.pojo.vo.SystemFileVo;
+import pers.yurwisher.dota2.pudge.system.service.IRelationService;
 import pers.yurwisher.dota2.pudge.system.service.ISystemConfigService;
 import pers.yurwisher.dota2.pudge.system.service.ISystemFileService;
 import pers.yurwisher.dota2.pudge.utils.PudgeUtil;
@@ -28,6 +31,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * @author yq
@@ -40,6 +44,7 @@ import java.time.LocalDateTime;
 public class SystemFileServiceImpl extends BaseServiceImpl<SystemFileMapper, SystemFile> implements ISystemFileService {
 
     private final ISystemConfigService systemConfigService;
+    private final IRelationService relationService;
 
     /**
      * MD5实例
@@ -54,7 +59,7 @@ public class SystemFileServiceImpl extends BaseServiceImpl<SystemFileMapper, Sys
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public SystemFileUploadBack upload(MultipartFile file, Integer fileTag, HttpServletRequest request) {
+    public SystemFileUploadBack upload(MultipartFile file, Integer fileTag, String mimeType, HttpServletRequest request) {
         logger.info("开始上传[{}]", file.getOriginalFilename());
         //读取文件流, 并关闭流
         byte[] fileBytes;
@@ -82,20 +87,6 @@ public class SystemFileServiceImpl extends BaseServiceImpl<SystemFileMapper, Sys
         FileUtil.writeBytes(fileBytes, root + filePath);
         logger.info("文件[{}]上传结束", file.getOriginalFilename());
         //保存文件基础信息到mysql
-        SystemFile entity = this.saveEntity(file, fileType, fileTag, fileMd5, filePath);
-        logger.info("文件[{}]信息保存完毕", file.getOriginalFilename());
-        return this.toBack(entity);
-    }
-
-    private SystemFileUploadBack toBack(SystemFile entity) {
-        SystemFileUploadBack back = new SystemFileUploadBack();
-        back.setFileName(entity.getFileName());
-        back.setId(entity.getId());
-        back.setHash(entity.getFileHash());
-        return back;
-    }
-
-    private SystemFile saveEntity(MultipartFile file, String fileType, Integer fileTag, String fileMd5, String filePath) {
         SystemFile entity = new SystemFile();
         //原始文件名称
         entity.setFileName(file.getOriginalFilename());
@@ -111,8 +102,26 @@ public class SystemFileServiceImpl extends BaseServiceImpl<SystemFileMapper, Sys
         entity.setFilePath(filePath);
         //上传时间
         entity.setUploadDate(LocalDateTime.now());
+        //上传人
+        entity.setUserId(JwtUser.currentUserId());
+        //mimeType
+        entity.setMimeType(mimeType);
         baseMapper.insert(entity);
-        return entity;
+        logger.info("文件[{}]信息保存完毕", file.getOriginalFilename());
+        return this.toBack(entity);
+    }
+
+    @Override
+    public List<SystemFileVo> getEntityFiles(Long entityId) {
+        return baseMapper.getEntityFiles(entityId);
+    }
+
+    private SystemFileUploadBack toBack(SystemFile entity) {
+        SystemFileUploadBack back = new SystemFileUploadBack();
+        back.setFileName(entity.getFileName());
+        back.setId(entity.getId());
+        back.setHash(entity.getFileHash());
+        return back;
     }
 
     /**

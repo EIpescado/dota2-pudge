@@ -8,6 +8,9 @@ import pers.yurwisher.dota2.pudge.system.entity.SystemFile;
 import pers.yurwisher.dota2.pudge.system.pojo.SystemFileUploadBack;
 import pers.yurwisher.dota2.pudge.system.pojo.qo.SystemFileQo;
 import pers.yurwisher.dota2.pudge.system.pojo.to.SystemFileTo;
+import pers.yurwisher.dota2.pudge.system.pojo.vo.SystemFileVo;
+
+import java.util.List;
 
 /**
  * @author yq
@@ -33,4 +36,10 @@ public interface SystemFileMapper extends CommonMapper<SystemFile> {
      */
     SystemFileUploadBack findByFileHash(@Param("fileHash") String fileHash);
 
+    /**
+     * 获取实体关联附件信息
+     * @param entityId 实体ID
+     * @return 附件信息集合
+     */
+    List<SystemFileVo> getEntityFiles(@Param("entityId")Long entityId);
 }

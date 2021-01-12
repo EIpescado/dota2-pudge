@@ -84,4 +84,19 @@ public interface RelationMapper {
      * @return username集合
      */
     List<String> getAllHaveThisRoleIdUsername(Long roleId);
+
+    /**
+     * 删除实体已绑定文件
+     * @param entityId 实体ID
+     * @return 影响行数
+     */
+    Integer deleteEntityFileRelationByEntityId(@Param("entityId")Long entityId);
+
+    /**
+     * 批量插入实体文件关系
+     * @param entityId 实体ID
+     * @param fileIds 按钮ID集合
+     * @return 影响行数
+     */
+    Integer batchInsertEntityFileRelation(@Param("entityId")Long entityId,@Param("fileIds") List<Long> fileIds);
 }

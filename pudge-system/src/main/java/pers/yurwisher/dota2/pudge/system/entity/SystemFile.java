@@ -31,4 +31,9 @@ public class SystemFile extends BaseEntity {
     private LocalDateTime uploadDate;
     /**文件标记,区分用途,详见字典system_file_tag*/
     private Integer fileTag;
+
+    /**上传用户ID*/
+    private Long userId;
+    /**文件的mimeType*/
+    private String mimeType;
 }

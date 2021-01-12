@@ -47,4 +47,13 @@
     <delete id="deleteRoleButtonRelationByRoleId">
            delete from role_button_relation where role_id = #{roleId}
     </delete>
+    <delete id="deleteEntityFileRelationByEntityId">
+         delete from entity_file_relation where entity_id = #{entityId}
+    </delete>
+    <insert id="batchInsertEntityFileRelation">
+        INSERT into entity_file_relation(entity_id,file_id) VALUES
+        <foreach collection="fileIds" item="fileId" separator=",">
+            (#{entityId},#{fileId})
+        </foreach>
+    </insert>
 </mapper>

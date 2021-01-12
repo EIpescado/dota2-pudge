@@ -79,4 +79,17 @@ public class RelationServiceImpl implements IRelationService {
     public List<String> getAllHaveThisRoleIdUsername(Long roleId) {
         return relationMapper.getAllHaveThisRoleIdUsername(roleId);
     }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void entityBindFiles(Long entityId, List<Long> fileIds) {
+        if (entityId != null) {
+            //先删除所有已绑定附件
+            relationMapper.deleteEntityFileRelationByEntityId(entityId);
+            if (CollectionUtil.isNotEmpty(fileIds)) {
+                //重新绑定
+                relationMapper.batchInsertEntityFileRelation(entityId, fileIds);
+            }
+        }
+    }
 }

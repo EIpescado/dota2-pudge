@@ -59,4 +59,11 @@ public interface IRelationService {
      * @return username 集合
      */
     List<String> getAllHaveThisRoleIdUsername(Long roleId);
+
+    /**
+     * 实体绑定文件
+     * @param entityId 实体ID
+     * @param fileIds 文件ID集合
+     */
+    void entityBindFiles(Long entityId, List<Long> fileIds);
 }
