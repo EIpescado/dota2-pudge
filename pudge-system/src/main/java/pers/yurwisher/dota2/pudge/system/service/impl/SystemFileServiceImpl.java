@@ -2,11 +2,13 @@ package pers.yurwisher.dota2.pudge.system.service.impl;
 
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.IoUtil;
+import cn.hutool.core.io.StreamProgress;
 import cn.hutool.core.text.StrBuilder;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.digest.MD5;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -28,8 +30,14 @@ import pers.yurwisher.dota2.pudge.utils.PudgeUtil;
 import pers.yurwisher.dota2.pudge.wrapper.PageR;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -114,6 +122,52 @@ public class SystemFileServiceImpl extends BaseServiceImpl<SystemFileMapper, Sys
     @Override
     public List<SystemFileVo> getEntityFiles(Long entityId) {
         return baseMapper.getEntityFiles(entityId);
+    }
+
+    @Override
+    public void download(Long id, HttpServletResponse response) {
+        SystemFile fileEntity = baseMapper.selectById(id);
+        //文件不存在
+        if (fileEntity == null) {
+            throw new SystemCustomException(SystemCustomTipEnum.FILE_NOT_EXIST);
+        }
+        //文件存储根路径
+        String root = systemConfigService.getValByCode(SystemConfigEnum.SYSTEM_FILE_ROOT_PATH);
+        String fileName;
+        try {
+            fileName = URLEncoder.encode(fileEntity.getFileName(), "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            return;
+        }
+        response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + fileName);
+        response.setContentType(fileEntity.getMimeType());
+        OutputStream outputStream = null;
+        InputStream inputStream = null;
+        try {
+            outputStream = response.getOutputStream();
+            inputStream = new FileInputStream(root + fileEntity.getFilePath());
+            IoUtil.copyByNIO(inputStream, outputStream, 8192, new StreamProgress() {
+                @Override
+                public void start() {
+                    logger.info("开始下载: [{}]", fileEntity.getFileName());
+                }
+
+                @Override
+                public void progress(long l) {
+                    logger.info("正在下载: [{}],已下载: [{}]", fileEntity.getFileName(), l);
+                }
+
+                @Override
+                public void finish() {
+                    logger.info("下载: [{}]完成", fileEntity.getFileName());
+                }
+            });
+        } catch (IOException e) {
+            logger.info("文件下载异常: [{}}]", e.getLocalizedMessage());
+        } finally {
+            IoUtil.close(inputStream);
+            IoUtil.close(outputStream);
+        }
     }
 
     private SystemFileUploadBack toBack(SystemFile entity) {

@@ -10,6 +10,7 @@ import pers.yurwisher.dota2.pudge.system.pojo.vo.SystemFileVo;
 import pers.yurwisher.dota2.pudge.wrapper.PageR;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 
@@ -47,4 +48,11 @@ public interface ISystemFileService extends BaseService<SystemFile> {
      * @return 附件列表
      */
     List<SystemFileVo> getEntityFiles(Long entityId);
+
+    /**
+     * 下载文件
+     * @param id 文件ID
+     * @param response 响应流
+     */
+    void download(Long id, HttpServletResponse response);
 }

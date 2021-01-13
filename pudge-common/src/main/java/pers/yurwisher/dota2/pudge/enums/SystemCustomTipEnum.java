@@ -34,6 +34,7 @@ public enum SystemCustomTipEnum implements ICustomTipEnum {
     QUERY_PAGE_SIZE_OVER_MAX(10020,"单页查询超出最大数量"),
 
     FILE_UPLOAD_ERROR(10021,"上传文件失败"),
+    FILE_NOT_EXIST(10022,"文件不存在"),
     ;
 
     private CustomTip tip;

@@ -18,6 +18,7 @@ import pers.yurwisher.dota2.pudge.wrapper.PageR;
 import pers.yurwisher.dota2.pudge.wrapper.R;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 /**
@@ -51,5 +52,10 @@ public class SystemFileController extends BaseController {
     @GetMapping("{entityId}")
     public R<List<SystemFileVo>> getEntityFiles(@PathVariable Long entityId) {
         return R.ok(systemFileService.getEntityFiles(entityId));
+    }
+
+    @GetMapping("download/{id}")
+    public void download(@PathVariable Long id, HttpServletResponse response) {
+        systemFileService.download(id,response);
     }
 }
