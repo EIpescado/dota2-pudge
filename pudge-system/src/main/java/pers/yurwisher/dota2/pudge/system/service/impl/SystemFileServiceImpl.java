@@ -1,14 +1,17 @@
 package pers.yurwisher.dota2.pudge.system.service.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.io.StreamProgress;
 import cn.hutool.core.text.StrBuilder;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.util.ZipUtil;
 import cn.hutool.crypto.digest.MD5;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -40,6 +43,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 /**
  * @author yq
@@ -133,12 +138,7 @@ public class SystemFileServiceImpl extends BaseServiceImpl<SystemFileMapper, Sys
         }
         //文件存储根路径
         String root = systemConfigService.getValByCode(SystemConfigEnum.SYSTEM_FILE_ROOT_PATH);
-        String fileName;
-        try {
-            fileName = URLEncoder.encode(fileEntity.getFileName(), "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            return;
-        }
+        String fileName = PudgeUtil.urlEncode(fileEntity.getFileName());
         response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + fileName);
         response.setContentType(fileEntity.getMimeType());
         OutputStream outputStream = null;
@@ -167,6 +167,42 @@ public class SystemFileServiceImpl extends BaseServiceImpl<SystemFileMapper, Sys
         } finally {
             IoUtil.close(inputStream);
             IoUtil.close(outputStream);
+        }
+    }
+
+    @Override
+    public void downloadZip(List<Long> ids, HttpServletResponse response) {
+        if (CollectionUtil.isNotEmpty(ids)) {
+            List<SystemFileVo> list = baseMapper.getSystemFiles(ids);
+            if (CollectionUtil.isNotEmpty(list)) {
+                //文件存储根路径
+                String root = systemConfigService.getValByCode(SystemConfigEnum.SYSTEM_FILE_ROOT_PATH);
+                ZipOutputStream outputStream = null;
+                InputStream inputStream = null;
+                try {
+                    //生成zip文件名 规则第一个文件名 + 等 + 压缩包总文件个数 + 个文件.zip,形如 1.txt等3个文件
+                    String zipFileName = PudgeUtil.urlEncode(StrBuilder.create(list.get(0).getFileName(),"等",Integer.toString(list.size()),"个文件.zip").toString());
+                    response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + zipFileName);
+                    response.setContentType("application/x-zip-compressed");
+                    outputStream = new ZipOutputStream(response.getOutputStream());
+                    SystemFileVo currentFileVo;
+                    for (int i = 0; i < list.size(); i++) {
+                        currentFileVo = list.get(i);
+                        //压缩包中的文件名
+                        outputStream.putNextEntry(new ZipEntry(currentFileVo.getFileName()));
+                        //写到
+                        inputStream = new FileInputStream(FileUtil.file(root, currentFileVo.getFilePath()));
+                        IoUtil.copy(inputStream, outputStream);
+                        IoUtil.close(inputStream);
+                        outputStream.closeEntry();
+                    }
+                } catch (IOException e) {
+                    logger.info("打包ZIP批量下载异常: [{}]", e.getLocalizedMessage());
+                } finally {
+                    IoUtil.close(inputStream);
+                    IoUtil.close(outputStream);
+                }
+            }
         }
     }
 
@@ -200,5 +236,9 @@ public class SystemFileServiceImpl extends BaseServiceImpl<SystemFileMapper, Sys
         //文件名称
         strBuilder.append(File.separator).append(IdUtil.fastSimpleUUID()).append(StrUtil.DOT).append(fileType);
         return strBuilder.toString();
+    }
+
+    public static void main(String[] args) {
+        ZipUtil.zip(FileUtil.file("d:/ccc.zip"), false, FileUtil.file("d:/logs"));
     }
 }

@@ -24,5 +24,12 @@
         LEFT JOIN system_file f on f.id = r.file_id
         where r.entity_id = #{entityId}
     </select>
+    <select id="getSystemFiles" resultType="pers.yurwisher.dota2.pudge.system.pojo.vo.SystemFileVo">
+        SELECT file_name,file_path,file_tag from system_file
+        where id in
+        <foreach collection="ids" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </select>
 
 </mapper>

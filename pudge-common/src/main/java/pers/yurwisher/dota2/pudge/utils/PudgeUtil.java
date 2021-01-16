@@ -32,7 +32,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
+import java.net.URLEncoder;
 import java.net.UnknownHostException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -285,6 +287,14 @@ public class PudgeUtil {
         }else{
             //部分文件根据内容无法获取文件名 直接获取扩展名
             return FileUtil.extName(fileName);
+        }
+    }
+
+    public static String urlEncode(String str){
+        try {
+            return StrUtil.isNotEmpty(str) ? URLEncoder.encode(str, "UTF-8") : "";
+        } catch (UnsupportedEncodingException e) {
+            return str;
         }
     }
 

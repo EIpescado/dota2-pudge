@@ -37,9 +37,17 @@ public interface SystemFileMapper extends CommonMapper<SystemFile> {
     SystemFileUploadBack findByFileHash(@Param("fileHash") String fileHash);
 
     /**
-     * 获取实体关联附件信息
+     * 获取实体关联文件信息
      * @param entityId 实体ID
-     * @return 附件信息集合
+     * @return 文件信息集合
      */
     List<SystemFileVo> getEntityFiles(@Param("entityId")Long entityId);
+
+    /**
+     * 批量获取文件信息
+     * @param ids 文件ID集合
+     * @return 文件信息集合
+     */
+    List<SystemFileVo> getSystemFiles(@Param("ids")List<Long> ids);
+
 }

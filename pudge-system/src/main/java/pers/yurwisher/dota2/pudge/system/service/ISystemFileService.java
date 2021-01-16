@@ -55,4 +55,11 @@ public interface ISystemFileService extends BaseService<SystemFile> {
      * @param response 响应流
      */
     void download(Long id, HttpServletResponse response);
+
+    /**
+     * 打包ZIP批量下载
+     * @param ids 文件ID集合
+     * @param response 响应流
+     */
+    void downloadZip(List<Long> ids, HttpServletResponse response);
 }

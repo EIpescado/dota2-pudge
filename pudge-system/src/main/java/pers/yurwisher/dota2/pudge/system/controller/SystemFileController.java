@@ -4,6 +4,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -57,5 +58,10 @@ public class SystemFileController extends BaseController {
     @GetMapping("download/{id}")
     public void download(@PathVariable Long id, HttpServletResponse response) {
         systemFileService.download(id,response);
+    }
+
+    @PostMapping("downloadZip")
+    public void downloadZip(@RequestBody List<Long> ids, HttpServletResponse response) {
+        systemFileService.downloadZip(ids,response);
     }
 }

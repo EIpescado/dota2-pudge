@@ -46,6 +46,11 @@ spring:
         queue-capacity: 128
         #线程池中corePoolSize线程空闲时间达到keepAliveTime也将关闭
         allow-core-thread-timeout: true
+server:
+  port: 8111
+  tomcat:
+    #tomcat临时文件缓存目录
+    basedir: D:\tomcatTemp
 #jwt配置
 jwt:
   token:
