@@ -5,6 +5,7 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 /**
  * @author yq
@@ -17,10 +18,11 @@ import java.io.Serializable;
 @Accessors(chain = true)
 public class SystemFileVo implements Serializable {
     private static final long serialVersionUID = 7243173454002280856L;
+    private Long id;
     private String fileName;
     private String fileType;
     private String filePath;
+    private LocalDateTime uploadDate;
+    private String uploadPerson;
     private Integer fileTag;
-    private String mimeType;
-    private Long id;
 }

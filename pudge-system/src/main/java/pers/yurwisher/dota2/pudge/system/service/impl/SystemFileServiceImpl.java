@@ -7,11 +7,9 @@ import cn.hutool.core.io.StreamProgress;
 import cn.hutool.core.text.StrBuilder;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.core.util.ZipUtil;
 import cn.hutool.crypto.digest.MD5;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -39,8 +37,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.zip.ZipEntry;
@@ -154,7 +150,7 @@ public class SystemFileServiceImpl extends BaseServiceImpl<SystemFileMapper, Sys
 
                 @Override
                 public void progress(long l) {
-                    logger.info("正在下载: [{}],已下载: [{}]", fileEntity.getFileName(), l);
+                    //logger.info("正在下载: [{}],已下载: [{}]", fileEntity.getFileName(), l);
                 }
 
                 @Override
@@ -181,7 +177,7 @@ public class SystemFileServiceImpl extends BaseServiceImpl<SystemFileMapper, Sys
                 InputStream inputStream = null;
                 try {
                     //生成zip文件名 规则第一个文件名 + 等 + 压缩包总文件个数 + 个文件.zip,形如 1.txt等3个文件
-                    String zipFileName = PudgeUtil.urlEncode(StrBuilder.create(list.get(0).getFileName(),"等",Integer.toString(list.size()),"个文件.zip").toString());
+                    String zipFileName = PudgeUtil.urlEncode(StrBuilder.create(list.get(0).getFileName(), "等", Integer.toString(list.size()), "个文件.zip").toString());
                     response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + zipFileName);
                     response.setContentType("application/x-zip-compressed");
                     outputStream = new ZipOutputStream(response.getOutputStream());
@@ -238,7 +234,4 @@ public class SystemFileServiceImpl extends BaseServiceImpl<SystemFileMapper, Sys
         return strBuilder.toString();
     }
 
-    public static void main(String[] args) {
-        ZipUtil.zip(FileUtil.file("d:/ccc.zip"), false, FileUtil.file("d:/logs"));
-    }
 }

@@ -20,8 +20,9 @@
         select id, file_hash as hash, file_name from system_file where file_hash = #{fileHash}
     </select>
     <select id="getEntityFiles" resultType="pers.yurwisher.dota2.pudge.system.pojo.vo.SystemFileVo">
-        SELECT f.id, file_name, file_type,file_path,file_tag,f.mime_type from entity_file_relation r
+        SELECT f.id, f.file_name, f.file_type,f.file_path,f.upload_date,u.nickname as uploadPerson,f.file_tag from entity_file_relation r
         LEFT JOIN system_file f on f.id = r.file_id
+        LEFT JOIN system_user u on u.id = f.user_id
         where r.entity_id = #{entityId}
     </select>
     <select id="getSystemFiles" resultType="pers.yurwisher.dota2.pudge.system.pojo.vo.SystemFileVo">
