@@ -14,6 +14,7 @@ import pers.yurwisher.dota2.pudge.system.pojo.SystemFileUploadBack;
 import pers.yurwisher.dota2.pudge.system.pojo.qo.SystemFileQo;
 import pers.yurwisher.dota2.pudge.system.pojo.to.SystemFileTo;
 import pers.yurwisher.dota2.pudge.system.pojo.vo.SystemFileVo;
+import pers.yurwisher.dota2.pudge.system.service.IRelationService;
 import pers.yurwisher.dota2.pudge.system.service.ISystemFileService;
 import pers.yurwisher.dota2.pudge.wrapper.PageR;
 import pers.yurwisher.dota2.pudge.wrapper.R;
@@ -32,9 +33,11 @@ import java.util.List;
 @RequestMapping("/file")
 public class SystemFileController extends BaseController {
     private final ISystemFileService systemFileService;
+    private final IRelationService relationService;
 
-    public SystemFileController(ISystemFileService systemFileService) {
+    public SystemFileController(ISystemFileService systemFileService, IRelationService relationService) {
         this.systemFileService = systemFileService;
+        this.relationService = relationService;
     }
 
     @GetMapping
@@ -47,7 +50,7 @@ public class SystemFileController extends BaseController {
                                           @RequestParam("fileTag") Integer fileTag,
                                           @RequestParam("mimeType") String mimeType,
                                           HttpServletRequest request) {
-        return R.ok(systemFileService.upload(file, fileTag, mimeType,request));
+        return R.ok(systemFileService.upload(file, fileTag, mimeType, request));
     }
 
     @GetMapping("{entityId}")
@@ -55,13 +58,18 @@ public class SystemFileController extends BaseController {
         return R.ok(systemFileService.getEntityFiles(entityId));
     }
 
+    @PostMapping("batchGetEntityFileCount")
+    public R<List<Integer>> batchGetEntityFileCount(@RequestBody List<Long> entityIds) {
+        return R.ok(relationService.batchGetEntityFileCount(entityIds));
+    }
+
     @GetMapping("download/{id}")
     public void download(@PathVariable Long id, HttpServletResponse response) {
-        systemFileService.download(id,response);
+        systemFileService.download(id, response);
     }
 
     @PostMapping("downloadZip")
     public void downloadZip(@RequestBody List<Long> ids, HttpServletResponse response) {
-        systemFileService.downloadZip(ids,response);
+        systemFileService.downloadZip(ids, response);
     }
 }

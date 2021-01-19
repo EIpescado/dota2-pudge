@@ -5,9 +5,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pers.yurwisher.dota2.pudge.system.mapper.RelationMapper;
+import pers.yurwisher.dota2.pudge.system.pojo.to.EntityFileCountTo;
 import pers.yurwisher.dota2.pudge.system.service.IRelationService;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author yq
@@ -91,5 +94,15 @@ public class RelationServiceImpl implements IRelationService {
                 relationMapper.batchInsertEntityFileRelation(entityId, fileIds);
             }
         }
+    }
+
+    @Override
+    public List<Integer> batchGetEntityFileCount(List<Long> entityIds) {
+        if (CollectionUtil.isNotEmpty(entityIds)) {
+            List<EntityFileCountTo> list = relationMapper.batchGetEntityFileCount(entityIds);
+            Map<Long,Integer> entityFileCountMap = list.stream().collect(Collectors.toMap(EntityFileCountTo::getEntityId,EntityFileCountTo::getFileCount));
+            return entityIds.stream().map(entityId -> entityFileCountMap.getOrDefault(entityId,0)).collect(Collectors.toList());
+        }
+        return null;
     }
 }

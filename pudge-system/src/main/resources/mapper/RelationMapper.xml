@@ -28,6 +28,15 @@
          SELECT DISTINCT user_id from user_role_relation where role_id = #{roleId}
         ) t on t.user_id = su.id
     </select>
+    <select id="batchGetEntityFileCount"
+            resultType="pers.yurwisher.dota2.pudge.system.pojo.to.EntityFileCountTo">
+        SELECT entity_id,count(file_id) as fileCount from entity_file_relation
+        where entity_id in
+        <foreach collection="entityIds" item="entityId" separator="," open="(" close=")">
+            #{entityId}
+        </foreach>
+        GROUP BY entity_id
+    </select>
 
     <insert id="batchInsertRoleMenuRelation">
         INSERT into role_menu_relation(role_id,menu_id) VALUES

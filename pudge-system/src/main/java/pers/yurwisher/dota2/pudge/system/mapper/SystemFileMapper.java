@@ -41,13 +41,13 @@ public interface SystemFileMapper extends CommonMapper<SystemFile> {
      * @param entityId 实体ID
      * @return 文件信息集合
      */
-    List<SystemFileVo> getEntityFiles(@Param("entityId")Long entityId);
+    List<SystemFileVo> getEntityFiles(@Param("entityId") Long entityId);
 
     /**
      * 批量获取文件信息
      * @param ids 文件ID集合
      * @return 文件信息集合
      */
-    List<SystemFileVo> getSystemFiles(@Param("ids")List<Long> ids);
+    List<SystemFileVo> getSystemFiles(@Param("ids") List<Long> ids);
 
 }

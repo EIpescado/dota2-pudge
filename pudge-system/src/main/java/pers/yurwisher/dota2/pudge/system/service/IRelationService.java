@@ -66,4 +66,11 @@ public interface IRelationService {
      * @param fileIds 文件ID集合
      */
     void entityBindFiles(Long entityId, List<Long> fileIds);
+
+    /**
+     * 批量获取实体关联的附件数量
+     * @param entityIds 实体ID集合
+     * @return 附件数量集合
+     */
+    List<Integer> batchGetEntityFileCount(List<Long> entityIds);
 }

@@ -1,6 +1,7 @@
 package pers.yurwisher.dota2.pudge.system.mapper;
 
 import org.apache.ibatis.annotations.Param;
+import pers.yurwisher.dota2.pudge.system.pojo.to.EntityFileCountTo;
 
 import java.util.List;
 
@@ -99,4 +100,12 @@ public interface RelationMapper {
      * @return 影响行数
      */
     Integer batchInsertEntityFileRelation(@Param("entityId")Long entityId,@Param("fileIds") List<Long> fileIds);
+
+
+    /**
+     * 批量获取实体关联附件数量
+     * @param entityIds 实体ID集合
+     * @return 附件ID集合
+     */
+    List<EntityFileCountTo> batchGetEntityFileCount(@Param("entityIds")List<Long> entityIds);
 }
