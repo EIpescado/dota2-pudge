@@ -35,7 +35,7 @@ public class AspectConfig {
     private final Logger logger = LoggerFactory.getLogger(AspectConfig.class);
     private static final ThreadLocal<Long> CURRENT_TIME = new ThreadLocal<>();
 
-    private ISystemLogService systemLogService;
+    private final ISystemLogService systemLogService;
     @Value("${query.max-page-size}")
     private Long maxPageSize;
 
@@ -52,6 +52,7 @@ public class AspectConfig {
         if (qo != null) {
             //限制分页查询最大单页数量
             if (qo.getSize() > maxPageSize) {
+                logger.info("");
                 throw new SystemCustomException(SystemCustomTipEnum.QUERY_PAGE_SIZE_OVER_MAX);
             }
             if (StrUtil.isEmpty(qo.getUsername())) {
@@ -70,8 +71,7 @@ public class AspectConfig {
      * 日志切点
      */
     @Pointcut("@annotation(pers.yurwisher.dota2.pudge.annotation.Log)")
-    public void logPointcut() {
-    }
+    public void logPointcut() {}
 
     /**
      * 日志环绕增强
