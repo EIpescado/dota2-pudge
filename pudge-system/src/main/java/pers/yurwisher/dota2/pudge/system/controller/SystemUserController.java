@@ -72,10 +72,17 @@ public class SystemUserController {
         return R.ok();
     }
 
-    @PostMapping("/switchEnabled/{id}")
-    @PreAuthorize("@el.check('user:switchEnabled')")
-    public R<String> switchEnabled(@PathVariable Long id) {
-        systemUserService.switchEnabled(id);
+    @PostMapping("/enableAccount/{id}")
+    @PreAuthorize("@el.check('user:enableAccount')")
+    public R<String> enableAccount(@PathVariable Long id) {
+        systemUserService.switchState(id, 1);
+        return R.ok();
+    }
+
+    @PostMapping("/disableAccount/{id}")
+    @PreAuthorize("@el.check('user:disableAccount')")
+    public R<String> disableAccount(@PathVariable Long id) {
+        systemUserService.switchState(id, 2);
         return R.ok();
     }
 

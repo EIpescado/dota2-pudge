@@ -46,4 +46,9 @@ public class SystemUser extends BaseEntity {
      */
     private String mail;
 
+    /**
+     * 状态
+     */
+    private Integer state;
+
 }

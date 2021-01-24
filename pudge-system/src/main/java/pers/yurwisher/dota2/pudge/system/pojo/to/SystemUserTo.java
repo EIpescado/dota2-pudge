@@ -26,5 +26,5 @@ public class SystemUserTo extends EntityFileCountTo {
 
     private String dateCreated;
 
-    private Boolean enabled;
+    private Integer state;
 }

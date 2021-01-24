@@ -17,9 +17,9 @@ import pers.yurwisher.dota2.pudge.base.impl.BaseServiceImpl;
 import pers.yurwisher.dota2.pudge.constants.CacheConstant;
 import pers.yurwisher.dota2.pudge.enums.SystemConfigEnum;
 import pers.yurwisher.dota2.pudge.enums.SystemCustomTipEnum;
+import pers.yurwisher.dota2.pudge.properties.LoginProperties;
 import pers.yurwisher.dota2.pudge.security.CurrentUser;
 import pers.yurwisher.dota2.pudge.security.JwtUser;
-import pers.yurwisher.dota2.pudge.properties.LoginProperties;
 import pers.yurwisher.dota2.pudge.system.entity.SystemUser;
 import pers.yurwisher.dota2.pudge.system.exception.SystemCustomException;
 import pers.yurwisher.dota2.pudge.system.mapper.SystemUserMapper;
@@ -75,9 +75,9 @@ public class ISystemUserServiceImpl extends BaseServiceImpl<SystemUserMapper, Sy
             //帐号或密码错误
             throw new SystemCustomException(SystemCustomTipEnum.AUTH_USERNAME_OR_PASSWORD_ERROR);
         }
-        if (!user.getEnabled()) {
-            //帐号未激活
-            throw new SystemCustomException(SystemCustomTipEnum.AUTH_USERNAME_NOT_ENABLED);
+        if (user.getState() == 2) {
+            //帐号被禁用
+            throw new SystemCustomException(SystemCustomTipEnum.AUTH_USERNAME_FORBIDDEN);
         }
         CurrentUser vo = new CurrentUser();
         BeanUtils.copyProperties(user, vo);
@@ -114,10 +114,13 @@ public class ISystemUserServiceImpl extends BaseServiceImpl<SystemUserMapper, Sy
             //用户名已被使用
             throw new SystemCustomException(SystemCustomTipEnum.PHONE_EXISTED);
         }
+        logger.info("新增用户: [{}]", fo.getUsername());
         SystemUser user = new SystemUser();
         BeanUtils.copyProperties(fo, user);
         //给予初始密码
         user.setPassword(this.getCipherDefaultPassword());
+        //启用.正常
+        user.setState(1);
         baseMapper.insert(user);
         //绑定角色
         relationService.userBindRoles(user.getId(), fo.getRoleIds());
@@ -163,15 +166,6 @@ public class ISystemUserServiceImpl extends BaseServiceImpl<SystemUserMapper, Sy
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void switchEnabled(Long id) {
-        SystemUser user = baseMapper.selectById(id);
-        Assert.notNull(user);
-        baseMapper.switchEnabledById(id);
-        this.userInfoChangeRemoveCache(user.getUsername());
-    }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
     public void changePassword(ResetPasswordFo resetPasswordFo) {
         CurrentUser currentUser = JwtUser.current();
         // 密码解密
@@ -211,24 +205,24 @@ public class ISystemUserServiceImpl extends BaseServiceImpl<SystemUserMapper, Sy
     public void changeMail(ChangeMailFo changeMailFo) {
         CurrentUser currentUser = JwtUser.current();
         //新邮箱与旧邮箱相同
-        if(changeMailFo.getMail().equals(currentUser.getMail())){
+        if (changeMailFo.getMail().equals(currentUser.getMail())) {
             throw new SystemCustomException(SystemCustomTipEnum.AUTH_NEW_MAIL_EQUAL_OLD);
         }
         // 密码解密
         String oldPass = this.decryptRsaPassword(changeMailFo.getPassword());
         //判断密码
-        if(!PudgeUtil.encodePwd(oldPass).equals(currentUser.getPassword())){
+        if (!PudgeUtil.encodePwd(oldPass).equals(currentUser.getPassword())) {
             throw new SystemCustomException(SystemCustomTipEnum.AUTH_CURRENT_PASS_ERROR);
         }
         //判断验证码
-        customRedisCacheService.getCacheAndDeletePlus(CacheConstant.MaName.CHANGE_MAIL_CODE, changeMailFo.getMail(),(String code) ->{
+        customRedisCacheService.getCacheAndDeletePlus(CacheConstant.MaName.CHANGE_MAIL_CODE, changeMailFo.getMail(), (String code) -> {
             if (StrUtil.isBlank(code)) {
-                //验证码过期
+                //邮件验证码过期
                 throw new SystemCustomException(SystemCustomTipEnum.AUTH_CODE_NOT_EXIST_OR_EXPIRED);
             }
             String codeVal = changeMailFo.getCode();
             if (StrUtil.isBlank(codeVal) || !codeVal.equalsIgnoreCase(code)) {
-                //验证码错误
+                //邮件验证码错误
                 throw new SystemCustomException(SystemCustomTipEnum.AUTH_CODE_ERROR);
             }
         });
@@ -246,7 +240,7 @@ public class ISystemUserServiceImpl extends BaseServiceImpl<SystemUserMapper, Sy
     public void changeAccountInfo(ChangeAccountInfoFo changeAccountInfoFo) {
         CurrentUser currentUser = JwtUser.current();
         //昵称没改 直接返回
-        if(currentUser.getNickname().equals(changeAccountInfoFo.getNickname())){
+        if (currentUser.getNickname().equals(changeAccountInfoFo.getNickname())) {
             return;
         }
         this.update(Wrappers.<SystemUser>lambdaUpdate()
@@ -274,24 +268,24 @@ public class ISystemUserServiceImpl extends BaseServiceImpl<SystemUserMapper, Sy
     public void changePhone(ChangePhoneFo changePhoneFo) {
         CurrentUser currentUser = JwtUser.current();
         //新旧手机相同
-        if(changePhoneFo.getPhone().equals(currentUser.getPhone())){
+        if (changePhoneFo.getPhone().equals(currentUser.getPhone())) {
             throw new SystemCustomException(SystemCustomTipEnum.AUTH_NEW_PHONE_EQUAL_OLD);
         }
         // 密码解密
         String oldPass = this.decryptRsaPassword(changePhoneFo.getPassword());
         //判断密码
-        if(!PudgeUtil.encodePwd(oldPass).equals(currentUser.getPassword())){
+        if (!PudgeUtil.encodePwd(oldPass).equals(currentUser.getPassword())) {
             throw new SystemCustomException(SystemCustomTipEnum.AUTH_CURRENT_PASS_ERROR);
         }
         //判断验证码
-        customRedisCacheService.getCacheAndDeletePlus(CacheConstant.MaName.CHANGE_PHONE_CODE, changePhoneFo.getPhone(),(String code) ->{
+        customRedisCacheService.getCacheAndDeletePlus(CacheConstant.MaName.CHANGE_PHONE_CODE, changePhoneFo.getPhone(), (String code) -> {
             if (StrUtil.isBlank(code)) {
-                //验证码过期
+                //短信验证码过期
                 throw new SystemCustomException(SystemCustomTipEnum.AUTH_CODE_NOT_EXIST_OR_EXPIRED);
             }
             String codeVal = changePhoneFo.getCode();
             if (StrUtil.isBlank(codeVal) || !codeVal.equalsIgnoreCase(code)) {
-                //验证码错误
+                //短信验证码错误
                 throw new SystemCustomException(SystemCustomTipEnum.AUTH_CODE_ERROR);
             }
         });
@@ -304,6 +298,21 @@ public class ISystemUserServiceImpl extends BaseServiceImpl<SystemUserMapper, Sy
         this.userInfoChangeRemoveCache(currentUser.getUsername());
     }
 
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void switchState(Long id, Integer state) {
+        SystemUser user = baseMapper.selectById(id);
+        Assert.notNull(user);
+        if (state.equals(user.getState())) {
+            return;
+        }
+        this.update(Wrappers.<SystemUser>lambdaUpdate()
+                .set(SystemUser::getState, state)
+                .set(SystemUser::getLastUpdated, LocalDateTime.now())
+                .eq(SystemUser::getId, id));
+        this.userInfoChangeRemoveCache(user.getUsername());
+    }
+
     /**
      * 获取默认密码的密文
      *
@@ -313,7 +322,7 @@ public class ISystemUserServiceImpl extends BaseServiceImpl<SystemUserMapper, Sy
         return PudgeUtil.encodePwd(systemConfigService.getValByCode(SystemConfigEnum.DEFAULT_PASSWORD));
     }
 
-    private String decryptRsaPassword(String rsaPassword){
+    private String decryptRsaPassword(String rsaPassword) {
         return loginRsa.decryptStr(rsaPassword, KeyType.PrivateKey);
     }
 

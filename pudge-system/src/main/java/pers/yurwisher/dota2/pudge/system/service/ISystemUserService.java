@@ -77,13 +77,6 @@ public interface ISystemUserService extends BaseService<SystemUser> {
     void resetPassword(Long id);
 
     /**
-     * 启用/禁用
-     *
-     * @param id 用户id
-     */
-    void switchEnabled(Long id);
-
-    /**
      * 修改密码
      * @param resetPasswordFo 参数
      */
@@ -119,4 +112,11 @@ public interface ISystemUserService extends BaseService<SystemUser> {
      */
     void changePhone(ChangePhoneFo changePhoneFo);
 
+    /**
+     * 变更用户状态
+     *
+     * @param id 用户id
+     * @param state 状态
+     */
+    void switchState(Long id,Integer state);
 }

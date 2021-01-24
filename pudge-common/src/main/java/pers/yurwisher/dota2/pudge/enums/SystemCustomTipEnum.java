@@ -10,7 +10,7 @@ import pers.yurwisher.dota2.pudge.wrapper.CustomTip;
  */
 public enum SystemCustomTipEnum implements ICustomTipEnum {
     AUTH_USERNAME_OR_PASSWORD_ERROR(10001,"帐号或密码错误"),
-    AUTH_USERNAME_NOT_ENABLED(10002,"帐号未激活"),
+    AUTH_USERNAME_FORBIDDEN(10002,"帐号已被禁用"),
     AUTH_NOR_RIGHT(10003,"无权操作"),
     AUTH_LOGIN_EXPIRED(10004,"登录已过期"),
     AUTH_CODE_NOT_EXIST_OR_EXPIRED(10005,"验证码已过期"),
