@@ -178,6 +178,7 @@ public class ISystemUserServiceImpl extends BaseServiceImpl<SystemUserMapper, Sy
         if (!resetPasswordFo.getNewPass().equals(resetPasswordFo.getConfirmPass())) {
             throw new SystemCustomException(SystemCustomTipEnum.AUTH_TWO_PASS_NOT_EQUAL);
         }
+        logger.info("用户[{}]变更密码",currentUser.getId());
         String newPass = this.decryptRsaPassword(resetPasswordFo.getNewPass());
         String currentUsername = currentUser.getUsername();
         this.update(Wrappers.<SystemUser>lambdaUpdate()
@@ -226,6 +227,7 @@ public class ISystemUserServiceImpl extends BaseServiceImpl<SystemUserMapper, Sy
                 throw new SystemCustomException(SystemCustomTipEnum.AUTH_CODE_ERROR);
             }
         });
+        logger.info("用户[{}]变更邮箱,从[{}]->[{}]}",currentUser.getId(),currentUser.getMail(),changeMailFo.getMail());
         this.update(Wrappers.<SystemUser>lambdaUpdate()
                 .set(SystemUser::getMail, changeMailFo.getMail())
                 .set(SystemUser::getLastUpdated, LocalDateTime.now())
@@ -243,6 +245,7 @@ public class ISystemUserServiceImpl extends BaseServiceImpl<SystemUserMapper, Sy
         if (currentUser.getNickname().equals(changeAccountInfoFo.getNickname())) {
             return;
         }
+        logger.info("用户[{}]变更帐号信息",currentUser.getId());
         this.update(Wrappers.<SystemUser>lambdaUpdate()
                 .set(SystemUser::getNickname, changeAccountInfoFo.getNickname())
                 .set(SystemUser::getLastUpdated, LocalDateTime.now())
@@ -289,6 +292,7 @@ public class ISystemUserServiceImpl extends BaseServiceImpl<SystemUserMapper, Sy
                 throw new SystemCustomException(SystemCustomTipEnum.AUTH_CODE_ERROR);
             }
         });
+        logger.info("用户[{}]变更绑定手机,从[{}]->[{}]}",currentUser.getId(),currentUser.getPhone(),changePhoneFo.getPhone());
         this.update(Wrappers.<SystemUser>lambdaUpdate()
                 .set(SystemUser::getPhone, changePhoneFo.getPhone())
                 .set(SystemUser::getLastUpdated, LocalDateTime.now())
@@ -306,6 +310,7 @@ public class ISystemUserServiceImpl extends BaseServiceImpl<SystemUserMapper, Sy
         if (state.equals(user.getState())) {
             return;
         }
+        logger.info("用户[{}]变更状态,从[{}]->[{}]}",id,user.getState(),state);
         this.update(Wrappers.<SystemUser>lambdaUpdate()
                 .set(SystemUser::getState, state)
                 .set(SystemUser::getLastUpdated, LocalDateTime.now())
