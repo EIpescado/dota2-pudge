@@ -261,7 +261,7 @@ public class ISystemUserServiceImpl extends BaseServiceImpl<SystemUserMapper, Sy
             //6位验证码
             String phoneValidCode = RandomUtil.randomNumbers(6);
             logger.info("更换绑定手机发送验证码 [{}] 到 [{}]", phoneValidCode, phone);
-            //存入redis
+            //先取已有->无则重发->存入redis
             customRedisCacheService.setCachePlus(CacheConstant.MaName.CHANGE_PHONE_CODE, phone, () -> phoneValidCode);
         }
     }
