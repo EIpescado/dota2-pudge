@@ -6,8 +6,11 @@
     <select id="list" resultType="pers.yurwisher.dota2.pudge.system.pojo.to.SystemUserTo">
         select  id,username,nickname,phone,date_created,state,mail from system_user
         <where>
-            <if test="qo.username != null and qo.username != ''">
-                username = #{qo.username}
+            <if test="qo.userId != null">
+                id = #{qo.userId}
+            </if>
+            <if test="qo.keyword != null and qo.keyword != ''">
+               and username = #{qo.keyword}
             </if>
         </where>
     </select>

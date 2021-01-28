@@ -11,8 +11,8 @@
             <if test="qo.fileTag != null">
                 AND f.file_tag = #{qo.fileTag}
             </if>
-            <if test="qo.fileName != null and qo.fileName != ''">
-                AND f.file_name like concat('%',#{qo.fileName},'%')
+            <if test="qo.keyword != null and qo.keyword != ''">
+                AND f.file_name like concat('%',#{qo.keyword},'%')
             </if>
         </where>
     </select>
@@ -26,7 +26,7 @@
         where r.entity_id = #{entityId}
     </select>
     <select id="getSystemFiles" resultType="pers.yurwisher.dota2.pudge.system.pojo.vo.SystemFileVo">
-        SELECT file_name,file_path,file_tag from system_file
+        SELECT file_name,file_path,file_tag,id from system_file
         where id in
         <foreach collection="ids" item="id" open="(" close=")" separator=",">
             #{id}

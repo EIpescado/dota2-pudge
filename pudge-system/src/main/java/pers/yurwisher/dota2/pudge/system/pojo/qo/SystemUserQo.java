@@ -15,5 +15,4 @@ import pers.yurwisher.dota2.pudge.base.BasePageQo;
 public class SystemUserQo extends BasePageQo {
     private static final long serialVersionUID = 1148610270866791888L;
 
-    private String username;
 }

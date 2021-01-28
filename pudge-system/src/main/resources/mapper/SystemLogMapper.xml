@@ -15,12 +15,12 @@
             <if test="qo.type != null">
               and s.type = #{qo.type}
             </if>
-            <if test="qo.keyWord != null and qo.keyWord != ''">
+            <if test="qo.keyword != null and qo.keyword != ''">
                 and (
-                  s.method like concat('%',#{qo.keyWord},'%') or
-                  s.action like concat('%',#{qo.keyWord},'%') or
-                  s.params like concat('%',#{qo.keyWord},'%') or
-                  s.error_info like concat('%',#{qo.keyWord},'%')
+                  s.method like concat('%',#{qo.keyword},'%') or
+                  s.action like concat('%',#{qo.keyword},'%') or
+                  s.params like concat('%',#{qo.keyword},'%') or
+                  s.error_info like concat('%',#{qo.keyword},'%')
                 )
             </if>
         </where>

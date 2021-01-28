@@ -47,6 +47,7 @@ public class SystemUserController {
         return R.ok(systemUserService.list(qo));
     }
 
+    @Log("新增用户")
     @PostMapping
     @PreAuthorize("@el.check('user:create')")
     public R<String> create(@RequestBody @Validated SystemUserFo fo) {
@@ -54,6 +55,7 @@ public class SystemUserController {
         return R.ok();
     }
 
+    @Log("修改用户")
     @PostMapping("/{id}")
     @PreAuthorize("@el.check('user:update')")
     public R<String> update(@RequestBody @Validated SystemUserFo fo, @PathVariable Long id) {
@@ -66,12 +68,14 @@ public class SystemUserController {
         return R.ok(systemUserService.get(id));
     }
 
+    @Log("重置密码")
     @PostMapping("/resetPassword/{id}")
     public R<String> resetPassword(@PathVariable Long id) {
         systemUserService.resetPassword(id);
         return R.ok();
     }
 
+    @Log("启用帐号")
     @PostMapping("/enableAccount/{id}")
     @PreAuthorize("@el.check('user:enableAccount')")
     public R<String> enableAccount(@PathVariable Long id) {
@@ -79,6 +83,7 @@ public class SystemUserController {
         return R.ok();
     }
 
+    @Log("禁用帐号")
     @PostMapping("/disableAccount/{id}")
     @PreAuthorize("@el.check('user:disableAccount')")
     public R<String> disableAccount(@PathVariable Long id) {
@@ -93,6 +98,7 @@ public class SystemUserController {
         return R.ok();
     }
 
+    @Log("获取更改邮箱验证码")
     @GetMapping(value = "/sendChangeMailCode")
     public R<String> sendChangeMailCode(@RequestParam String mail) {
         systemUserService.sendChangeMailCode(mail);
@@ -106,6 +112,7 @@ public class SystemUserController {
         return R.ok();
     }
 
+    @Log("获取换绑手机验证码")
     @GetMapping(value = "/sendChangePhoneCode")
     public R<String> sendChangePhoneCode(@RequestParam String phone) {
         systemUserService.sendChangePhoneCode(phone);

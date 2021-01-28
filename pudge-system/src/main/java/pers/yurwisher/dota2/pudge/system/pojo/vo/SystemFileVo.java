@@ -1,9 +1,11 @@
 package pers.yurwisher.dota2.pudge.system.pojo.vo;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
+import java.io.File;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
@@ -25,4 +27,8 @@ public class SystemFileVo implements Serializable {
     private LocalDateTime uploadDate;
     private String uploadPerson;
     private Integer fileTag;
+
+
+    @JSONField(serialize = false)
+    private File file;
 }

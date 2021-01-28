@@ -15,33 +15,60 @@ import pers.yurwisher.dota2.pudge.base.BaseEntity;
 public class SystemLog extends BaseEntity {
     private static final long serialVersionUID = -3283462691884708202L;
 
-    /**操作用户ID*/
+    /**
+     * 操作用户ID
+     */
     private Long userId;
-    /**操作名称*/
+    /**
+     * 操作名称
+     */
     private String action;
-    /**接口对应方法*/
+    /**
+     * 接口对应方法
+     */
     private String method;
-    /**请求参数*/
+    /**
+     * 请求参数
+     */
     private String params;
 
-    /**请求IP*/
+    /**
+     * 请求IP
+     */
     private String ip;
 
-    /**请求地址*/
+    /**
+     * 请求地址
+     */
     private String address;
 
-    /**浏览器*/
+    /**
+     * 浏览器
+     */
     private String browser;
 
-    /**系统*/
+    /**
+     * 系统
+     */
     private String system;
 
-    /**消耗时间 单位ms*/
+    /**
+     * 消耗时间 单位ms
+     */
     private Long timeCost;
 
-    /**日志类型 详见字典*/
+    /**
+     * 日志类型 详见字典
+     */
     private Integer type;
 
-    /**异常信息*/
+    /**
+     * 异常信息
+     */
     private String errorInfo;
+
+    /**
+     * 请求地址
+     */
+    private String url;
 }

@@ -5,8 +5,8 @@
         SELECT type_code,seq,name,val,fixed,id,last_updated from system_dict
         WHERE type_code = #{qo.typeCode}
         AND enabled = 1
-        <if test="qo.keyWord != null and qo.keyWord != ''">
-            and (val like concat('%',#{qo.keyWord},'%') or name like concat('%',#{qo.keyWord},'%'))
+        <if test="qo.keyword != null and qo.keyword != ''">
+            and (val like concat('%',#{qo.keyword},'%') or name like concat('%',#{qo.keyword},'%'))
         </if>
         ORDER BY seq
     </select>

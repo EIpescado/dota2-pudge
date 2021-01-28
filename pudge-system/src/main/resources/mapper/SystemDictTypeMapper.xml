@@ -4,8 +4,8 @@
     <select id="list" resultType="pers.yurwisher.dota2.pudge.system.pojo.to.SystemDictTypeTo">
         SELECT code,name,id,last_updated from system_dict_type
         WHERE enabled = 1
-        <if test="qo.keyWord != null and qo.keyWord != ''">
-            and (code like concat('%',#{qo.keyWord},'%') or name like concat('%',#{qo.keyWord},'%'))
+        <if test="qo.keyword != null and qo.keyword != ''">
+            and (code like concat('%',#{qo.keyword},'%') or name like concat('%',#{qo.keyword},'%'))
         </if>
         order by last_updated desc
     </select>

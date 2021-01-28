@@ -24,7 +24,6 @@ import pers.yurwisher.dota2.pudge.system.pojo.SystemFileUploadBack;
 import pers.yurwisher.dota2.pudge.system.pojo.qo.SystemFileQo;
 import pers.yurwisher.dota2.pudge.system.pojo.to.SystemFileTo;
 import pers.yurwisher.dota2.pudge.system.pojo.vo.SystemFileVo;
-import pers.yurwisher.dota2.pudge.system.service.IRelationService;
 import pers.yurwisher.dota2.pudge.system.service.ISystemConfigService;
 import pers.yurwisher.dota2.pudge.system.service.ISystemFileService;
 import pers.yurwisher.dota2.pudge.utils.PudgeUtil;
@@ -39,6 +38,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -53,7 +53,6 @@ import java.util.zip.ZipOutputStream;
 public class SystemFileServiceImpl extends BaseServiceImpl<SystemFileMapper, SystemFile> implements ISystemFileService {
 
     private final ISystemConfigService systemConfigService;
-    private final IRelationService relationService;
 
     /**
      * MD5实例
@@ -130,18 +129,25 @@ public class SystemFileServiceImpl extends BaseServiceImpl<SystemFileMapper, Sys
         SystemFile fileEntity = baseMapper.selectById(id);
         //文件不存在
         if (fileEntity == null) {
-            throw new SystemCustomException(SystemCustomTipEnum.FILE_NOT_EXIST);
+            logger.info("文件[{}]对象不存在", id);
+            throw new SystemCustomException(SystemCustomTipEnum.FILE_NOT_EXIST, id);
         }
         //文件存储根路径
         String root = systemConfigService.getValByCode(SystemConfigEnum.SYSTEM_FILE_ROOT_PATH);
-        String fileName = PudgeUtil.urlEncode(fileEntity.getFileName());
-        response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + fileName);
-        response.setContentType(fileEntity.getMimeType());
         OutputStream outputStream = null;
         InputStream inputStream = null;
         try {
+            File file = new File(root, fileEntity.getFilePath());
+            //判断文件是否存在
+            if (!FileUtil.exist(file)) {
+                logger.info("文件[{}]不存在", id);
+                throw new SystemCustomException(SystemCustomTipEnum.FILE_NOT_EXIST, fileEntity.getFileName());
+            }
+            String fileName = PudgeUtil.urlEncode(fileEntity.getFileName());
+            response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + fileName);
+            response.setContentType(fileEntity.getMimeType());
             outputStream = response.getOutputStream();
-            inputStream = new FileInputStream(root + fileEntity.getFilePath());
+            inputStream = new FileInputStream(file);
             IoUtil.copyByNIO(inputStream, outputStream, 8192, new StreamProgress() {
                 @Override
                 public void start() {
@@ -160,6 +166,7 @@ public class SystemFileServiceImpl extends BaseServiceImpl<SystemFileMapper, Sys
             });
         } catch (IOException e) {
             logger.info("文件下载异常: [{}}]", e.getLocalizedMessage());
+            throw new SystemCustomException(SystemCustomTipEnum.FILE_DOWNLOAD_ERROR);
         } finally {
             IoUtil.close(inputStream);
             IoUtil.close(outputStream);
@@ -170,34 +177,45 @@ public class SystemFileServiceImpl extends BaseServiceImpl<SystemFileMapper, Sys
     public void downloadZip(List<Long> ids, HttpServletResponse response) {
         if (CollectionUtil.isNotEmpty(ids)) {
             List<SystemFileVo> list = baseMapper.getSystemFiles(ids);
-            if (CollectionUtil.isNotEmpty(list)) {
-                //文件存储根路径
-                String root = systemConfigService.getValByCode(SystemConfigEnum.SYSTEM_FILE_ROOT_PATH);
-                ZipOutputStream outputStream = null;
-                InputStream inputStream = null;
-                try {
-                    //生成zip文件名 规则第一个文件名 + 等 + 压缩包总文件个数 + 个文件.zip,形如 1.txt等3个文件
-                    String zipFileName = PudgeUtil.urlEncode(StrBuilder.create(list.get(0).getFileName(), "等", Integer.toString(list.size()), "个文件.zip").toString());
-                    response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + zipFileName);
-                    response.setContentType("application/x-zip-compressed");
-                    outputStream = new ZipOutputStream(response.getOutputStream());
-                    SystemFileVo currentFileVo;
-                    for (int i = 0; i < list.size(); i++) {
-                        currentFileVo = list.get(i);
-                        //压缩包中的文件名
-                        outputStream.putNextEntry(new ZipEntry(currentFileVo.getFileName()));
-                        //写到
-                        inputStream = new FileInputStream(FileUtil.file(root, currentFileVo.getFilePath()));
-                        IoUtil.copy(inputStream, outputStream);
-                        IoUtil.close(inputStream);
-                        outputStream.closeEntry();
-                    }
-                } catch (IOException e) {
-                    logger.info("打包ZIP批量下载异常: [{}]", e.getLocalizedMessage());
-                } finally {
-                    IoUtil.close(inputStream);
-                    IoUtil.close(outputStream);
+            //无有效数据
+            if (CollectionUtil.isEmpty(list)) {
+                logger.info("无有效文件: [{}]", list);
+                throw new SystemCustomException(SystemCustomTipEnum.FILE_NOT_EXIST, ids);
+            }
+            //文件存储根路径
+            String root = systemConfigService.getValByCode(SystemConfigEnum.SYSTEM_FILE_ROOT_PATH);
+            ZipOutputStream outputStream = null;
+            InputStream inputStream = null;
+            try {
+                //筛选出文件真实存在的数据
+                Optional<SystemFileVo> optionalSystemFileVo = list.stream().map(v -> v.setFile(FileUtil.file(root, v.getFilePath()))).filter(f -> !FileUtil.exist(f.getFile())).findFirst();
+                if (optionalSystemFileVo.isPresent()) {
+                    SystemFileVo errorFile = optionalSystemFileVo.get();
+                    logger.info("文件不存在: [{}]", errorFile.getId());
+                    throw new SystemCustomException(SystemCustomTipEnum.FILE_NOT_EXIST, errorFile.getFileName());
                 }
+                //生成zip文件名 规则第一个文件名 + 等 + 压缩包总文件个数 + 个文件.zip,形如 1.txt等3个文件
+                String zipFileName = PudgeUtil.urlEncode(StrBuilder.create(list.get(0).getFileName(), "等", Integer.toString(list.size()), "个文件.zip").toString());
+                response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + zipFileName);
+                response.setContentType("application/x-zip-compressed");
+                outputStream = new ZipOutputStream(response.getOutputStream());
+                SystemFileVo currentFileVo;
+                for (int i = 0; i < list.size(); i++) {
+                    currentFileVo = list.get(i);
+                    //压缩包中的文件名
+                    outputStream.putNextEntry(new ZipEntry(currentFileVo.getFileName()));
+                    //写到
+                    inputStream = new FileInputStream(currentFileVo.getFile());
+                    IoUtil.copy(inputStream, outputStream);
+                    IoUtil.close(inputStream);
+                    outputStream.closeEntry();
+                }
+            } catch (IOException e) {
+                logger.info("打包ZIP批量下载异常: [{}]", e.getLocalizedMessage());
+                throw new SystemCustomException(SystemCustomTipEnum.FILE_DOWNLOAD_ERROR);
+            } finally {
+                IoUtil.close(inputStream);
+                IoUtil.close(outputStream);
             }
         }
     }

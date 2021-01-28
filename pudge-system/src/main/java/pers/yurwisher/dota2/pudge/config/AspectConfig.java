@@ -7,10 +7,12 @@ import org.aspectj.lang.annotation.AfterThrowing;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
+import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import pers.yurwisher.dota2.pudge.annotation.AdminNotFilterByUserId;
 import pers.yurwisher.dota2.pudge.base.BasePageQo;
 import pers.yurwisher.dota2.pudge.enums.SystemCustomTipEnum;
 import pers.yurwisher.dota2.pudge.security.CurrentUser;
@@ -21,6 +23,8 @@ import pers.yurwisher.dota2.pudge.utils.PudgeUtil;
 import pers.yurwisher.dota2.pudge.utils.RequestHolder;
 
 import javax.servlet.http.HttpServletRequest;
+import java.lang.reflect.Method;
+import java.util.Map;
 
 
 /**
@@ -52,13 +56,25 @@ public class AspectConfig {
         if (qo != null) {
             //限制分页查询最大单页数量
             if (qo.getSize() > maxPageSize) {
-                logger.info("");
+                logger.info("分页查询超出最大单页数量");
                 throw new SystemCustomException(SystemCustomTipEnum.QUERY_PAGE_SIZE_OVER_MAX);
             }
             if (StrUtil.isEmpty(qo.getUsername())) {
+                MethodSignature signature = (MethodSignature) pjp.getSignature();
+                Method method = signature.getMethod();
+                AdminNotFilterByUserId annotation = method.getAnnotation(AdminNotFilterByUserId.class);
                 CurrentUser currentUser = JwtUser.current();
-                //admin 查看所有
-                if (!currentUser.isAdmin()) {
+                //是否按用户ID过滤
+                boolean filterByUserId ;
+                //配置了注解
+                if (annotation != null) {
+                    //不按用户ID过滤 需满足 AdminNotFilterByUserId 为true 且是 admin
+                    filterByUserId = !(annotation.value() && currentUser.isAdmin());
+                }else{
+                    //未配置注解则判断是否admin admin默认默认不按用户ID过滤数据
+                    filterByUserId = !currentUser.isAdmin();
+                }
+                if (filterByUserId) {
                     qo.setUsername(currentUser.getUsername());
                     qo.setUserId(currentUser.getId());
                 }
@@ -71,7 +87,8 @@ public class AspectConfig {
      * 日志切点
      */
     @Pointcut("@annotation(pers.yurwisher.dota2.pudge.annotation.Log)")
-    public void logPointcut() {}
+    public void logPointcut() {
+    }
 
     /**
      * 日志环绕增强
@@ -82,19 +99,34 @@ public class AspectConfig {
         CURRENT_TIME.set(System.currentTimeMillis());
         result = joinPoint.proceed();
         long timeCost = getTimeCost();
+        HttpServletRequest request = RequestHolder.currentRequest();
         //异步保存日志
-        systemLogService.saveLog(joinPoint, this.getUserClientInfo(), this.getUserId(), timeCost);
+        systemLogService.saveLog(joinPoint,
+                this.getUserClientInfo(request),
+                this.getUserId(),
+                timeCost,
+                this.getUrlParams(request),
+                this.getUrl(request)
+        );
         return result;
     }
 
     /**
-     * 配置异常通知
+     * 异常增强
      */
     @AfterThrowing(pointcut = "logPointcut()", throwing = "throwable")
     public void logAfterThrowing(JoinPoint joinPoint, Throwable throwable) {
         long timeCost = getTimeCost();
+        HttpServletRequest request = RequestHolder.currentRequest();
         //异步保存日志
-        systemLogService.saveErrorLog(joinPoint, this.getUserClientInfo(), this.getUserId(), timeCost, throwable.getLocalizedMessage());
+        systemLogService.saveErrorLog(joinPoint,
+                this.getUserClientInfo(request),
+                this.getUserId(),
+                timeCost,
+                throwable.getLocalizedMessage(),
+                this.getUrlParams(request),
+                this.getUrl(request)
+        );
     }
 
     private long getTimeCost() {
@@ -113,9 +145,33 @@ public class AspectConfig {
         return userId;
     }
 
-    private PudgeUtil.UserClientInfo getUserClientInfo() {
-        HttpServletRequest request = RequestHolder.currentRequest();
+    /**
+     * 获取客户请求客户端信息
+     *
+     * @param request 请求
+     * @return 客户端信息
+     */
+    private PudgeUtil.UserClientInfo getUserClientInfo(HttpServletRequest request) {
         return PudgeUtil.getUserClientInfo(request);
     }
 
+    /**
+     * 获取请求参数 只可在异步保存日志前调用,request已失效
+     *
+     * @param request 请求
+     * @return 请求参数, 即url上参数
+     */
+    private Map<String, String[]> getUrlParams(HttpServletRequest request) {
+        return request.getParameterMap();
+    }
+
+    /**
+     * 获取请求地址
+     *
+     * @param request 请求
+     * @return 请求地址
+     */
+    private String getUrl(HttpServletRequest request) {
+        return request.getRequestURI();
+    }
 }
