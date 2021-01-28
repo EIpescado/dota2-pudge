@@ -1,5 +1,6 @@
 package pers.yurwisher.dota2.pudge.system.service;
 
+import com.alibaba.fastjson.JSONObject;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import pers.yurwisher.dota2.pudge.base.BaseService;
@@ -10,8 +11,6 @@ import pers.yurwisher.dota2.pudge.system.pojo.to.UserSystemLogTo;
 import pers.yurwisher.dota2.pudge.system.pojo.vo.SystemLogVo;
 import pers.yurwisher.dota2.pudge.utils.PudgeUtil;
 import pers.yurwisher.dota2.pudge.wrapper.PageR;
-
-import java.util.Map;
 
 
 /**
@@ -59,7 +58,7 @@ public interface ISystemLogService extends BaseService<SystemLog> {
      * @param url   url
      * @throws Throwable 异常
      */
-    void saveLog(ProceedingJoinPoint joinPoint, PudgeUtil.UserClientInfo userClientInfo, Long userId, long timeCost, Map<String, String[]> parameterMap,String url) throws Throwable;
+    void saveLog(ProceedingJoinPoint joinPoint, PudgeUtil.UserClientInfo userClientInfo, Long userId, long timeCost, JSONObject parameterMap, String url) throws Throwable;
 
     /**
      * 保存异常日志
@@ -72,6 +71,6 @@ public interface ISystemLogService extends BaseService<SystemLog> {
      * @param parameterMap   url参数
      * @param url   url
      */
-    void saveErrorLog(JoinPoint joinPoint, PudgeUtil.UserClientInfo userClientInfo, Long userId, long timeCost, String errorInfo, Map<String, String[]> parameterMap,String url);
+    void saveErrorLog(JoinPoint joinPoint, PudgeUtil.UserClientInfo userClientInfo, Long userId, long timeCost, String errorInfo, JSONObject parameterMap, String url);
 
 }

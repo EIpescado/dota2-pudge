@@ -1,7 +1,7 @@
 package pers.yurwisher.dota2.pudge.utils;
 
 import cn.hutool.core.util.NumberUtil;
-import org.apache.commons.lang3.StringUtils;
+import cn.hutool.core.util.StrUtil;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
@@ -62,7 +62,7 @@ public class ChineseNumberUtils {
      * 中文转阿拉伯数字
      */
     private static BigDecimal chinese2Number(String text) {
-        if (StringUtils.isNotEmpty(text)) {
+        if (StrUtil.isNotEmpty(text)) {
             text = replaceAllChineseSpecialExpress(text);
             //亿级以上单独处理
             if (text.contains("亿")) {
@@ -86,7 +86,7 @@ public class ChineseNumberUtils {
     }
 
     private static BigDecimal textToBigDecimalOverYi(String text) {
-        if (StringUtils.isNotEmpty(text)) {
+        if (StrUtil.isNotEmpty(text)) {
             //当前单位在数组的索引值
             int nowUnitIndex;
             //拆分后的单个文本
@@ -98,7 +98,7 @@ public class ChineseNumberUtils {
             //拆出来后的剩余文本
             String nowText = text;
             BigDecimal value = BigDecimal.ZERO;
-            BigDecimal textToBigDecimalValue ;
+            BigDecimal textToBigDecimalValue;
             for (int i = 0, length = CN_UNIT_ARRAY.length; i < length; i++) {
                 nowUnitIndex = nowText.lastIndexOf(CN_UNIT_ARRAY[i]);
                 if (nowUnitIndex != -1) {
@@ -110,7 +110,7 @@ public class ChineseNumberUtils {
                 }
                 if (textValue != null) {
                     textToBigDecimalValue = textToBigDecimal(textValue);
-                    if(textToBigDecimalValue != null){
+                    if (textToBigDecimalValue != null) {
                         value = value.add(textToBigDecimalValue);
                     }
                 }
@@ -128,7 +128,7 @@ public class ChineseNumberUtils {
         //首字符是否为单位 十单独处理..
         boolean prefixIsUnit = !prefixIsTen && CN_UNIT_MAP.containsKey(prefix);
         //只有一个字符且只为单位返回null
-        if(oneUnitText.length() == 1 && prefixIsUnit){
+        if (oneUnitText.length() == 1 && prefixIsUnit) {
             return null;
         }
         //首字符为单位补1
@@ -146,7 +146,7 @@ public class ChineseNumberUtils {
             if (CN_NUMBER_MAP.containsKey(iChar)) {
                 beforeUnitValue = CN_NUMBER_MAP.get(iChar);
                 //最后数字可能不带单位 如 九千三
-                if (i == oneUnitText.length() - 1 && StringUtils.isNotEmpty(lastUnit)) {
+                if (i == oneUnitText.length() - 1 && StrUtil.isNotEmpty(lastUnit)) {
                     //加上最后一个单位 的 后一个单位与此数字的乘积
                     Integer indexForNow = findNowIndex(lastUnit);
                     if (indexForNow != null) {
@@ -210,7 +210,7 @@ public class ChineseNumberUtils {
         //文本builder
         StringBuilder textBuilder = new StringBuilder();
         //拆分文本 比如 吃饭一百五好贵啊 ,拆分成 吃饭 ,一百五,好贵啊
-        BigDecimal temp ;
+        BigDecimal temp;
         for (int i = 0, length = text.length(); i < length; i++) {
             String iChar = String.valueOf(text.charAt(i));
             boolean currentIsValueOrUnit = CN_NUMBER_MAP.containsKey(iChar) || CN_UNIT_MAP.containsKey(iChar);
@@ -229,9 +229,9 @@ public class ChineseNumberUtils {
                 //既不是值也不是单位
                 if (previousOneIsValueOrUnit) {
                     temp = chinese2Number(numberBuilder.toString());
-                    if(temp != null){
+                    if (temp != null) {
                         sb.append(temp);
-                    }else {
+                    } else {
                         sb.append(numberBuilder.toString());
                     }
                     numberBuilder.delete(0, numberBuilder.length());
@@ -245,9 +245,9 @@ public class ChineseNumberUtils {
         }
         if (numberBuilder.length() > 0) {
             temp = chinese2Number(numberBuilder.toString());
-            if(temp != null){
+            if (temp != null) {
                 sb.append(temp);
-            }else {
+            } else {
                 sb.append(numberBuilder.toString());
             }
         }

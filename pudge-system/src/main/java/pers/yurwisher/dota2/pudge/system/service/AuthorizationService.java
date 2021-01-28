@@ -55,7 +55,7 @@ public class AuthorizationService {
         loginRsa = SecureUtil.rsa(loginProperties.getPasswordPrivateKey(), null);
     }
 
-    public R login(UserLoginForm form, HttpServletRequest request) {
+    public R<Map<String, Object>> login(UserLoginForm form, HttpServletRequest request) {
         //校验验证码
         this.verifyCode(form.getUuid(), form.getCode());
         // 密码解密
@@ -103,7 +103,7 @@ public class AuthorizationService {
         });
     }
 
-    public R getCode() {
+    public R<Map<String, Object>> getCode() {
         String uuid = IdUtil.simpleUUID();
         Captcha captcha = loginProperties.switchCaptcha();
         customRedisCacheService.setCachePlus(CacheConstant.MaName.LOGIN_CODE, uuid, () -> {
@@ -126,7 +126,7 @@ public class AuthorizationService {
         return R.ok(imgResult);
     }
 
-    public R info() {
+    public R<CurrentUser> info() {
         return R.ok(back2Front(JwtUser.current()));
     }
 
@@ -138,7 +138,7 @@ public class AuthorizationService {
         return currentUserWithPassword;
     }
 
-    public R logout(HttpServletRequest request) {
+    public R<String> logout(HttpServletRequest request) {
         String token = tokenProvider.getToken(request);
         if (StrUtil.isNotBlank(token)) {
             String subject = tokenProvider.getSubjectFromToken(token);

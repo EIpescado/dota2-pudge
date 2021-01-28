@@ -3,8 +3,6 @@ package pers.yurwisher.dota2.pudge.system.service.impl;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.text.StrBuilder;
 import cn.hutool.core.util.StrUtil;
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -27,7 +25,6 @@ import pers.yurwisher.dota2.pudge.wrapper.PageR;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
-import java.util.Map;
 
 /**
  * @author yq
@@ -58,18 +55,18 @@ public class SystemLogServiceImpl extends BaseServiceImpl<SystemLogMapper, Syste
     @Override
     @Transactional(rollbackFor = Exception.class)
     @Async
-    public void saveLog(ProceedingJoinPoint joinPoint, PudgeUtil.UserClientInfo userClientInfo, Long userId, long timeCost, Map<String, String[]> parameterMap,String url) throws Throwable {
-        this.saveLog(joinPoint, userClientInfo, userId, timeCost, 1, null, parameterMap,url);
+    public void saveLog(ProceedingJoinPoint joinPoint, PudgeUtil.UserClientInfo userClientInfo, Long userId, long timeCost, JSONObject parameterMap, String url) throws Throwable {
+        this.saveLog(joinPoint, userClientInfo, userId, timeCost, 1, null, parameterMap, url);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     @Async
-    public void saveErrorLog(JoinPoint joinPoint, PudgeUtil.UserClientInfo userClientInfo, Long userId, long timeCost, String errorInfo, Map<String, String[]> parameterMap,String url) {
-        this.saveLog(joinPoint, userClientInfo, userId, timeCost, 2, errorInfo, parameterMap,url);
+    public void saveErrorLog(JoinPoint joinPoint, PudgeUtil.UserClientInfo userClientInfo, Long userId, long timeCost, String errorInfo, JSONObject parameterMap, String url) {
+        this.saveLog(joinPoint, userClientInfo, userId, timeCost, 2, errorInfo, parameterMap, url);
     }
 
-    public void saveLog(JoinPoint joinPoint, PudgeUtil.UserClientInfo userClientInfo, Long userId, long timeCost, Integer type, String errorInfo, Map<String, String[]> parameterMap,String url) {
+    public void saveLog(JoinPoint joinPoint, PudgeUtil.UserClientInfo userClientInfo, Long userId, long timeCost, Integer type, String errorInfo, JSONObject parameterMap, String url) {
         SystemLog log = new SystemLog();
         log.setTimeCost(timeCost);
         log.setUserId(userId);
@@ -89,7 +86,7 @@ public class SystemLogServiceImpl extends BaseServiceImpl<SystemLogMapper, Syste
         log.setMethod(methodName);
 
         //参数
-        log.setParams(this.buildRequestParams(parameterMap,method,joinPoint.getArgs()));
+        log.setParams(this.buildRequestParams(parameterMap, method, joinPoint.getArgs()));
         //日志类型
         log.setType(type);
         log.setErrorInfo(errorInfo);
@@ -103,20 +100,17 @@ public class SystemLogServiceImpl extends BaseServiceImpl<SystemLogMapper, Syste
      * @param parameterMap requestParam 参数
      * @return 参数
      */
-    private String buildRequestParams(Map<String, String[]> parameterMap, Method method, Object[] args){
-        Object requestBody = this.getRequestBody(method,args);
-        if(CollectionUtil.isEmpty(parameterMap) && requestBody == null){
+    private String buildRequestParams(JSONObject parameterMap, Method method, Object[] args) {
+        Object requestBody = this.getRequestBody(method, args);
+        if (CollectionUtil.isEmpty(parameterMap) && requestBody == null) {
             return null;
         }
         JSONObject params = new JSONObject();
         if (requestBody != null) {
-            params.put("requestBody",requestBody);
+            params.put("requestBody", requestBody);
         }
         if (CollectionUtil.isNotEmpty(parameterMap)) {
-            JSONObject requestParams = new JSONObject();
-            //修改为 key: value,即取string[]数组的第一个值
-            parameterMap.forEach((k,v) -> requestParams.put(k,v != null && v.length > 0 ? v[0] : null));
-            params.put("requestParams",requestParams);
+            params.put("requestParams", parameterMap);
         }
         return params.toJSONString();
     }

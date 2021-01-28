@@ -1,6 +1,10 @@
 package pers.yurwisher.dota2.pudge.config;
 
+import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.AfterThrowing;
@@ -161,8 +165,16 @@ public class AspectConfig {
      * @param request 请求
      * @return 请求参数, 即url上参数
      */
-    private Map<String, String[]> getUrlParams(HttpServletRequest request) {
-        return request.getParameterMap();
+    private JSONObject getUrlParams(HttpServletRequest request) {
+        // fix 异步可能导致request 已失效获取不到参数
+        Map<String, String[]> parameterMap = request.getParameterMap();
+        if (CollectionUtil.isNotEmpty(parameterMap)) {
+            JSONObject requestParams = new JSONObject();
+            //修改为 key: value,即取string[]数组的第一个值
+            parameterMap.forEach((k,v) -> requestParams.put(k,v != null && v.length > 0 ? v[0] : null));
+            return requestParams;
+        }
+        return null;
     }
 
     /**
