@@ -5,7 +5,7 @@
         SELECT
         s.id,s.action, s.date_created, s.ip, s.address, s.user_id,
         s.method, s.time_cost, s.type, s.system,browser,
-        u.nickname
+        u.nickname,s.url
         FROM system_log s
         LEFT JOIN system_user u ON u.id = s.user_id
         <where>
