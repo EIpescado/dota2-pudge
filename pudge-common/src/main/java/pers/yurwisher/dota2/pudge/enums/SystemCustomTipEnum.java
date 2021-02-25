@@ -36,6 +36,8 @@ public enum SystemCustomTipEnum implements ICustomTipEnum {
     FILE_UPLOAD_ERROR(10021,"上传文件失败"),
     FILE_NOT_EXIST(10022,"%s 不存在"),
     FILE_DOWNLOAD_ERROR(10022,"文件下载失败,稍后重试"),
+    IMPORT_DATA_ERROR(10022,"第[%s]行[%s]列导入异常: %s"),
+    IMPORT_DATA_ERROR_FOR_ROW(10022,"第[%s]行导入数据异常"),
     ;
 
     private CustomTip tip;

@@ -1,5 +1,6 @@
 package pers.yurwisher.dota2.pudge.system.service;
 
+import org.springframework.web.multipart.MultipartFile;
 import pers.yurwisher.dota2.pudge.system.entity.SystemDict;
 import pers.yurwisher.dota2.pudge.base.BaseService;
 import pers.yurwisher.dota2.pudge.system.pojo.fo.SystemDictFo;
@@ -73,4 +74,11 @@ public interface ISystemDictService extends BaseService<SystemDict> {
      * @return 描述
      */
     String getNameByTypeAndVal(String dictType,String val);
+
+    /**
+     * 导入字典
+     * @param file 模版文件
+     */
+    void importDict(MultipartFile file);
+
 }

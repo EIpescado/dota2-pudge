@@ -2,6 +2,7 @@ package pers.yurwisher.dota2.pudge.exception;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
+import com.alibaba.excel.exception.ExcelAnalysisException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.NestedRuntimeException;
@@ -103,6 +104,19 @@ public class GlobalDefaultExceptionHandler {
     @ExceptionHandler(BadCredentialsException.class)
     public R<String> noHandlerFoundExceptionHandle(BadCredentialsException e) {
         return R.fail(SystemCustomTipEnum.AUTH_USERNAME_OR_PASSWORD_ERROR);
+    }
+
+    /**
+     * EasyExcel解析异常
+     */
+    @ExceptionHandler(ExcelAnalysisException.class)
+    public R<String> excelAnalysisExceptionHandle(ExcelAnalysisException e) {
+        Throwable throwable =  e.getCause();
+        if(throwable instanceof ExcelDataCustomException){
+            ExcelDataCustomException exception = (ExcelDataCustomException) throwable;
+            return R.fail(exception.tip());
+        }
+        return R.fail(CustomTipEnum.FAIL);
     }
 
     /**

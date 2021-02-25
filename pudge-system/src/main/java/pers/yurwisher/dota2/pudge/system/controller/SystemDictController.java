@@ -8,8 +8,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import pers.yurwisher.dota2.pudge.annotation.Log;
 import pers.yurwisher.dota2.pudge.base.BaseController;
+import pers.yurwisher.dota2.pudge.system.pojo.SystemFileUploadBack;
 import pers.yurwisher.dota2.pudge.system.pojo.fo.SystemDictFo;
 import pers.yurwisher.dota2.pudge.system.pojo.qo.SystemDictQo;
 import pers.yurwisher.dota2.pudge.system.pojo.to.SystemDictTo;
@@ -19,6 +21,7 @@ import pers.yurwisher.dota2.pudge.wrapper.PageR;
 import pers.yurwisher.dota2.pudge.wrapper.R;
 import pers.yurwisher.dota2.pudge.wrapper.Selector;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 /**
@@ -70,4 +73,12 @@ public class SystemDictController extends BaseController {
     public R<List<Selector<String>>> select(@RequestParam String dictType) {
         return R.ok(systemDictService.select(dictType));
     }
+
+    @PostMapping("import")
+    @Log("导入字典")
+    public R<String> importDict(@RequestParam("file") MultipartFile file) {
+        systemDictService.importDict(file);
+        return R.ok();
+    }
+
 }

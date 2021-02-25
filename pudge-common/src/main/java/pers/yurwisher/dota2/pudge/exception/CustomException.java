@@ -23,16 +23,16 @@ public class CustomException extends RuntimeException {
         this.tip = customTip;
     }
 
-    public CustomException(CustomTip customTip, Object...args) {
-        this(CustomTip.of(customTip.getCode(),String.format(customTip.getMsg(),args)));
+    public CustomException(CustomTip customTip, Object... args) {
+        this(CustomTip.of(customTip.getCode(), String.format(customTip.getMsg(), args)));
     }
 
-    public CustomException(ICustomTipEnum customTipEnum){
+    public CustomException(ICustomTipEnum customTipEnum) {
         this(customTipEnum.tip());
     }
 
-    public CustomException(ICustomTipEnum customTipEnum, Object...args){
-        this(customTipEnum.tip(),args);
+    public CustomException(ICustomTipEnum customTipEnum, Object... args) {
+        this(customTipEnum.tip(), args);
     }
 
     public CustomTip getTip() {
