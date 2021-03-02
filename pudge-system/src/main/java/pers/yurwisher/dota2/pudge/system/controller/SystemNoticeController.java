@@ -1,5 +1,6 @@
 package pers.yurwisher.dota2.pudge.system.controller;
 
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,14 +34,14 @@ public class SystemNoticeController extends BaseController {
     }
 
     @PostMapping
-    public R<String> create(@RequestBody SystemNoticeFo fo) {
+    public R<String> create(@RequestBody @Validated SystemNoticeFo fo) {
         systemNoticeService.create(fo);
         return R.ok();
     }
 
     @PostMapping("{id}")
     @Log("修改公告")
-    public R<String> update(@PathVariable(name = "id") Long id, @RequestBody SystemNoticeFo fo) {
+    public R<String> update(@PathVariable(name = "id") Long id, @RequestBody @Validated SystemNoticeFo fo) {
         systemNoticeService.update(id, fo);
         return R.ok();
     }

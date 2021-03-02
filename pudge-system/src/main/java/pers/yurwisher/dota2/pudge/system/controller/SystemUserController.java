@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import pers.yurwisher.dota2.pudge.annotation.AdminNotFilterByUserId;
 import pers.yurwisher.dota2.pudge.annotation.Log;
 import pers.yurwisher.dota2.pudge.system.pojo.fo.ChangeAccountInfoFo;
 import pers.yurwisher.dota2.pudge.system.pojo.fo.ChangeMailFo;
@@ -134,6 +135,7 @@ public class SystemUserController {
     }
 
     @GetMapping("log")
+    @AdminNotFilterByUserId(false)
     public R<PageR<UserSystemLogTo>> log(@ModelAttribute SystemLogQo qo) {
         return R.ok(systemLogService.userLogList(qo));
     }
